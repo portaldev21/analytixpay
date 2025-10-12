@@ -1,0 +1,173 @@
+'use server'
+
+import { revalidatePath } from 'next/cache'
+import { createClient, getCurrentUser, hasAccessToAccount } from '@/lib/supabase/server'
+import { parsePdfFile } from '@/lib/pdf/parser'
+import type { TApiResponse, TInvoice, TInvoiceWithTransactions } from '@/db/types'
+
+/**
+ * Upload and process invoice PDF
+ */
+export async function uploadInvoice(
+  formData: FormData
+): Promise<TApiResponse<{ invoice: TInvoice; transactionsCount: number }>> {
+  try {
+    const supabase = await createClient()
+    const user = await getCurrentUser()
+
+    if (!user) {
+      return { data: null, error: 'Usuário não autenticado', success: false }
+    }
+
+    const file = formData.get('file') as File
+    const accountId = formData.get('accountId') as string
+
+    if (!file || !accountId) {
+      return { data: null, error: 'Arquivo e conta são obrigatórios', success: false }
+    }
+
+    // Check access
+    if (!(await hasAccessToAccount(accountId))) {
+      return { data: null, error: 'Acesso negado', success: false }
+    }
+
+    // Upload file to Supabase Storage
+    const fileExt = file.name.split('.').pop()
+    const fileName = `${Date.now()}.${fileExt}`
+    const filePath = `${accountId}/${fileName}`
+
+    const { error: uploadError } = await supabase.storage
+      .from('invoices')
+      .upload(filePath, file)
+
+    if (uploadError) {
+      return { data: null, error: uploadError.message, success: false }
+    }
+
+    const { data: { publicUrl } } = supabase.storage.from('invoices').getPublicUrl(filePath)
+
+    // Parse PDF
+    const buffer = await file.arrayBuffer()
+    const parseResult = await parsePdfFile(buffer)
+
+    if (parseResult.error || !parseResult.transactions.length) {
+      await supabase.storage.from('invoices').remove([filePath])
+      return { data: null, error: parseResult.error || 'Nenhuma transação encontrada', success: false }
+    }
+
+    // Create invoice
+    const { data: invoice, error: invoiceError } = await supabase
+      .from('invoices')
+      .insert({
+        account_id: accountId,
+        user_id: user.id,
+        file_url: publicUrl,
+        file_name: file.name,
+        period: parseResult.period,
+        card_last_digits: parseResult.cardLastDigits,
+        total_amount: parseResult.totalAmount,
+        status: 'completed',
+      })
+      .select()
+      .single()
+
+    if (invoiceError || !invoice) {
+      await supabase.storage.from('invoices').remove([filePath])
+      return { data: null, error: invoiceError?.message || 'Erro ao criar fatura', success: false }
+    }
+
+    // Insert transactions
+    const transactions = parseResult.transactions.map(t => ({
+      invoice_id: invoice.id,
+      account_id: accountId,
+      ...t,
+    }))
+
+    const { error: transError } = await supabase.from('transactions').insert(transactions)
+
+    if (transError) {
+      return { data: null, error: transError.message, success: false }
+    }
+
+    revalidatePath('/invoices')
+    revalidatePath('/transactions')
+    revalidatePath('/dashboard')
+
+    return {
+      data: { invoice, transactionsCount: transactions.length },
+      error: null,
+      success: true,
+    }
+  } catch (error) {
+    return {
+      data: null,
+      error: error instanceof Error ? error.message : 'Erro ao processar fatura',
+      success: false,
+    }
+  }
+}
+
+/**
+ * Get invoices for account
+ */
+export async function getInvoices(accountId: string): Promise<TApiResponse<TInvoice[]>> {
+  try {
+    const supabase = await createClient()
+
+    if (!(await hasAccessToAccount(accountId))) {
+      return { data: null, error: 'Acesso negado', success: false }
+    }
+
+    const { data, error } = await supabase
+      .from('invoices')
+      .select('*')
+      .eq('account_id', accountId)
+      .order('created_at', { ascending: false })
+
+    if (error) {
+      return { data: null, error: error.message, success: false }
+    }
+
+    return { data: data || [], error: null, success: true }
+  } catch (error) {
+    return {
+      data: null,
+      error: error instanceof Error ? error.message : 'Erro ao buscar faturas',
+      success: false,
+    }
+  }
+}
+
+/**
+ * Delete invoice
+ */
+export async function deleteInvoice(invoiceId: string): Promise<TApiResponse<{ success: true }>> {
+  try {
+    const supabase = await createClient()
+    const user = await getCurrentUser()
+
+    if (!user) {
+      return { data: null, error: 'Usuário não autenticado', success: false }
+    }
+
+    const { error } = await supabase
+      .from('invoices')
+      .delete()
+      .eq('id', invoiceId)
+
+    if (error) {
+      return { data: null, error: error.message, success: false }
+    }
+
+    revalidatePath('/invoices')
+    revalidatePath('/dashboard')
+
+    return { data: { success: true }, error: null, success: true }
+  } catch (error) {
+    return {
+      data: null,
+      error: error instanceof Error ? error.message : 'Erro ao deletar fatura',
+      success: false,
+    }
+  }
+}
