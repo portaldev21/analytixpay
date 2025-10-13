@@ -293,7 +293,7 @@ INSERT INTO categories (name, icon, color, keywords) VALUES
   ('Beleza', 'Sparkles', '#f97316', ARRAY['salão', 'cabeleireiro', 'manicure', 'spa', 'cosméticos', 'perfume', 'maquiagem']),
   ('Tecnologia', 'Laptop', '#6366f1', ARRAY['eletrônico', 'computador', 'celular', 'smartphone', 'notebook', 'tablet', 'acessório tech']),
   ('Serviços', 'Wrench', '#64748b', ARRAY['manutenção', 'conserto', 'reparo', 'serviço', 'assinatura', 'mensalidade']),
-  ('Outros', 'MoreHorizontal', '#94a3b8', ARRAY[]);
+  ('Outros', 'MoreHorizontal', '#94a3b8', ARRAY[]::text[]);
 
 -- =====================================================
 -- STORAGE BUCKET (Execute in Supabase Dashboard > Storage)

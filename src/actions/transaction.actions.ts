@@ -61,7 +61,71 @@ export async function getTransactions(
 }
 
 /**
- * Get dashboard stats
+ * Get transaction stats for dashboard
+ */
+export async function getTransactionStats(accountId: string): Promise<TApiResponse<{
+  totalSpent: number
+  averageTransaction: number
+  transactionCount: number
+  categoryBreakdown: { category: string; total: number; count: number; percentage: number }[]
+}>> {
+  try {
+    const supabase = await createClient()
+
+    if (!(await hasAccessToAccount(accountId))) {
+      return { data: null, error: 'Acesso negado', success: false }
+    }
+
+    const { data: transactions, error } = await supabase
+      .from('transactions')
+      .select('*')
+      .eq('account_id', accountId)
+
+    if (error) {
+      return { data: null, error: error.message, success: false }
+    }
+
+    const totalSpent = transactions.reduce((sum, t) => sum + Number(t.amount), 0)
+    const averageTransaction = transactions.length > 0 ? totalSpent / transactions.length : 0
+
+    // Category breakdown
+    const categoryMap = new Map<string, { total: number; count: number }>()
+    transactions.forEach(t => {
+      const existing = categoryMap.get(t.category) || { total: 0, count: 0 }
+      categoryMap.set(t.category, {
+        total: existing.total + Number(t.amount),
+        count: existing.count + 1,
+      })
+    })
+
+    const categoryBreakdown = Array.from(categoryMap.entries()).map(([category, stats]) => ({
+      category,
+      total: stats.total,
+      count: stats.count,
+      percentage: totalSpent > 0 ? (stats.total / totalSpent) * 100 : 0,
+    }))
+
+    return {
+      data: {
+        totalSpent,
+        averageTransaction,
+        transactionCount: transactions.length,
+        categoryBreakdown,
+      },
+      error: null,
+      success: true,
+    }
+  } catch (error) {
+    return {
+      data: null,
+      error: error instanceof Error ? error.message : 'Erro ao buscar estatísticas',
+      success: false,
+    }
+  }
+}
+
+/**
+ * Get dashboard stats (complete)
  */
 export async function getDashboardStats(accountId: string): Promise<TApiResponse<TDashboardStats>> {
   try {
