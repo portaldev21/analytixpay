@@ -109,7 +109,11 @@ CREATE POLICY "Users can view their own accounts"
   ON accounts FOR SELECT
   USING (
     owner_id = auth.uid() OR
-    id IN (SELECT account_id FROM account_members WHERE user_id = auth.uid())
+    EXISTS (
+      SELECT 1 FROM account_members
+      WHERE account_members.account_id = accounts.id
+      AND account_members.user_id = auth.uid()
+    )
   );
 
 CREATE POLICY "Users can create accounts"
@@ -125,11 +129,13 @@ CREATE POLICY "Only owners can delete their accounts"
   USING (owner_id = auth.uid());
 
 -- Account Members Policies
+-- Fixed: No recursive subquery, uses direct user_id check
 CREATE POLICY "Members can view their account members"
   ON account_members FOR SELECT
   USING (
+    user_id = auth.uid() OR
     account_id IN (
-      SELECT account_id FROM account_members WHERE user_id = auth.uid()
+      SELECT id FROM accounts WHERE owner_id = auth.uid()
     )
   );
 

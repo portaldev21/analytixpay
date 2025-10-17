@@ -199,6 +199,11 @@ Acesse: http://localhost:3000
 - **Causa**: Políticas de Storage não configuradas
 - **Solução**: Volte ao passo 4
 
+### Botão Google fica "Conectando..." e dá erro
+- **Causa**: Google OAuth não está configurado no Supabase
+- **Solução**: Veja [GOOGLE_OAUTH_SETUP.md](GOOGLE_OAUTH_SETUP.md) para configurar (10 min)
+- **Alternativa**: Use login com Email/Senha (funciona 100%)
+
 ### PDF não processa transações
 - **Causa**: Formato do PDF não suportado
 - **Solução**: O parser suporta formatos brasileiros padrão
@@ -255,7 +260,7 @@ Acesse: http://localhost:3000
 - UI responsiva
 
 ### 🚧 Para Implementar (Futuro):
-- Google OAuth (backend pronto, falta frontend)
+- Google OAuth (backend pronto, precisa config - veja [GOOGLE_OAUTH_SETUP.md](GOOGLE_OAUTH_SETUP.md))
 - Edição de transações
 - Filtros avançados
 - Gráficos (Recharts já instalado)
@@ -310,6 +315,7 @@ Acesse: http://localhost:3000
 - [QUICKSTART.md](QUICKSTART.md) - Setup rápido
 - [DEPLOYMENT.md](DEPLOYMENT.md) - Deploy em produção
 - [PENDING_SETUP.md](PENDING_SETUP.md) - Configurações pendentes
+- [GOOGLE_OAUTH_SETUP.md](GOOGLE_OAUTH_SETUP.md) - Setup Google OAuth (10 min)
 
 ### Links Úteis:
 - **Supabase Dashboard**: https://supabase.com/dashboard/project/qzczyicspbizosjogmlq

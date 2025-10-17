@@ -69,8 +69,8 @@ export function CreateAccountForm() {
           )}
 
           {success && (
-            <div className="rounded-md bg-green-50 dark:bg-green-950/20 p-3 text-sm text-green-800 dark:text-green-200">
-              Conta criada com sucesso!
+            <div className="rounded-md bg-green-500/10 border border-green-500/20 p-3 text-sm text-green-700 dark:text-green-400 font-medium">
+              ✓ Conta criada com sucesso!
             </div>
           )}
 

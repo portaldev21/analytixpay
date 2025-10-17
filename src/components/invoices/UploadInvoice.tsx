@@ -101,23 +101,23 @@ export function UploadInvoice({ accountId }: UploadInvoiceProps) {
       {status !== "idle" && (
         <Card
           className={cn(
-            "p-4",
-            status === "success" && "bg-green-50 dark:bg-green-950/20 border-green-200",
-            status === "error" && "bg-red-50 dark:bg-red-950/20 border-red-200"
+            "p-4 border-2",
+            status === "success" && "bg-green-500/10 border-green-500/30",
+            status === "error" && "bg-red-500/10 border-red-500/30"
           )}
         >
           <div className="flex items-start gap-3">
             {status === "success" ? (
-              <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
+              <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />
             ) : (
-              <XCircle className="h-5 w-5 text-red-600 mt-0.5" />
+              <XCircle className="h-5 w-5 text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0" />
             )}
             <div className="flex-1">
               <p
                 className={cn(
                   "text-sm font-medium",
-                  status === "success" && "text-green-900 dark:text-green-100",
-                  status === "error" && "text-red-900 dark:text-red-100"
+                  status === "success" && "text-green-700 dark:text-green-300",
+                  status === "error" && "text-red-700 dark:text-red-300"
                 )}
               >
                 {message}
