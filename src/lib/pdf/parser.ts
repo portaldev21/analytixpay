@@ -195,7 +195,7 @@ export function calculateTotalAmount(transactions: TParsedTransaction[]): number
 export async function parsePdfFile(file: ArrayBuffer): Promise<TPdfParseResult> {
   try {
     // Dynamic import to avoid bundling issues
-    const pdfParse = (await import('pdf-parse/lib/pdf-parse.js')).default
+    const pdfParse = (await import('pdf-parse')).default
 
     const data = await pdfParse(Buffer.from(file))
     const text = data.text

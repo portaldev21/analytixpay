@@ -26,16 +26,16 @@ export async function getUserAccounts(): Promise<TApiResponse<TAccount[]>> {
       .select('account_id, accounts(*)')
       .eq('user_id', user.id)
 
-    if (error) {
+    if (error || !members) {
       return {
         data: null,
-        error: error.message,
+        error: error?.message || 'Erro ao buscar contas',
         success: false,
       }
     }
 
     const accounts = members
-      .map(m => m.accounts)
+      .map((m: any) => m.accounts)
       .filter(Boolean) as TAccount[]
 
     return {
@@ -119,8 +119,8 @@ export async function getAccountWithMembers(
       .eq('account_id', accountId)
 
     const result: TAccountWithMembers = {
-      ...account,
-      members: account.members || [],
+      ...(account as any),
+      members: (account as any).members || [],
       _count: {
         members: membersCount || 0,
         invoices: invoicesCount || 0,

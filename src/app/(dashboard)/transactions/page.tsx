@@ -1,13 +1,13 @@
 import { Suspense } from "react"
 import { CreditCard } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
-import { listTransactions } from "@/actions/transaction.actions"
+import { getTransactions } from "@/actions/transaction.actions"
 import { TransactionsTable } from "@/components/transactions/TransactionsTable"
 import { EmptyState } from "@/components/shared/EmptyState"
 import { Loading } from "@/components/shared/Loading"
 
 async function TransactionsList({ accountId }: { accountId: string }) {
-  const result = await listTransactions(accountId, {})
+  const result = await getTransactions(accountId, {})
 
   if (!result.success || !result.data) {
     return (
