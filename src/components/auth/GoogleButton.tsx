@@ -9,9 +9,21 @@ export function GoogleButton() {
   const [isLoading, setIsLoading] = useState(false)
 
   const handleGoogleLogin = async () => {
-    setIsLoading(true)
-    await loginWithGoogle()
-    // O redirect é feito pelo Supabase, não precisamos desativar loading
+    try {
+      setIsLoading(true)
+      const result = await loginWithGoogle()
+
+      if (result.success && result.data?.url) {
+        // Redirecionar para a URL de autenticação do Google
+        window.location.href = result.data.url
+      } else {
+        console.error('Erro ao iniciar login com Google:', result.error)
+        setIsLoading(false)
+      }
+    } catch (error) {
+      console.error('Erro ao fazer login com Google:', error)
+      setIsLoading(false)
+    }
   }
 
   return (
