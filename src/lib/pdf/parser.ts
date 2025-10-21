@@ -190,21 +190,36 @@ export function calculateTotalAmount(transactions: TParsedTransaction[]): number
 
 /**
  * Main parser function - to be used in Server Actions
- * Note: pdf-parse must be imported dynamically in Server Actions due to Node.js dependencies
+ * Uses pdf2json library with zero dependencies
  */
 export async function parsePdfFile(file: ArrayBuffer): Promise<TPdfParseResult> {
-  let parser: any = null
-
   try {
-    // Dynamic import - Use Node.js bundle (no worker required)
-    const { PDFParse } = await import('pdf-parse/node')
+    // Dynamic import - pdf2json has zero dependencies
+    const { PDFParser } = await import('pdf2json')
 
-    // Create parser instance with buffer
-    parser = new PDFParse({ data: Buffer.from(file) })
+    // Create parser instance
+    const pdfParser = new PDFParser(null, true)
 
-    // Extract text from PDF
-    const result = await parser.getText()
-    const text = result.text
+    // Parse PDF using promise wrapper
+    const text = await new Promise<string>((resolve, reject) => {
+      // Handle parsing completion
+      pdfParser.on('pdfParser_dataReady', () => {
+        try {
+          const rawText = pdfParser.getRawTextContent()
+          resolve(rawText)
+        } catch (err) {
+          reject(err)
+        }
+      })
+
+      // Handle parsing errors
+      pdfParser.on('pdfParser_dataError', (errData: any) => {
+        reject(errData.parserError || new Error('PDF parsing failed'))
+      })
+
+      // Start parsing
+      pdfParser.parseBuffer(Buffer.from(file))
+    })
 
     if (!text || text.length < 50) {
       return {
@@ -226,6 +241,9 @@ export async function parsePdfFile(file: ArrayBuffer): Promise<TPdfParseResult> 
     const cardLastDigits = extractCardLastDigits(text)
     const totalAmount = calculateTotalAmount(transactions)
 
+    // Clean up resources
+    pdfParser.destroy()
+
     return {
       transactions,
       period,
@@ -237,15 +255,6 @@ export async function parsePdfFile(file: ArrayBuffer): Promise<TPdfParseResult> 
     return {
       transactions: [],
       error: `Erro ao processar PDF: ${error instanceof Error ? error.message : 'Erro desconhecido'}`
-    }
-  } finally {
-    // Clean up parser resources
-    if (parser) {
-      try {
-        await parser.destroy()
-      } catch (cleanupError) {
-        console.error('Error cleaning up PDF parser:', cleanupError)
-      }
     }
   }
 }
