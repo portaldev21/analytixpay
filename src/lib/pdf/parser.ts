@@ -193,12 +193,18 @@ export function calculateTotalAmount(transactions: TParsedTransaction[]): number
  * Note: pdf-parse must be imported dynamically in Server Actions due to Node.js dependencies
  */
 export async function parsePdfFile(file: ArrayBuffer): Promise<TPdfParseResult> {
-  try {
-    // Dynamic import - CommonJS module
-    const pdfParse = require('pdf-parse').default || require('pdf-parse')
+  let parser: any = null
 
-    const data = await pdfParse(Buffer.from(file))
-    const text = data.text
+  try {
+    // Dynamic import - PDFParse is a class (v2 API)
+    const { PDFParse } = await import('pdf-parse')
+
+    // Create parser instance with buffer
+    parser = new PDFParse({ data: Buffer.from(file) })
+
+    // Extract text from PDF
+    const result = await parser.getText()
+    const text = result.text
 
     if (!text || text.length < 50) {
       return {
@@ -231,6 +237,15 @@ export async function parsePdfFile(file: ArrayBuffer): Promise<TPdfParseResult> 
     return {
       transactions: [],
       error: `Erro ao processar PDF: ${error instanceof Error ? error.message : 'Erro desconhecido'}`
+    }
+  } finally {
+    // Clean up parser resources
+    if (parser) {
+      try {
+        await parser.destroy()
+      } catch (cleanupError) {
+        console.error('Error cleaning up PDF parser:', cleanupError)
+      }
     }
   }
 }
