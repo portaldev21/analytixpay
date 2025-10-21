@@ -46,9 +46,13 @@ export async function uploadInvoice(
 
     const { data: { publicUrl } } = supabase.storage.from('invoices').getPublicUrl(filePath)
 
-    // Parse PDF
+    // Parse PDF with AI (with regex fallback)
     const buffer = await file.arrayBuffer()
-    const parseResult = await parsePdfFile(buffer)
+    const parseResult = await parsePdfFile(buffer, {
+      useAI: true,
+      fallbackToRegex: true,
+      debug: false
+    })
 
     if (parseResult.error || !parseResult.transactions.length) {
       await supabase.storage.from('invoices').remove([filePath])

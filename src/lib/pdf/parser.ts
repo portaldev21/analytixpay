@@ -18,6 +18,42 @@ const CATEGORY_KEYWORDS: Record<string, string[]> = {
 }
 
 /**
+ * Convert Brazilian month names to numbers
+ */
+const MONTH_MAP: Record<string, string> = {
+  'jan': '01', 'janeiro': '01',
+  'fev': '02', 'fevereiro': '02',
+  'mar': '03', 'março': '03',
+  'abr': '04', 'abril': '04',
+  'mai': '05', 'maio': '05',
+  'jun': '06', 'junho': '06',
+  'jul': '07', 'julho': '07',
+  'ago': '08', 'agosto': '08',
+  'set': '09', 'setembro': '09',
+  'out': '10', 'outubro': '10',
+  'nov': '11', 'novembro': '11',
+  'dez': '12', 'dezembro': '12',
+}
+
+/**
+ * Convert date formats like "29 de nov. 2024" to ISO format
+ */
+function convertBrazilianDate(dateStr: string): string | null {
+  // Pattern: DD de MES. YYYY or DD de MES YYYY
+  const match = dateStr.match(/(\d{1,2})\s+de\s+([a-z]+)\.?\s+(\d{4})/i)
+  if (!match) return null
+
+  const day = match[1].padStart(2, '0')
+  const monthName = match[2].toLowerCase().replace('.', '')
+  const year = match[3]
+
+  const month = MONTH_MAP[monthName]
+  if (!month) return null
+
+  return `${year}-${month}-${day}`
+}
+
+/**
  * Detect category based on description
  */
 function detectCategory(description: string): string {
@@ -38,17 +74,29 @@ function detectCategory(description: string): string {
  * Extract transactions from PDF text
  * This is a simplified parser that works with common Brazilian credit card invoice formats
  */
-export function parseTransactionsFromText(text: string): TParsedTransaction[] {
+export function parseTransactionsFromText(text: string, debug = false): TParsedTransaction[] {
   const transactions: TParsedTransaction[] = []
   const lines = text.split('\n')
 
+  if (debug) {
+    console.log('=== PDF TEXT DEBUG ===')
+    console.log('Total lines:', lines.length)
+    console.log('First 20 lines:')
+    lines.slice(0, 20).forEach((line, i) => {
+      console.log(`${i + 1}: ${line}`)
+    })
+    console.log('=====================')
+  }
+
   // Common patterns for Brazilian credit card invoices
   const patterns = [
-    // Pattern 1: DD/MM/YYYY DESCRIPTION R$ 1.234,56
+    // Pattern 1: Banco Inter format - DD de MES. YYYY DESCRIPTION - R$ 1.234,56
+    /(\d{1,2}\s+de\s+[a-z]+\.?\s+\d{4})\s+(.+?)\s+-\s+R\$\s*([\d.,]+)/gi,
+    // Pattern 2: DD/MM/YYYY DESCRIPTION R$ 1.234,56
     /(\d{2}\/\d{2}\/\d{4})\s+(.+?)\s+R\$\s*([\d.,]+)/gi,
-    // Pattern 2: DD/MM DESCRIPTION 1.234,56
+    // Pattern 3: DD/MM DESCRIPTION 1.234,56
     /(\d{2}\/\d{2})\s+(.+?)\s+([\d.,]+)/gi,
-    // Pattern 3: DD/MM/YY DESCRIPTION $ 1.234,56
+    // Pattern 4: DD/MM/YY DESCRIPTION $ 1.234,56
     /(\d{2}\/\d{2}\/\d{2})\s+(.+?)\s+\$?\s*([\d.,]+)/gi,
   ]
 
@@ -58,23 +106,37 @@ export function parseTransactionsFromText(text: string): TParsedTransaction[] {
 
       for (const match of matches) {
         try {
-          let date = match[1]
+          let dateStr = match[1]
           const description = match[2]?.trim() || 'Sem descrição'
           const amountStr = match[3]?.trim() || '0'
+
+          if (debug && match) {
+            console.log('Match found:', { date: dateStr, description, amountStr, fullLine: line })
+          }
 
           // Skip if description or amount is invalid
           if (!description || description.length < 3) continue
           if (!amountStr || amountStr === '0') continue
 
           // Convert date to ISO format
-          if (date.length === 5) { // DD/MM
-            const currentYear = new Date().getFullYear()
-            date = `${date}/${currentYear}`
-          }
+          let isoDate: string
 
-          const [day, month, year] = date.split('/')
-          const fullYear = year.length === 2 ? `20${year}` : year
-          const isoDate = `${fullYear}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+          // Check if date is in Brazilian format (DD de MES YYYY)
+          if (dateStr.includes(' de ')) {
+            const converted = convertBrazilianDate(dateStr)
+            if (!converted) continue
+            isoDate = converted
+          } else {
+            // Handle DD/MM/YYYY, DD/MM, DD/MM/YY formats
+            if (dateStr.length === 5) { // DD/MM
+              const currentYear = new Date().getFullYear()
+              dateStr = `${dateStr}/${currentYear}`
+            }
+
+            const [day, month, year] = dateStr.split('/')
+            const fullYear = year.length === 2 ? `20${year}` : year
+            isoDate = `${fullYear}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+          }
 
           // Parse amount (Brazilian format: 1.234,56)
           const amount = parseFloat(
@@ -191,8 +253,14 @@ export function calculateTotalAmount(transactions: TParsedTransaction[]): number
 /**
  * Main parser function - to be used in Server Actions
  * Uses pdf2json library with zero dependencies
+ * Supports AI-based parsing with regex fallback
  */
-export async function parsePdfFile(file: ArrayBuffer): Promise<TPdfParseResult> {
+export async function parsePdfFile(
+  file: ArrayBuffer,
+  options: { debug?: boolean; useAI?: boolean; fallbackToRegex?: boolean } = {}
+): Promise<TPdfParseResult> {
+  const { debug = false, useAI = true, fallbackToRegex = true } = options
+
   try {
     // Dynamic import - pdf2json has zero dependencies (default export)
     const PDFParser = (await import('pdf2json')).default
@@ -221,6 +289,26 @@ export async function parsePdfFile(file: ArrayBuffer): Promise<TPdfParseResult> 
       pdfParser.parseBuffer(Buffer.from(file))
     })
 
+    if (debug) {
+      console.log('=== RAW PDF TEXT ===')
+      console.log('Text length:', text.length)
+      console.log('First 500 chars:', text.substring(0, 500))
+      console.log('====================')
+
+      // Save to file for analysis (Node.js environment only)
+      try {
+        const fs = await import('fs/promises')
+        const path = await import('path')
+        const debugDir = path.join(process.cwd(), 'debug')
+        await fs.mkdir(debugDir, { recursive: true })
+        const debugFile = path.join(debugDir, `pdf-debug-${Date.now()}.txt`)
+        await fs.writeFile(debugFile, text, 'utf-8')
+        console.log(`Debug file saved to: ${debugFile}`)
+      } catch (err) {
+        console.error('Could not save debug file:', err)
+      }
+    }
+
     if (!text || text.length < 50) {
       return {
         transactions: [],
@@ -228,7 +316,33 @@ export async function parsePdfFile(file: ArrayBuffer): Promise<TPdfParseResult> 
       }
     }
 
-    const transactions = parseTransactionsFromText(text)
+    // Clean up PDF parser resources
+    pdfParser.destroy()
+
+    // Try AI parsing first if enabled
+    if (useAI) {
+      console.log('Attempting AI-based parsing...')
+      const { parseInvoiceWithAI } = await import('./ai-parser')
+      const aiResult = await parseInvoiceWithAI(text)
+
+      // If AI parsing succeeded, return result
+      if (aiResult.transactions.length > 0) {
+        console.log('✓ AI parsing successful')
+        return aiResult
+      }
+
+      console.log('AI parsing returned no transactions')
+
+      // If AI failed and no fallback, return AI error
+      if (!fallbackToRegex) {
+        return aiResult
+      }
+
+      console.log('Falling back to regex parsing...')
+    }
+
+    // Fallback to regex parsing
+    const transactions = parseTransactionsFromText(text, debug)
 
     if (transactions.length === 0) {
       return {
@@ -240,9 +354,6 @@ export async function parsePdfFile(file: ArrayBuffer): Promise<TPdfParseResult> 
     const period = extractPeriod(text)
     const cardLastDigits = extractCardLastDigits(text)
     const totalAmount = calculateTotalAmount(transactions)
-
-    // Clean up resources
-    pdfParser.destroy()
 
     return {
       transactions,

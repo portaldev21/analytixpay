@@ -97,15 +97,32 @@ export async function actionName(params): Promise<TApiResponse<ReturnType>> {
 
 ### PDF Parsing System
 
-PDF processing (`src/lib/pdf/parser.ts`) extracts structured data from Brazilian credit card invoices:
+PDF processing uses a **hybrid AI + regex approach** for universal invoice parsing:
 
-- Uses `pdf-parse` with dynamic imports (Node.js dependency)
-- Supports multiple date/amount patterns for different banks
-- Auto-categorizes transactions via keyword matching
-- Detects installments, international transactions, card digits, and billing period
-- Returns `TPdfParseResult` with transactions array and metadata
+**AI Parser** (`src/lib/pdf/ai-parser.ts`):
+- Uses OpenAI GPT-4o-mini for intelligent data extraction
+- Works with **any bank format** (Inter, Nubank, Itaú, Bradesco, etc.)
+- Extracts structured JSON with transactions, dates, amounts, installments
+- Auto-categorizes transactions intelligently
+- Cost: ~$0.01-0.03 per invoice (~3000-5000 tokens)
+- Returns `TPdfParseResult` with parsed data
 
-**Pattern matching:** Handles Brazilian currency format (R$ 1.234,56) and date formats (DD/MM/YYYY, DD/MM/YY, DD/MM).
+**Regex Parser** (`src/lib/pdf/parser.ts` - fallback):
+- Pattern-based extraction for common Brazilian formats
+- Supports multiple date/amount patterns
+- Keyword-based categorization
+- Used as fallback if AI parsing fails or is disabled
+
+**Main Parser** (`parsePdfFile` in `src/lib/pdf/parser.ts`):
+- Uses `pdf2json` to extract raw text from PDF
+- Tries AI parsing first (if `OPENAI_API_KEY` is configured)
+- Falls back to regex patterns if AI fails
+- Handles Brazilian currency (R$ 1.234,56) and dates (DD/MM/YYYY, "DD de MÊS YYYY")
+
+**Configuration:**
+- Set `OPENAI_API_KEY` in `.env.local` for AI parsing (see `OPENAI_SETUP.md`)
+- Can disable AI via options: `parsePdfFile(buffer, { useAI: false })`
+- Debug mode available: `parsePdfFile(buffer, { debug: true })`
 
 ### Authentication & Access Control
 
@@ -234,10 +251,16 @@ Auto-categorization uses keyword matching against Brazilian merchant patterns:
 
 Required in `.env.local`:
 ```
+# Supabase
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key (if needed)
+
+# App
 NEXT_PUBLIC_APP_URL=http://localhost:3000
+
+# OpenAI (optional - for AI-powered PDF parsing)
+OPENAI_API_KEY=sk-proj-... (see OPENAI_SETUP.md)
 ```
 
 ## Documentation References
@@ -247,3 +270,5 @@ Additional documentation in repository:
 - `PROJECT_DOCUMENTATION.md` - Complete architecture
 - `SETUP_GUIDE.md` - Detailed setup instructions
 - `README.md` - Project overview and features
+- `OPENAI_SETUP.md` - OpenAI API configuration for AI parsing
+- `DEBUG_PDF_PARSER.md` - Debugging guide for PDF parsing issues

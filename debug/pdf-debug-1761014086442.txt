@@ -1,0 +1,324 @@
+Resumo da fatura
+Olá, Fabiane! A sua fatura chegou!
+Total da sua fatura
+R$ 5.721,21
+Este é o valor que você precisa pagar nesse mês
+Limite de crédito total
+R$ 21.789,39
+Data de Vencimento
+07/06/2025
+Pagamento mínimo: R$ 858,18
+O pagamento mínimo é o valor que você precisa pagar nesse mês para não ficar em atraso com a fatura.
+A diferença será cobrada com juros e impostos na próxima fatura.
+Encargos em caso de pagamento mínimo desta fatura
+Pagamento mínimo: R$ 858,18
+Encargos rotativos          15,60% am
+IOF diário              0,246% am
+IOF adicional            0,380% am
+Em caso de pagamento mínimo o valor financiado será:
+Valor total financiado         R$ 4.863,03
+Total a pagar em encargos e IOF do
+rotativo
+R$ 941,76
+Total a pagar            R$ 5.804,79
+Pagamento via Boleto
+Caso o pagamento da fatura seja feito via boleto, o prazo para
+reconhecimento do pagamento e liberação do limite é de até 3 dias úteis.
+07790.00116 01001.305208 87352.066564 1 00000000000000
+AUTENTICAÇÃO MECÂNICA FICHA DE COMPENSAÇÃO
+Pagamento via Pix
+Faça o pagamento pela conta do Inter ou via
+Pix. Escaneie o QR Code abaixo para pagar a
+fatura. Seu limite será liberado em até 24h.
+----------------Page (0) Break----------------
+FABIANE A DA SILVA PEREIRA
+5555****3173   07/06/2025   R$ 5.721,21
+Precisa de uma força para pagar a fatura deste mês?
+Confira as opções de parcelamento disponíveis pra você.
+Parcelamento       Total
+1 + 2 de R$ 2.075,36     R$ 6.226,08
+1 + 3 de R$ 1.622,21     R$ 6.488,84
+1 + 4 de R$ 1.351,69      R$ 6.758,45
+1 + 5 de R$ 1.172,48      R$ 7.034,88
+1 + 6 de R$ 1.045,43     R$ 7.318,01
+1 + 7 de R$ 950,98      R$ 7.607,84
+1 + 8 de R$ 878,25      R$ 7.904,25
+Parcelamento       Total
+1 + 9 de R$ 820,72      R$ 8.207,20
+1 + 10 de R$ 774,23      R$ 8.516,53
+1 + 11 de R$ 736,02      R$ 8.832,24
+1 + 12 de R$ 704,17      R$ 9.154,21
+1 + 13 de R$ 677,30      R$ 9.482,20
+1 + 14 de R$ 654,41      R$ 9.816,15
+O IOF e juros, com Taxa Efetiva Mensal de 11,90% am e Taxa Efetiva Anual de 285,44% aa já estão incluídas no valor total
+do parcelamento, podendo as taxas serem menores a depender do perfil do cliente disponíveis.
+Caso opte pelo parcelamento, é importante saber:
+É necessário realizar um pagamento único, correspondendo exatamente ao valor da parcela desejada, até a data de
+vencimento.
+Após a data de vencimento, você poderá visualizar o parcelamento contratado em nosso aplicativo.
+Não será possível receber os pontos Loop correspondentes à fatura parcelada.
+Caso tenha Débito Automático ativo, será preciso desabilitá-lo em até 1 dia útil antes do vencimento da fatura e cancelar
+o próximo agendamento programado.
+Você pode acessar sua fatura no Super App e fazer uma simulação em "Parcelar fatura".
+Para mais detalhes sobre o parcelamento e encargos envolvidos, clique aqui.
+DESPESAS DO MÊS
+R$ 5.721,21
+Essa é a soma de todas as suas
+despesas durante esse mês.
+VALOR ANTECIPADO
+R$ 0,00
+Esse é o valor que você antecipou no
+mês passado.
+FATURA ATUAL
+R$ 5.721,21
+Esse é o valor que você precisa pagar
+nesse mês
+Descritivo detalhado
+Despesas do mês                                     R$ 5.721,21
+Valor total de juros e encargos                                R$ 0,00
+Valor antecipado                                       R$ 0,00
+Fatura atual                                       R$ 5.721,21
+----------------Page (1) Break----------------
+FABIANE A DA SILVA PEREIRA
+5555****3173   07/06/2025   R$ 5.721,21
+Despesas da fatura
+CARTÃO 5555****3173
+Data     Movimentação                        Beneficiário            Valor
+07 de mai. 2025 PAGTO DEBITO AUTOMATICO                     -           + R$ 4.020,23
+Total CARTÃO 5555****3173                                          R$ 0,00
+CARTÃO 5361****5532
+Data     Movimentação                        Beneficiário            Valor
+29 de nov. 2024 Magalu *MAGAZINELUIZA (Parcela 06 de 10)               -             R$ 297,90
+01 de mai. 2025  UBER* TRIP                           -             R$ 31,98
+Total CARTÃO 5361****5532                                         R$ 329,88
+CARTÃO 5361****4733
+Data     Movimentação                        Beneficiário            Valor
+23 de out. 2024  AMAZON MARKETPLACE (Parcela 08 de 12)               -            R$ 459,30
+26 de jan. 2025  DECOLAR (Parcela 05 de 06)                     -            R$ 1.304,39
+04 de fev. 2025 PrincipiaEs (Parcela 04 de 06)                    -             R$ 21,69
+19 de fev. 2025  INSTITUTO CARVALHO SAU (Parcela 04 de 10)              -             R$ 371,50
+14 de mar. 2025 INSTITUTO CARVALHO SAU (Parcela 03 de 10)              -            R$ 540,00
+09 de abr. 2025  DrogariaSP drogariasa S (Parcela 02 de 10)                -             R$ 156,08
+30 de abr. 2025  MP *PETROBRASPREM                       -             R$ 62,01
+01 de mai. 2025  DARWIN SEGUROS AUTO                      -             R$ 233,59
+----------------Page (2) Break----------------
+FABIANE A DA SILVA PEREIRA
+5555****3173   07/06/2025   R$ 5.721,21
+Despesas da fatura
+CARTÃO 5361****4733
+Data     Movimentação                        Beneficiário            Valor
+03 de mai. 2025 flexpag *CELPE                         -             R$ 957,80
+05 de mai. 2025 MP *PETROBRASPREM                       -             R$ 182,40
+05 de mai. 2025 Wellhub Gympass BR Gym                      -             R$ 89,90
+06 de mai. 2025 RECIBOM SUPERMERCADOS                     -             R$ 270,92
+07 de mai. 2025 FRIGORIFICO NACIONAL 3                      -             R$ 163,48
+08 de mai. 2025 ClubeWine 52681125                        -             R$ 66,65
+18 de mai. 2025  MP *PETROBRASPREM                       -             R$ 63,16
+18 de mai. 2025  Wellhub Gympass BR Gym                      -             R$ 89,90
+22 de mai. 2025 MP *PETROBRASPREM                       -             R$ 131,17
+Total CARTÃO 5361****4733                                         R$ 5.163,94
+CARTÃO 5555****5972
+Data     Movimentação                        Beneficiário            Valor
+18 de mai. 2025  MERCADOLIVRE*ARNOLDIM                     -             R$ 227,39
+Total CARTÃO 5555****5972                                          R$ 227,39
+----------------Page (3) Break----------------
+FABIANE A DA SILVA PEREIRA
+5555****3173   07/06/2025   R$ 5.721,21
+Limite de crédito total:
+R$ 21.789,39
+Os valores dos limites são referentes ao valor
+utilizado e disponível no momento de fechamento
+da fatura.
+Utilizado:
+R$ 17.355,42
+Disponível:
+R$ 4.433,97
+Como está distribuído o seu limite de crédito por
+produto?
+Pix no crédito
+Utilizado:
+R$ 0,00
+Disponível:
+R$ 2.129,56
+Boleto no crédito
+Utilizado:
+R$ 0,00
+Disponível:
+R$ 2.129,56
+Saque
+Utilizado:
+R$ 0,00
+Disponível:
+R$ 2.000,00
+Próxima fatura
+Data de corte: 30/06/2025
+Essas são as compras parceladas realizadas até o
+fechamento da fatura atual, e que farão parte da sua
+próxima fatura:
+Movimentação            Valor
+AMAZON MARKETPLACE (Parcela 09 de
+12)
+R$ 459,30
+Magalu *MAGAZINELUIZA (Parcela 07 de
+10)
+R$ 297,90
+DECOLAR (Parcela 06 de 06)       R$ 1.304,39
+PrincipiaEs (Parcela 05 de 06)        R$ 21,69
+INSTITUTO CARVALHO SAU (Parcela 05
+de 10)
+R$ 371,50
+INSTITUTO CARVALHO SAU (Parcela 04
+de 10)
+R$ 540,00
+DrogariaSP drogariasa S (Parcela 03 de
+10)
+R$ 156,08
+Saldo total de compras parceladas     R$ 3.150,86
+Saldo demais compras parceladas     R$ 8.483,35
+Saldo em aberto total         R$ 11.634,21
+Fale com a gente
+Capitais e regiões metropolitanas: 3003 4070
+Demais localidades: 0800 940 0007
+Ouvidoria: 0800 940 7772
+SAC: 0800 940 9999
+Fale com a gente pelo chat, no nosso Super App, ou
+acesse: www.bancointer.com.br
+Deficiência de fala e audição:
+https://inter.co/atendimento-em-libras/
+----------------Page (4) Break----------------
+FABIANE A DA SILVA PEREIRA
+5555****3173   07/06/2025   R$ 5.721,21
+1. Pagamento total
+Esta é a melhor escolha! Com o pagamento total você quita todo o saldo da sua fatura, libera o mesmo valor no seu limite
+de crédito e não há cobrança de juros.
+Você ainda pode colocar sua fatura em débito automático na sua conta digital. Assim, você não precisa se preocupar com o
+pagamento, que é realizado de forma automática no valor total da fatura e dia de vencimento.
+É importante lembrar: com o débito automático, é preciso ter o saldo adequado em conta no dia vencimento da fatura, para
+que o débito do valor seja realizado.
+2. Pagamento parcial
+Nesta opção, o pagamento realizado deve ser igual ou acima do pagamento mínimo. O saldo restante da sua fatura será
+carregado para o próximo mês e sofrerá cobrança de encargos financeiros juros, pois você estará financiando o valor pelo
+crédito rotativo.
+Se você preferir pagar sua fatura com mais tranquilidade, as opções de parcelamento do saldo podem ser mais adequadas
+à sua capacidade financeira de pagamento. Para parcelar sua fatura, escolha uma das opções oferecidas e pague o valor
+exato da parcela, incluindo os centavos, até a data do vencimento.
+As opções de planos de parcelamento incluem apenas o valor total da fatura que está sendo parcelada. Possíveis
+transações futuras serão lançadas normalmente em suas próximas faturas, compondo um novo valor a pagar.
+Lembre-se: o valor total do plano escolhido irá impactar seu limite de crédito. À medida que as parcelas forem quitadas, o
+valor proporcional será liberado para sua utilização. Se você tem o pagamento em Débito Automático (DA) ativo e quer
+aderir ao parcelamento da fatura, é preciso desabilitar o DA em até 1 dia útil antes do vencimento da fatura. Também é
+necessário cancelar o próximo agendamento programado do DA.
+Desativando o Débito Automático da fatura
+No Super App, acesse a área de Cartões, vá em Configurações, clique em Débito Automático em Conta e em Desativar
+Débito Automático.
+Cancelando o Agendamento
+No o Super App, acesse o menu Agendamentos, selecione o próximo pagamento agendado da fatura e deslize para
+cancelar.
+Lembre-se: ao desativar o débito automático, você deixará de receber pontos no Inter Loop pelo uso do seu cartão de
+crédito.
+3. Ausência de pagamento, pagamento abaixo do valor mínimo da fatura e pagamento em
+atraso
+Nestas situações, você estará inadimplente e seu cartão será bloqueado até a normalização do pagamento.
+O saldo não pago será carregado para o próximo mês e acrescidos de i) IOF e juros remuneratórios, ii) multa de atraso de
+2% sobre o saldo não pago e iii) juros moratórios de 1% ao mês, capitalizados diariamente a partir da data de vencimento
+até a data de pagamento.
+De acordo com a Resolução nº 4.549/2017 do Banco Central do Brasil saldo devedor não pode utilizar o crédito rotativo por
+mais de 30 dias.
+Caso isto ocorra, o parcelamento é realizado automaticamente em até 15 parcelas, com a aplicação de juros remuneratórios.
+O parcelamento compulsório é fundamental para garantir as suas condições de crédito. O valor do plano do parcelamento
+compulsório irá impactar seu limite de crédito e, à medida que as parcelas forem quitadas, o valor proporcional será
+liberado para sua utilização.
+Você pode realizar a quitação total do saldo parcelado compulsoriamente a qualquer momento. Basta entrar em contato por
+meio dos nossos Canais de Relacionamento e solicitar a antecipação do plano para quitação.
+----------------Page (5) Break----------------
+FABIANE A DA SILVA PEREIRA
+5555****3173   07/06/2025   R$ 5.721,21
+Encargos financeiros
+Encargos                                            Taxa
+Encargos rotativos                                             15,60% am
+Encargos Máximo Próximo Período                                        19,00% am
+Juros de Parcelamento de Fatura                                         9,10% am
+Multa por Atraso                                              2,00% am
+Juros de mora                                               1,00% am
+IOF de Financiamento                                    0,626% sobre o valor da transação
+IOF Internacional                                              3,50% am
+Atenção: Caso o pagamento realizado seja menor que o valor total dessa fatura, a fatura do próximo mês virá com juros e encargos, calculados sobre a
+diferença entre o valor total e o valor pago.
+Faça um Pix. Use esse QR Code para pagar sua fatura.
+Seu limite será liberado em até 24h.
+AGÊNCIA / CEDENTE
+00001/00000027
+ESPÉCIE
+R$
+VALOR DO DOCUMENTO
+5.721,21
+VENCIMENTO
+07/06/2025
+MORA / MULTA
+VALOR COBRADO
+NOSSO NÚMERO
+08735206656
+Nº DOCUMENTO
+101/47
+AV BARBACENA 1219 STO
+AGOSTINHO 30190131
+BELO HORIZONTE / MG
+AUTENTICAÇÃO MECÂNICA
+077-9
+07790.00116 01001.305208 87352.066564 1 00000000000000
+LOCAL DE PAGAMENTO
+PAGAVEL EM QUALQUER BANCO, MESMO APOS O VENCIMENTO
+VENCIMENTO
+07/06/2025
+BENEFICIÁRIO
+BANCO INTER S/A CNPJ: 00.416.968\0001-01
+AV BARBACENA 1219 STO AGOSTINHO 30190131
+AGÊNCIA / CEDENTE
+00001/00000027
+DATA DOCUMENTO
+31/05/2025
+Nº DOCUMENTO
+00682218510
+ESPÉCIE DOC.
+OUTROS
+ACEITE
+N
+DATA PROCESSAMENTO
+31/05/2025
+NOSSO NÚMERO
+08735206656
+USO DO BANCO    CARTEIRA
+001
+ESPÉCIE
+R$
+QUANTIDADE DE
+MOEDA
+VALOR DE MOEDA   VALOR DO DOCUMENTO
+5.721,21
+INSTRUÇÕES: (Todas as informações deste boleto são de responsabilidade do beneficiário).
+Os encargos sobre o pagamento em atraso constarão na próxima fatura mensal.
+Utilize esta ficha de compensação caso deseje quitar ou pagar parcialmente o saldo
+devedor do seu Cartão Inter.
+SR. CAIXA FAVOR NÃO ACEITAR PAGAMENTO EM CHEQUE
+DESCONTO / ABATIMENTO
+OUTRAS DEDUÇÕES
+MORA / MULTA
+OUTROS ACRÉSCIMOS
+VALOR COBRADO
+5.721,21
+PAGADOR
+Uniprime
+FABIANE A DA SILVA PEREIRA
+AVENIDA ARMINDO MOURA
+581
+QD E BL 10
+AP201
+BOA VIAGEM
+51130180 RECIFE PE
+AUTENTICAÇÃO MECÂNICA
+FICHA DE COMPENSAÇÃO
+Caso o pagamento da fatura seja feito em outra
+instituição financeira, o prazo para
+reconhecimento do pagamento e liberação do
+limite é de até 3 dias úteis.
+----------------Page (6) Break----------------
