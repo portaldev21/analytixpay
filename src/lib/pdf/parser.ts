@@ -194,10 +194,10 @@ export function calculateTotalAmount(transactions: TParsedTransaction[]): number
  */
 export async function parsePdfFile(file: ArrayBuffer): Promise<TPdfParseResult> {
   try {
-    // Dynamic import - pdf2json has zero dependencies
-    const { PDFParser } = await import('pdf2json')
+    // Dynamic import - pdf2json has zero dependencies (default export)
+    const PDFParser = (await import('pdf2json')).default
 
-    // Create parser instance
+    // Create parser instance (null context, true for raw text)
     const pdfParser = new PDFParser(null, true)
 
     // Parse PDF using promise wrapper
