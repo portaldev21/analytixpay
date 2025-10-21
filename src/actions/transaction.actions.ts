@@ -231,16 +231,23 @@ export async function getDashboardStats(accountId: string): Promise<TApiResponse
  */
 export async function updateTransaction(
   transactionId: string,
+  accountId: string,
   updates: Partial<TTransaction>
 ): Promise<TApiResponse<TTransaction>> {
   try {
     const supabase = await createClient()
+
+    // Validate access to account
+    if (!(await hasAccessToAccount(accountId))) {
+      return { data: null, error: 'Acesso negado', success: false }
+    }
 
     // Type workaround for Supabase generated types
     const { data, error } = await (supabase
       .from('transactions') as any)
       .update(updates)
       .eq('id', transactionId)
+      .eq('account_id', accountId) // Ensure transaction belongs to account
       .select()
       .single()
 
