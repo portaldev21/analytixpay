@@ -1,6 +1,7 @@
 import { formatCurrency, formatDate } from "@/lib/utils"
 import { CategoryBadge } from "./CategoryBadge"
 import { EditTransactionDialog } from "./EditTransactionDialog"
+import { DeleteTransactionButton } from "./DeleteTransactionButton"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import type { TTransaction } from "@/db/types"
@@ -46,7 +47,10 @@ export function TransactionsTable({ transactions }: TransactionsTableProps) {
               <p className="font-semibold text-lg">
                 {formatCurrency(transaction.amount)}
               </p>
-              <EditTransactionDialog transaction={transaction} />
+              <div className="flex flex-col gap-1">
+                <EditTransactionDialog transaction={transaction} />
+                <DeleteTransactionButton transaction={transaction} />
+              </div>
             </div>
           </div>
         </Card>

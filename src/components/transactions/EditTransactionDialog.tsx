@@ -173,28 +173,24 @@ export function EditTransactionDialog({ transaction }: EditTransactionDialogProp
 
             <div className="grid gap-2">
               <Label htmlFor="category">Categoria</Label>
-              <Select
-                value={formData.category}
-                onValueChange={(value) => setFormData({ ...formData, category: value })}
-              >
-                <SelectTrigger id="category">
-                  <SelectValue placeholder="Selecione uma categoria">
-                    <div className="flex items-center gap-2">
-                      <span>{formData.category}</span>
-                      <CategoryBadge category={formData.category} />
-                    </div>
-                  </SelectValue>
-                </SelectTrigger>
-                <SelectContent>
-                  {CATEGORIES.map((category) => (
-                    <SelectItem key={category} value={category}>
-                      <div className="flex items-center gap-2">
-                        <span>{category}</span>
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="flex items-center gap-2">
+                <Select
+                  value={formData.category}
+                  onValueChange={(value) => setFormData({ ...formData, category: value })}
+                >
+                  <SelectTrigger id="category" className="flex-1">
+                    <SelectValue placeholder="Selecione uma categoria" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {CATEGORIES.map((category) => (
+                      <SelectItem key={category} value={category}>
+                        {category}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <CategoryBadge category={formData.category} />
+              </div>
             </div>
 
             <div className="grid gap-2">
