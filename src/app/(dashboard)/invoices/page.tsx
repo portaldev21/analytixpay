@@ -9,6 +9,7 @@ import { Loading } from "@/components/shared/Loading"
 import { Button } from "@/components/ui/button"
 
 async function InvoicesList({ accountId }: { accountId: string }) {
+  const supabase = await createClient()
   const result = await getInvoices(accountId)
 
   if (!result.success || !result.data) {
@@ -29,10 +30,25 @@ async function InvoicesList({ accountId }: { accountId: string }) {
     )
   }
 
+  // Get transaction count for each invoice
+  const invoicesWithCount = await Promise.all(
+    result.data.map(async (invoice) => {
+      const { count } = await supabase
+        .from('transactions')
+        .select('*', { count: 'exact', head: true })
+        .eq('invoice_id', invoice.id)
+
+      return {
+        ...invoice,
+        transaction_count: count || 0
+      }
+    })
+  )
+
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-      {result.data.map((invoice) => (
-        <InvoiceCard key={invoice.id} invoice={invoice} />
+      {invoicesWithCount.map((invoice) => (
+        <InvoiceCard key={invoice.id} invoice={invoice} accountId={accountId} />
       ))}
     </div>
   )

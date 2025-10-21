@@ -146,9 +146,12 @@ export async function getInvoices(accountId: string): Promise<TApiResponse<TInvo
 }
 
 /**
- * Delete invoice
+ * Delete invoice (and all associated transactions via CASCADE)
  */
-export async function deleteInvoice(invoiceId: string): Promise<TApiResponse<{ success: true }>> {
+export async function deleteInvoice(invoiceId: string, accountId: string): Promise<TApiResponse<{
+  success: true
+  deletedTransactions: number
+}>> {
   try {
     const supabase = await createClient()
     const user = await getCurrentUser()
@@ -157,19 +160,70 @@ export async function deleteInvoice(invoiceId: string): Promise<TApiResponse<{ s
       return { data: null, error: 'Usuário não autenticado', success: false }
     }
 
-    const { error } = await supabase
+    // Check if user is owner (only owners can delete invoices)
+    const { data: account } = await supabase
+      .from('accounts')
+      .select('owner_id')
+      .eq('id', accountId)
+      .single()
+
+    if (!account || account.owner_id !== user.id) {
+      return { data: null, error: 'Apenas o dono da conta pode deletar faturas', success: false }
+    }
+
+    // Get invoice details before deletion
+    const { data: invoice } = await supabase
+      .from('invoices')
+      .select('file_url, id')
+      .eq('id', invoiceId)
+      .eq('account_id', accountId)
+      .single()
+
+    if (!invoice) {
+      return { data: null, error: 'Fatura não encontrada', success: false }
+    }
+
+    // Count transactions before deletion
+    const { count: transactionsCount } = await supabase
+      .from('transactions')
+      .select('*', { count: 'exact', head: true })
+      .eq('invoice_id', invoiceId)
+
+    // Delete invoice (transactions will be deleted automatically via CASCADE)
+    const { error: deleteError } = await supabase
       .from('invoices')
       .delete()
       .eq('id', invoiceId)
+      .eq('account_id', accountId)
 
-    if (error) {
-      return { data: null, error: error.message, success: false }
+    if (deleteError) {
+      return { data: null, error: deleteError.message, success: false }
+    }
+
+    // Extract file path from URL and delete from Storage
+    try {
+      const urlParts = invoice.file_url.split('/invoices/')
+      if (urlParts.length > 1) {
+        const filePath = urlParts[1].split('?')[0] // Remove query params
+        await supabase.storage.from('invoices').remove([filePath])
+      }
+    } catch (storageError) {
+      // Log but don't fail - file might already be deleted
+      console.warn('Failed to delete file from storage:', storageError)
     }
 
     revalidatePath('/invoices')
+    revalidatePath('/transactions')
     revalidatePath('/dashboard')
 
-    return { data: { success: true }, error: null, success: true }
+    return {
+      data: {
+        success: true,
+        deletedTransactions: transactionsCount || 0
+      },
+      error: null,
+      success: true
+    }
   } catch (error) {
     return {
       data: null,
