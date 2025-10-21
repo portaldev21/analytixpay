@@ -196,8 +196,8 @@ export async function parsePdfFile(file: ArrayBuffer): Promise<TPdfParseResult> 
   let parser: any = null
 
   try {
-    // Dynamic import - PDFParse is a class (v2 API)
-    const { PDFParse } = await import('pdf-parse')
+    // Dynamic import - Use Node.js bundle (no worker required)
+    const { PDFParse } = await import('pdf-parse/node')
 
     // Create parser instance with buffer
     parser = new PDFParse({ data: Buffer.from(file) })
