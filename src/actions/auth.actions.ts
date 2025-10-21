@@ -97,7 +97,7 @@ export async function signup(
       .insert({
         name: 'Minha Conta',
         owner_id: data.user.id,
-      })
+      } as any)
 
     if (accountError) {
       console.error('Error creating default account:', accountError)

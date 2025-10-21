@@ -68,7 +68,7 @@ export default async function DashboardPage() {
     .eq("user_id", user.id)
     .single()
 
-  const accountId = accountMember?.account_id
+  const accountId = (accountMember as any)?.account_id
 
   return (
     <div className="space-y-6">

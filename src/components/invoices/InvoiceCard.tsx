@@ -24,27 +24,27 @@ export function InvoiceCard({ invoice, onDelete }: InvoiceCardProps) {
               <div className="flex flex-wrap gap-3 mt-2 text-sm text-muted-foreground">
                 <div className="flex items-center gap-1">
                   <Calendar className="h-4 w-4" />
-                  {formatDate(invoice.uploaded_at)}
+                  {formatDate(invoice.created_at)}
                 </div>
-                {invoice.period_month && invoice.period_year && (
+                {invoice.period && (
                   <div className="flex items-center gap-1">
                     <CreditCard className="h-4 w-4" />
-                    {invoice.period_month}/{invoice.period_year}
+                    {invoice.period}
                   </div>
                 )}
               </div>
             </div>
           </div>
 
-          <Badge variant={invoice.status === "processed" ? "default" : "secondary"}>
-            {invoice.status === "processed" ? "Processado" : "Pendente"}
+          <Badge variant={invoice.status === "completed" ? "default" : invoice.status === "error" ? "destructive" : "secondary"}>
+            {invoice.status === "completed" ? "Processado" : invoice.status === "error" ? "Erro" : "Processando"}
           </Badge>
         </div>
 
-        {invoice.card_last_four && (
+        {invoice.card_last_digits && (
           <div className="mt-4 text-sm">
             <span className="text-muted-foreground">Cartão: </span>
-            <span className="font-medium">**** {invoice.card_last_four}</span>
+            <span className="font-medium">**** {invoice.card_last_digits}</span>
           </div>
         )}
 

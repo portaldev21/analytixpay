@@ -47,7 +47,7 @@ export default async function TransactionsPage() {
     .eq("user_id", user.id)
     .single()
 
-  const accountId = accountMember?.account_id
+  const accountId = (accountMember as any)?.account_id
 
   if (!accountId) {
     return (

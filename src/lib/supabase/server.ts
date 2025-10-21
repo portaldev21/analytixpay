@@ -68,7 +68,7 @@ export async function getUserAccounts() {
     return []
   }
 
-  return data.map(item => item.accounts).filter(Boolean)
+  return data.map(item => (item as any).accounts).filter(Boolean)
 }
 
 /**
@@ -109,5 +109,5 @@ export async function isAccountOwner(accountId: string): Promise<boolean> {
     .eq('id', accountId)
     .single()
 
-  return !error && data?.owner_id === user.id
+  return !error && (data as any)?.owner_id === user.id
 }

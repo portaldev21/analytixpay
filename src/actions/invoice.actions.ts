@@ -67,7 +67,7 @@ export async function uploadInvoice(
         card_last_digits: parseResult.cardLastDigits,
         total_amount: parseResult.totalAmount,
         status: 'completed',
-      })
+      } as any)
       .select()
       .single()
 
@@ -76,14 +76,17 @@ export async function uploadInvoice(
       return { data: null, error: invoiceError?.message || 'Erro ao criar fatura', success: false }
     }
 
+    // Type assertion for invoice
+    const createdInvoice = invoice as TInvoice
+
     // Insert transactions
     const transactions = parseResult.transactions.map(t => ({
-      invoice_id: invoice.id,
+      invoice_id: createdInvoice.id,
       account_id: accountId,
       ...t,
     }))
 
-    const { error: transError } = await supabase.from('transactions').insert(transactions)
+    const { error: transError } = await supabase.from('transactions').insert(transactions as any)
 
     if (transError) {
       return { data: null, error: transError.message, success: false }
@@ -94,7 +97,7 @@ export async function uploadInvoice(
     revalidatePath('/dashboard')
 
     return {
-      data: { invoice, transactionsCount: transactions.length },
+      data: { invoice: createdInvoice, transactionsCount: transactions.length },
       error: null,
       success: true,
     }

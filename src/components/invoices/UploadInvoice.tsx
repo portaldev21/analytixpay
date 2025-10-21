@@ -38,7 +38,7 @@ export function UploadInvoice({ accountId }: UploadInvoiceProps) {
         if (result.success) {
           setStatus("success")
           setMessage(
-            `Fatura processada com sucesso! ${result.data?.transactionCount || 0} transações encontradas.`
+            `Fatura processada com sucesso! ${result.data?.transactionsCount || 0} transações encontradas.`
           )
           router.refresh()
         } else {

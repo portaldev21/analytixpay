@@ -85,12 +85,15 @@ export async function getTransactionStats(accountId: string): Promise<TApiRespon
       return { data: null, error: error.message, success: false }
     }
 
-    const totalSpent = transactions.reduce((sum, t) => sum + Number(t.amount), 0)
-    const averageTransaction = transactions.length > 0 ? totalSpent / transactions.length : 0
+    // Type assertion
+    const transactionList = (transactions || []) as TTransaction[]
+
+    const totalSpent = transactionList.reduce((sum, t) => sum + Number(t.amount), 0)
+    const averageTransaction = transactionList.length > 0 ? totalSpent / transactionList.length : 0
 
     // Category breakdown
     const categoryMap = new Map<string, { total: number; count: number }>()
-    transactions.forEach(t => {
+    transactionList.forEach(t => {
       const existing = categoryMap.get(t.category) || { total: 0, count: 0 }
       categoryMap.set(t.category, {
         total: existing.total + Number(t.amount),
@@ -109,7 +112,7 @@ export async function getTransactionStats(accountId: string): Promise<TApiRespon
       data: {
         totalSpent,
         averageTransaction,
-        transactionCount: transactions.length,
+        transactionCount: transactionList.length,
         categoryBreakdown,
       },
       error: null,
@@ -144,16 +147,19 @@ export async function getDashboardStats(accountId: string): Promise<TApiResponse
       return { data: null, error: error.message, success: false }
     }
 
-    const totalAmount = transactions.reduce((sum, t) => sum + Number(t.amount), 0)
-    const averageAmount = transactions.length > 0 ? totalAmount / transactions.length : 0
+    // Type assertion
+    const transactionList = (transactions || []) as TTransaction[]
 
-    const largestTransaction = transactions.length > 0
-      ? transactions.reduce((max, t) => (Number(t.amount) > Number(max.amount) ? t : max))
+    const totalAmount = transactionList.reduce((sum, t) => sum + Number(t.amount), 0)
+    const averageAmount = transactionList.length > 0 ? totalAmount / transactionList.length : 0
+
+    const largestTransaction = transactionList.length > 0
+      ? transactionList.reduce((max, t) => (Number(t.amount) > Number(max.amount) ? t : max))
       : null
 
     // Category breakdown
     const categoryMap = new Map<string, { total: number; count: number }>()
-    transactions.forEach(t => {
+    transactionList.forEach(t => {
       const existing = categoryMap.get(t.category) || { total: 0, count: 0 }
       categoryMap.set(t.category, {
         total: existing.total + Number(t.amount),
@@ -173,7 +179,7 @@ export async function getDashboardStats(accountId: string): Promise<TApiResponse
     const currentMonth = now.getMonth()
     const currentYear = now.getFullYear()
 
-    const currentMonthTransactions = transactions.filter(t => {
+    const currentMonthTransactions = transactionList.filter(t => {
       const date = new Date(t.date)
       return date.getMonth() === currentMonth && date.getFullYear() === currentYear
     })
@@ -181,7 +187,7 @@ export async function getDashboardStats(accountId: string): Promise<TApiResponse
     const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1
     const lastMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear
 
-    const lastMonthTransactions = transactions.filter(t => {
+    const lastMonthTransactions = transactionList.filter(t => {
       const date = new Date(t.date)
       return date.getMonth() === lastMonth && date.getFullYear() === lastMonthYear
     })
@@ -194,7 +200,7 @@ export async function getDashboardStats(accountId: string): Promise<TApiResponse
       : 0
 
     const stats: TDashboardStats = {
-      totalTransactions: transactions.length,
+      totalTransactions: transactionList.length,
       totalAmount,
       averageAmount,
       largestTransaction: largestTransaction ? {
@@ -230,8 +236,9 @@ export async function updateTransaction(
   try {
     const supabase = await createClient()
 
-    const { data, error } = await supabase
-      .from('transactions')
+    // Type workaround for Supabase generated types
+    const { data, error } = await (supabase
+      .from('transactions') as any)
       .update(updates)
       .eq('id', transactionId)
       .select()

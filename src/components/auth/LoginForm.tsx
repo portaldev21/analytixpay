@@ -36,7 +36,7 @@ export function LoginForm() {
     setIsLoading(true)
     setError(null)
 
-    const result = await login(data)
+    const result = await login(data.email, data.password)
 
     if (result.success) {
       router.push("/dashboard")

@@ -56,7 +56,7 @@ export default async function InvoicesPage() {
     .eq("user_id", user.id)
     .single()
 
-  const accountId = accountMember?.account_id
+  const accountId = (accountMember as any)?.account_id
 
   if (!accountId) {
     return (

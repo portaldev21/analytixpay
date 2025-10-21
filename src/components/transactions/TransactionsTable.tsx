@@ -26,9 +26,9 @@ export function TransactionsTable({ transactions }: TransactionsTableProps) {
               <div className="flex items-center gap-2 flex-wrap">
                 <h3 className="font-medium truncate">{transaction.description}</h3>
                 <CategoryBadge category={transaction.category} />
-                {transaction.is_installment && transaction.installment_number && (
+                {transaction.installment && (
                   <Badge variant="secondary" className="text-xs">
-                    {transaction.installment_number}/{transaction.total_installments}
+                    {transaction.installment}
                   </Badge>
                 )}
                 {transaction.is_international && (
@@ -38,18 +38,13 @@ export function TransactionsTable({ transactions }: TransactionsTableProps) {
                 )}
               </div>
               <p className="text-sm text-muted-foreground mt-1">
-                {formatDate(transaction.transaction_date)}
+                {formatDate(transaction.date)}
               </p>
             </div>
             <div className="text-right flex-shrink-0">
               <p className="font-semibold text-lg">
                 {formatCurrency(transaction.amount)}
               </p>
-              {transaction.original_amount && transaction.original_currency && (
-                <p className="text-xs text-muted-foreground">
-                  {transaction.original_currency} {transaction.original_amount.toFixed(2)}
-                </p>
-              )}
             </div>
           </div>
         </Card>

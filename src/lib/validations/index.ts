@@ -54,9 +54,7 @@ export const addMemberSchema = z.object({
   email: z.string()
     .email('Email inválido')
     .min(1, 'Email é obrigatório'),
-  role: z.enum(['owner', 'member'], {
-    errorMap: () => ({ message: 'Role inválida' })
-  }).default('member'),
+  role: z.union([z.literal('owner'), z.literal('member')]).default('member'),
 })
 
 export type TCreateAccountForm = z.infer<typeof createAccountSchema>

@@ -166,7 +166,7 @@ export async function createAccount(
       .insert({
         name: validated.name,
         owner_id: user.id,
-      })
+      } as any)
       .select()
       .single()
 
@@ -178,18 +178,21 @@ export async function createAccount(
       }
     }
 
+    // Type assertion for account
+    const createdAccount = account as TAccount
+
     // Add owner as member
     const { error: memberError } = await supabase
       .from('account_members')
       .insert({
-        account_id: account.id,
+        account_id: createdAccount.id,
         user_id: user.id,
         role: 'owner',
-      })
+      } as any)
 
     if (memberError) {
       // Rollback account creation
-      await supabase.from('accounts').delete().eq('id', account.id)
+      await supabase.from('accounts').delete().eq('id', createdAccount.id)
       return {
         data: null,
         error: memberError.message,
@@ -201,7 +204,7 @@ export async function createAccount(
     revalidatePath('/settings')
 
     return {
-      data: account,
+      data: createdAccount,
       error: null,
       success: true,
     }
@@ -289,7 +292,7 @@ export async function addMemberToAccount(
         account_id: accountId,
         user_id: targetUser.id,
         role: validated.role,
-      })
+      } as any)
 
     if (memberError) {
       return {
@@ -351,7 +354,7 @@ export async function removeMemberFromAccount(
       .eq('id', accountId)
       .single()
 
-    if (account?.owner_id === userId) {
+    if ((account as any)?.owner_id === userId) {
       return {
         data: null,
         error: 'Não é possível remover o dono da conta',

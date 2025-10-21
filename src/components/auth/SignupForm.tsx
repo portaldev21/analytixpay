@@ -15,7 +15,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 
 type SignupFormData = {
-  name: string
+  fullName?: string
   email: string
   password: string
   confirmPassword: string
@@ -38,7 +38,7 @@ export function SignupForm() {
     setIsLoading(true)
     setError(null)
 
-    const result = await signup(data)
+    const result = await signup(data.email, data.password, data.confirmPassword, data.fullName)
 
     if (result.success) {
       router.push("/dashboard")
@@ -66,16 +66,16 @@ export function SignupForm() {
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="name">Nome</Label>
+            <Label htmlFor="fullName">Nome</Label>
             <Input
-              id="name"
+              id="fullName"
               type="text"
               placeholder="Seu nome completo"
-              {...register("name")}
+              {...register("fullName")}
               disabled={isLoading}
             />
-            {errors.name && (
-              <p className="text-sm text-destructive">{errors.name.message}</p>
+            {errors.fullName && (
+              <p className="text-sm text-destructive">{errors.fullName.message}</p>
             )}
           </div>
 
