@@ -296,3 +296,100 @@ export async function deleteTransaction(transactionId: string): Promise<TApiResp
     }
   }
 }
+
+/**
+ * Get spending trends (monthly or weekly)
+ */
+export async function getSpendingTrends(
+  accountId: string,
+  months: number = 6
+): Promise<TApiResponse<{ month: string; total: number; count: number }[]>> {
+  try {
+    const supabase = await createClient()
+
+    if (!(await hasAccessToAccount(accountId))) {
+      return { data: null, error: 'Acesso negado', success: false }
+    }
+
+    const startDate = new Date()
+    startDate.setMonth(startDate.getMonth() - months)
+
+    const { data: transactions, error } = await supabase
+      .from('transactions')
+      .select('*')
+      .eq('account_id', accountId)
+      .gte('date', startDate.toISOString())
+
+    if (error) {
+      return { data: null, error: error.message, success: false }
+    }
+
+    const transactionList = (transactions || []) as TTransaction[]
+
+    // Group by month
+    const monthMap = new Map<string, { total: number; count: number }>()
+
+    transactionList.forEach(t => {
+      const date = new Date(t.date)
+      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
+
+      const existing = monthMap.get(monthKey) || { total: 0, count: 0 }
+      monthMap.set(monthKey, {
+        total: existing.total + Number(t.amount),
+        count: existing.count + 1,
+      })
+    })
+
+    // Convert to array and sort by month
+    const trends = Array.from(monthMap.entries())
+      .map(([month, stats]) => ({
+        month,
+        total: stats.total,
+        count: stats.count,
+      }))
+      .sort((a, b) => a.month.localeCompare(b.month))
+
+    return { data: trends, error: null, success: true }
+  } catch (error) {
+    return {
+      data: null,
+      error: error instanceof Error ? error.message : 'Erro ao buscar tendências',
+      success: false,
+    }
+  }
+}
+
+/**
+ * Get top expenses
+ */
+export async function getTopExpenses(
+  accountId: string,
+  limit: number = 5
+): Promise<TApiResponse<TTransaction[]>> {
+  try {
+    const supabase = await createClient()
+
+    if (!(await hasAccessToAccount(accountId))) {
+      return { data: null, error: 'Acesso negado', success: false }
+    }
+
+    const { data, error } = await supabase
+      .from('transactions')
+      .select('*')
+      .eq('account_id', accountId)
+      .order('amount', { ascending: false })
+      .limit(limit)
+
+    if (error) {
+      return { data: null, error: error.message, success: false }
+    }
+
+    return { data: data || [], error: null, success: true }
+  } catch (error) {
+    return {
+      data: null,
+      error: error instanceof Error ? error.message : 'Erro ao buscar maiores gastos',
+      success: false,
+    }
+  }
+}

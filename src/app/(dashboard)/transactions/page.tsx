@@ -69,7 +69,7 @@ export default async function TransactionsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 h-full">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Transações</h1>
         <p className="text-muted-foreground mt-1">

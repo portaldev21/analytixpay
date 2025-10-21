@@ -178,3 +178,60 @@ export async function deleteInvoice(invoiceId: string): Promise<TApiResponse<{ s
     }
   }
 }
+
+/**
+ * Get invoices summary for dashboard
+ */
+export async function getInvoicesSummary(accountId: string): Promise<TApiResponse<{
+  invoiceId: string
+  period: string
+  cardLastDigits: string | null
+  totalAmount: number
+  transactionCount: number
+}[]>> {
+  try {
+    const supabase = await createClient()
+
+    if (!(await hasAccessToAccount(accountId))) {
+      return { data: null, error: 'Acesso negado', success: false }
+    }
+
+    const { data: invoices, error: invoicesError } = await supabase
+      .from('invoices')
+      .select('*')
+      .eq('account_id', accountId)
+      .order('created_at', { ascending: false })
+
+    if (invoicesError) {
+      return { data: null, error: invoicesError.message, success: false }
+    }
+
+    const invoiceList = (invoices || []) as TInvoice[]
+
+    // Get transaction count for each invoice
+    const summaries = await Promise.all(
+      invoiceList.map(async (invoice) => {
+        const { count, error } = await supabase
+          .from('transactions')
+          .select('*', { count: 'exact', head: true })
+          .eq('invoice_id', invoice.id)
+
+        return {
+          invoiceId: invoice.id,
+          period: invoice.period || 'Sem período',
+          cardLastDigits: invoice.card_last_digits,
+          totalAmount: Number(invoice.total_amount) || 0,
+          transactionCount: count || 0,
+        }
+      })
+    )
+
+    return { data: summaries, error: null, success: true }
+  } catch (error) {
+    return {
+      data: null,
+      error: error instanceof Error ? error.message : 'Erro ao buscar resumo de faturas',
+      success: false,
+    }
+  }
+}

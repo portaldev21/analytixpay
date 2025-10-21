@@ -31,21 +31,19 @@ export function TransactionsTable({ transactions }: TransactionsTableProps) {
 
   return (
     <div className="space-y-4">
-      <AnimatePresence mode="popLayout">
+      <AnimatePresence initial={false}>
         {transactions.map((transaction) => (
           <motion.div
             key={transaction.id}
-            layout
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{
               opacity: 0,
-              x: -100,
-              height: 0,
-              marginBottom: 0,
-              transition: { duration: 0.1, ease: "easeInOut" },
+              x: -50,
+              scale: 0.95,
+              transition: { duration: 0.2, ease: "easeOut" },
             }}
-            transition={{ duration: 0.1 }}
+            transition={{ duration: 0.2 }}
           >
             <Card
               className={`p-4 transition-all ${

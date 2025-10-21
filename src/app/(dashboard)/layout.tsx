@@ -19,12 +19,12 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="flex h-screen">
+    <div className="flex h-screen overflow-hidden">
       <aside className="hidden md:block w-64 flex-shrink-0">
         <Sidebar />
       </aside>
 
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col min-h-0">
         <Header
           user={{
             name: user.user_metadata?.name || user.email?.split("@")[0],
@@ -34,7 +34,9 @@ export default async function DashboardLayout({
         />
 
         <main className="flex-1 overflow-y-auto p-6">
-          {children}
+          <div className="max-w-7xl mx-auto">
+            {children}
+          </div>
         </main>
       </div>
     </div>

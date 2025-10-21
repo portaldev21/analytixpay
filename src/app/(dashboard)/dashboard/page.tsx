@@ -1,8 +1,17 @@
 import { Suspense } from "react"
 import { DollarSign, TrendingUp, ShoppingCart, CreditCard } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
-import { getTransactionStats } from "@/actions/transaction.actions"
+import {
+  getTransactionStats,
+  getSpendingTrends,
+  getTopExpenses,
+} from "@/actions/transaction.actions"
+import { getInvoicesSummary } from "@/actions/invoice.actions"
 import { StatsCard } from "@/components/dashboard/StatsCard"
+import { SpendingTrendsChart } from "@/components/dashboard/SpendingTrendsChart"
+import { CategoryBreakdownChart } from "@/components/dashboard/CategoryBreakdownChart"
+import { InvoicesSummary } from "@/components/dashboard/InvoicesSummary"
+import { TopExpenses } from "@/components/dashboard/TopExpenses"
 import { Loading } from "@/components/shared/Loading"
 import { formatCurrency } from "@/lib/utils"
 
@@ -50,6 +59,40 @@ async function DashboardStats({ accountId }: { accountId: string }) {
   )
 }
 
+async function DashboardCharts({ accountId }: { accountId: string }) {
+  const [trendsResult, statsResult, invoicesResult, topExpensesResult] =
+    await Promise.all([
+      getSpendingTrends(accountId, 6),
+      getTransactionStats(accountId),
+      getInvoicesSummary(accountId),
+      getTopExpenses(accountId, 5),
+    ])
+
+  return (
+    <div className="grid gap-6 lg:grid-cols-2">
+      {trendsResult.success && trendsResult.data && (
+        <div className="lg:col-span-2">
+          <SpendingTrendsChart data={trendsResult.data} />
+        </div>
+      )}
+
+      {statsResult.success && statsResult.data && (
+        <CategoryBreakdownChart data={statsResult.data.categoryBreakdown} />
+      )}
+
+      {topExpensesResult.success && topExpensesResult.data && (
+        <TopExpenses data={topExpensesResult.data} />
+      )}
+
+      {invoicesResult.success && invoicesResult.data && (
+        <div className="lg:col-span-2">
+          <InvoicesSummary data={invoicesResult.data} />
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default async function DashboardPage() {
   const supabase = await createClient()
 
@@ -80,9 +123,15 @@ export default async function DashboardPage() {
       </div>
 
       {accountId ? (
-        <Suspense fallback={<Loading className="py-12" />}>
-          <DashboardStats accountId={accountId} />
-        </Suspense>
+        <>
+          <Suspense fallback={<Loading className="py-12" />}>
+            <DashboardStats accountId={accountId} />
+          </Suspense>
+
+          <Suspense fallback={<Loading className="py-12" />}>
+            <DashboardCharts accountId={accountId} />
+          </Suspense>
+        </>
       ) : (
         <div className="text-center p-12 border border-dashed rounded-lg">
           <p className="text-muted-foreground">
