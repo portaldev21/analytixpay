@@ -20,13 +20,15 @@ import type { TTransaction } from "@/db/types"
 
 interface DeleteTransactionButtonProps {
   transaction: TTransaction
+  onDeleteStart?: () => void
 }
 
-export function DeleteTransactionButton({ transaction }: DeleteTransactionButtonProps) {
+export function DeleteTransactionButton({ transaction, onDeleteStart }: DeleteTransactionButtonProps) {
   const [deleting, setDeleting] = useState(false)
 
   const handleDelete = async () => {
     setDeleting(true)
+    onDeleteStart?.() // Chama callback para iniciar animação
 
     try {
       const result = await deleteTransaction(transaction.id)
@@ -35,10 +37,10 @@ export function DeleteTransactionButton({ transaction }: DeleteTransactionButton
         toast.success("Transação deletada com sucesso!")
       } else {
         toast.error(result.error || "Erro ao deletar transação")
+        setDeleting(false)
       }
     } catch (error) {
       toast.error("Erro ao deletar transação")
-    } finally {
       setDeleting(false)
     }
   }
