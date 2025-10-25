@@ -57,7 +57,7 @@ npm run dev
 
 Acesse: http://localhost:3000
 
-📖 **Guia completo**: [QUICKSTART.md](./QUICKSTART.md)
+📖 **Guia completo**: [docs/guides/QUICKSTART.md](docs/guides/QUICKSTART.md)
 
 ## 📋 Variáveis de Ambiente
 
@@ -233,16 +233,31 @@ npm run build        # Build de produção
 npm run start        # Rodar produção
 npm run lint         # Linter (Biome)
 npm run format       # Formatar código (Biome)
+npm run test         # Testes (Vitest)
+npm run test:coverage # Testes com coverage
 ```
 
 ## 📚 Documentação
 
-- [QUICKSTART.md](./QUICKSTART.md) - Início rápido em 5 minutos
-- [PROJECT_DOCUMENTATION.md](./PROJECT_DOCUMENTATION.md) - Arquitetura completa
-- [SETUP_GUIDE.md](./SETUP_GUIDE.md) - Guia detalhado de setup
-- [INSTALLATION.md](./INSTALLATION.md) - Instalação detalhada
-- [DEPLOYMENT.md](./DEPLOYMENT.md) - Guia de deploy
-- [IMPLEMENTATION_SUMMARY.md](./IMPLEMENTATION_SUMMARY.md) - Resumo da implementação
+**Toda a documentação foi reorganizada na pasta [docs/](docs/)**
+
+### 📖 Início Rápido
+- [QUICKSTART.md](docs/guides/QUICKSTART.md) - Início rápido em 5 minutos
+- [PROJECT_DOCUMENTATION.md](docs/guides/PROJECT_DOCUMENTATION.md) - Arquitetura completa
+
+### ⚙️ Setup e Configuração
+- [INSTALLATION.md](docs/setup/INSTALLATION.md) - Instalação detalhada
+- [SETUP_GUIDE.md](docs/setup/SETUP_GUIDE.md) - Guia detalhado de setup
+- [GOOGLE_OAUTH_SETUP.md](docs/setup/GOOGLE_OAUTH_SETUP.md) - Setup OAuth
+- [OPENAI_SETUP.md](docs/setup/OPENAI_SETUP.md) - Setup OpenAI (AI parsing)
+
+### 🚀 Deploy e Melhorias
+- [DEPLOYMENT.md](docs/guides/DEPLOYMENT.md) - Guia de deploy
+- [IMPROVEMENT_PLAN.md](docs/improvements/IMPROVEMENT_PLAN.md) - Plano de melhorias completo
+- [IMPROVEMENTS_IMPLEMENTED.md](docs/improvements/IMPROVEMENTS_IMPLEMENTED.md) - Melhorias já implementadas
+
+### 📋 Ver Tudo
+- **[docs/README.md](docs/README.md)** - Índice completo da documentação
 
 ## 🛣️ Roadmap
 
