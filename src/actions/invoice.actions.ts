@@ -228,7 +228,7 @@ export async function deleteInvoice(
       .eq("id", accountId)
       .single();
 
-    if (!account || account.owner_id !== user.id) {
+    if (!account || (account as { owner_id: string }).owner_id !== user.id) {
       return {
         data: null,
         error: "Apenas o dono da conta pode deletar faturas",
@@ -247,6 +247,9 @@ export async function deleteInvoice(
     if (!invoice) {
       return { data: null, error: "Fatura não encontrada", success: false };
     }
+
+    // Type assertion for invoice
+    const invoiceData = invoice as { file_url: string; id: string };
 
     // Count transactions before deletion
     const { count: transactionsCount } = await supabase
@@ -267,7 +270,7 @@ export async function deleteInvoice(
 
     // Extract file path from URL and delete from Storage
     try {
-      const urlParts = invoice.file_url.split("/invoices/");
+      const urlParts = invoiceData.file_url.split("/invoices/");
       if (urlParts.length > 1) {
         const filePath = urlParts[1].split("?")[0]; // Remove query params
         await supabase.storage.from("invoices").remove([filePath]);
