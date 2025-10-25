@@ -1,14 +1,14 @@
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
-import type { Database } from '@/db/types'
-import { env } from '@/lib/env'
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
+import type { Database } from "@/db/types";
+import { env } from "@/lib/env";
 
 /**
  * Supabase Client for Server Components and Server Actions
  * Use this in Server Components and Server Actions
  */
 export async function createClient() {
-  const cookieStore = await cookies()
+  const cookieStore = await cookies();
 
   return createServerClient<Database>(
     env.NEXT_PUBLIC_SUPABASE_URL,
@@ -16,13 +16,13 @@ export async function createClient() {
     {
       cookies: {
         getAll() {
-          return cookieStore.getAll()
+          return cookieStore.getAll();
         },
         setAll(cookiesToSet) {
           try {
             cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            )
+              cookieStore.set(name, value, options),
+            );
           } catch {
             // The `setAll` method was called from a Server Component.
             // This can be ignored if you have middleware refreshing
@@ -30,87 +30,90 @@ export async function createClient() {
           }
         },
       },
-    }
-  )
+    },
+  );
 }
 
 /**
  * Get current user from Supabase
  */
 export async function getCurrentUser() {
-  const supabase = await createClient()
-  const { data: { user }, error } = await supabase.auth.getUser()
+  const supabase = await createClient();
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
 
   if (error || !user) {
-    return null
+    return null;
   }
 
-  return user
+  return user;
 }
 
 /**
  * Get user's accounts
  */
 export async function getUserAccounts() {
-  const supabase = await createClient()
-  const user = await getCurrentUser()
+  const supabase = await createClient();
+  const user = await getCurrentUser();
 
   if (!user) {
-    return []
+    return [];
   }
 
   const { data, error } = await supabase
-    .from('account_members')
-    .select('account_id, accounts(*)')
-    .eq('user_id', user.id)
+    .from("account_members")
+    .select("account_id, accounts(*)")
+    .eq("user_id", user.id);
 
   if (error) {
-    console.error('Error fetching user accounts:', error)
-    return []
+    console.error("Error fetching user accounts:", error);
+    return [];
   }
 
-  return data.map(item => (item as any).accounts).filter(Boolean)
+  return data.map((item) => (item as any).accounts).filter(Boolean);
 }
 
 /**
  * Check if user has access to account
  */
 export async function hasAccessToAccount(accountId: string): Promise<boolean> {
-  const supabase = await createClient()
-  const user = await getCurrentUser()
+  const supabase = await createClient();
+  const user = await getCurrentUser();
 
   if (!user) {
-    return false
+    return false;
   }
 
   const { data, error } = await supabase
-    .from('account_members')
-    .select('id')
-    .eq('account_id', accountId)
-    .eq('user_id', user.id)
-    .single()
+    .from("account_members")
+    .select("id")
+    .eq("account_id", accountId)
+    .eq("user_id", user.id)
+    .single();
 
-  return !error && !!data
+  return !error && !!data;
 }
 
 /**
  * Check if user is account owner
  */
 export async function isAccountOwner(accountId: string): Promise<boolean> {
-  const supabase = await createClient()
-  const user = await getCurrentUser()
+  const supabase = await createClient();
+  const user = await getCurrentUser();
 
   if (!user) {
-    return false
+    return false;
   }
 
   const { data, error } = await supabase
-    .from('accounts')
-    .select('owner_id')
-    .eq('id', accountId)
-    .single()
+    .from("accounts")
+    .select("owner_id")
+    .eq("id", accountId)
+    .single();
 
-  return !error && (data as any)?.owner_id === user.id
+  return !error && (data as any)?.owner_id === user.id;
 }
 
 /**
@@ -119,13 +122,13 @@ export async function isAccountOwner(accountId: string): Promise<boolean> {
  * @throws Error if not authenticated
  */
 export async function requireAuth() {
-  const user = await getCurrentUser()
+  const user = await getCurrentUser();
   if (!user) {
-    throw new Error('Usuário não autenticado')
+    throw new Error("Usuário não autenticado");
   }
 
-  const supabase = await createClient()
-  return { user, supabase }
+  const supabase = await createClient();
+  return { user, supabase };
 }
 
 /**
@@ -134,14 +137,14 @@ export async function requireAuth() {
  * @throws Error if not authenticated or no access
  */
 export async function requireAccountAccess(accountId: string) {
-  const { user, supabase } = await requireAuth()
+  const { user, supabase } = await requireAuth();
 
-  const hasAccess = await hasAccessToAccount(accountId)
+  const hasAccess = await hasAccessToAccount(accountId);
   if (!hasAccess) {
-    throw new Error('Acesso negado a esta conta')
+    throw new Error("Acesso negado a esta conta");
   }
 
-  return { user, supabase, accountId }
+  return { user, supabase, accountId };
 }
 
 /**
@@ -150,21 +153,21 @@ export async function requireAccountAccess(accountId: string) {
  * @throws Error if not authenticated or not owner
  */
 export async function requireAccountOwnership(accountId: string) {
-  const { user, supabase } = await requireAuth()
+  const { user, supabase } = await requireAuth();
 
   const { data: account, error } = await supabase
-    .from('accounts')
-    .select('owner_id')
-    .eq('id', accountId)
-    .single()
+    .from("accounts")
+    .select("owner_id")
+    .eq("id", accountId)
+    .single();
 
   if (error || !account) {
-    throw new Error('Conta não encontrada')
+    throw new Error("Conta não encontrada");
   }
 
   if ((account as any).owner_id !== user.id) {
-    throw new Error('Apenas o dono da conta pode realizar esta ação')
+    throw new Error("Apenas o dono da conta pode realizar esta ação");
   }
 
-  return { user, account, supabase, accountId }
+  return { user, account, supabase, accountId };
 }

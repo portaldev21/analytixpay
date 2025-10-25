@@ -1,52 +1,52 @@
-"use client"
+"use client";
 
-import { useState, useCallback } from "react"
+import { useState, useCallback } from "react";
 
-export type ToastType = "success" | "error" | "info" | "warning"
+export type ToastType = "success" | "error" | "info" | "warning";
 
 export interface Toast {
-  id: string
-  type: ToastType
-  message: string
+  id: string;
+  type: ToastType;
+  message: string;
 }
 
 export function useToast() {
-  const [toasts, setToasts] = useState<Toast[]>([])
+  const [toasts, setToasts] = useState<Toast[]>([]);
 
   const addToast = useCallback((type: ToastType, message: string) => {
-    const id = Math.random().toString(36).substring(7)
-    setToasts((prev) => [...prev, { id, type, message }])
+    const id = Math.random().toString(36).substring(7);
+    setToasts((prev) => [...prev, { id, type, message }]);
 
     setTimeout(() => {
-      setToasts((prev) => prev.filter((t) => t.id !== id))
-    }, 5000)
+      setToasts((prev) => prev.filter((t) => t.id !== id));
+    }, 5000);
 
-    return id
-  }, [])
+    return id;
+  }, []);
 
   const removeToast = useCallback((id: string) => {
-    setToasts((prev) => prev.filter((t) => t.id !== id))
-  }, [])
+    setToasts((prev) => prev.filter((t) => t.id !== id));
+  }, []);
 
   const success = useCallback(
     (message: string) => addToast("success", message),
-    [addToast]
-  )
+    [addToast],
+  );
 
   const error = useCallback(
     (message: string) => addToast("error", message),
-    [addToast]
-  )
+    [addToast],
+  );
 
   const info = useCallback(
     (message: string) => addToast("info", message),
-    [addToast]
-  )
+    [addToast],
+  );
 
   const warning = useCallback(
     (message: string) => addToast("warning", message),
-    [addToast]
-  )
+    [addToast],
+  );
 
   return {
     toasts,
@@ -56,5 +56,5 @@ export function useToast() {
     error,
     info,
     warning,
-  }
+  };
 }

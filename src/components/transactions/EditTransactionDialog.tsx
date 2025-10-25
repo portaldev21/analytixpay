@@ -1,10 +1,13 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Pencil, Trash2 } from "lucide-react"
-import { toast } from "sonner"
-import { updateTransaction, deleteTransaction } from "@/actions/transaction.actions"
-import { Button } from "@/components/ui/button"
+import { useState } from "react";
+import { Pencil, Trash2 } from "lucide-react";
+import { toast } from "sonner";
+import {
+  updateTransaction,
+  deleteTransaction,
+} from "@/actions/transaction.actions";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -13,7 +16,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,22 +27,22 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+} from "@/components/ui/alert-dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { Checkbox } from "@/components/ui/checkbox"
-import { CategoryBadge } from "./CategoryBadge"
-import type { TTransaction } from "@/db/types"
+} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { CategoryBadge } from "./CategoryBadge";
+import type { TTransaction } from "@/db/types";
 
 interface EditTransactionDialogProps {
-  transaction: TTransaction
+  transaction: TTransaction;
 }
 
 const CATEGORIES = [
@@ -52,25 +55,27 @@ const CATEGORIES = [
   "Casa",
   "Serviços",
   "Outros",
-]
+];
 
-export function EditTransactionDialog({ transaction }: EditTransactionDialogProps) {
-  const [open, setOpen] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [deleting, setDeleting] = useState(false)
+export function EditTransactionDialog({
+  transaction,
+}: EditTransactionDialogProps) {
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const [formData, setFormData] = useState({
-    date: transaction.date.split('T')[0], // Convert to YYYY-MM-DD
+    date: transaction.date.split("T")[0], // Convert to YYYY-MM-DD
     description: transaction.description,
     amount: transaction.amount,
     category: transaction.category,
     installment: transaction.installment || "",
     is_international: transaction.is_international,
-  })
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
+    e.preventDefault();
+    setLoading(true);
 
     try {
       const result = await updateTransaction(
@@ -83,40 +88,40 @@ export function EditTransactionDialog({ transaction }: EditTransactionDialogProp
           category: formData.category,
           installment: formData.installment || null,
           is_international: formData.is_international,
-        }
-      )
+        },
+      );
 
       if (result.success) {
-        toast.success("Transação atualizada com sucesso!")
-        setOpen(false)
+        toast.success("Transação atualizada com sucesso!");
+        setOpen(false);
       } else {
-        toast.error(result.error || "Erro ao atualizar transação")
+        toast.error(result.error || "Erro ao atualizar transação");
       }
     } catch (error) {
-      toast.error("Erro ao atualizar transação")
+      toast.error("Erro ao atualizar transação");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleDelete = async () => {
-    setDeleting(true)
+    setDeleting(true);
 
     try {
-      const result = await deleteTransaction(transaction.id)
+      const result = await deleteTransaction(transaction.id);
 
       if (result.success) {
-        toast.success("Transação deletada com sucesso!")
-        setOpen(false)
+        toast.success("Transação deletada com sucesso!");
+        setOpen(false);
       } else {
-        toast.error(result.error || "Erro ao deletar transação")
+        toast.error(result.error || "Erro ao deletar transação");
       }
     } catch (error) {
-      toast.error("Erro ao deletar transação")
+      toast.error("Erro ao deletar transação");
     } finally {
-      setDeleting(false)
+      setDeleting(false);
     }
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -140,7 +145,9 @@ export function EditTransactionDialog({ transaction }: EditTransactionDialogProp
               <Input
                 id="description"
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
                 required
               />
             </div>
@@ -152,7 +159,9 @@ export function EditTransactionDialog({ transaction }: EditTransactionDialogProp
                   id="date"
                   type="date"
                   value={formData.date}
-                  onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, date: e.target.value })
+                  }
                   required
                 />
               </div>
@@ -165,7 +174,9 @@ export function EditTransactionDialog({ transaction }: EditTransactionDialogProp
                   step="0.01"
                   min="0"
                   value={formData.amount}
-                  onChange={(e) => setFormData({ ...formData, amount: Number(e.target.value) })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, amount: Number(e.target.value) })
+                  }
                   required
                 />
               </div>
@@ -176,7 +187,9 @@ export function EditTransactionDialog({ transaction }: EditTransactionDialogProp
               <div className="flex items-center gap-2">
                 <Select
                   value={formData.category}
-                  onValueChange={(value) => setFormData({ ...formData, category: value })}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, category: value })
+                  }
                 >
                   <SelectTrigger id="category" className="flex-1">
                     <SelectValue placeholder="Selecione uma categoria" />
@@ -198,7 +211,9 @@ export function EditTransactionDialog({ transaction }: EditTransactionDialogProp
               <Input
                 id="installment"
                 value={formData.installment}
-                onChange={(e) => setFormData({ ...formData, installment: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, installment: e.target.value })
+                }
                 placeholder="Ex: 1/12"
               />
             </div>
@@ -208,7 +223,10 @@ export function EditTransactionDialog({ transaction }: EditTransactionDialogProp
                 id="is_international"
                 checked={formData.is_international}
                 onCheckedChange={(checked) =>
-                  setFormData({ ...formData, is_international: checked as boolean })
+                  setFormData({
+                    ...formData,
+                    is_international: checked as boolean,
+                  })
                 }
               />
               <Label
@@ -237,11 +255,14 @@ export function EditTransactionDialog({ transaction }: EditTransactionDialogProp
                 <AlertDialogHeader>
                   <AlertDialogTitle>Deletar Transação</AlertDialogTitle>
                   <AlertDialogDescription>
-                    Tem certeza que deseja deletar esta transação? Esta ação não pode ser desfeita.
+                    Tem certeza que deseja deletar esta transação? Esta ação não
+                    pode ser desfeita.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel disabled={deleting}>Cancelar</AlertDialogCancel>
+                  <AlertDialogCancel disabled={deleting}>
+                    Cancelar
+                  </AlertDialogCancel>
                   <AlertDialogAction
                     onClick={handleDelete}
                     disabled={deleting}
@@ -269,5 +290,5 @@ export function EditTransactionDialog({ transaction }: EditTransactionDialogProp
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

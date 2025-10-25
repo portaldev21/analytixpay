@@ -15,9 +15,7 @@ export function TopExpenses({ data }: TopExpensesProps) {
     return (
       <Card className="p-8 text-center">
         <TrendingUp className="mx-auto h-12 w-12 text-muted-foreground/50 mb-3" />
-        <p className="text-muted-foreground">
-          Nenhuma transação encontrada
-        </p>
+        <p className="text-muted-foreground">Nenhuma transação encontrada</p>
       </Card>
     );
   }

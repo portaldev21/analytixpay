@@ -2,35 +2,35 @@
  * Pagination parameters
  */
 export type TPaginationParams = {
-  page?: number
-  limit?: number
-}
+  page?: number;
+  limit?: number;
+};
 
 /**
  * Paginated result wrapper
  */
 export type TPaginatedResult<T> = {
-  data: T[]
+  data: T[];
   pagination: {
-    page: number
-    limit: number
-    total: number
-    totalPages: number
-    hasNext: boolean
-    hasPrev: boolean
-  }
-}
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    hasNext: boolean;
+    hasPrev: boolean;
+  };
+};
 
 /**
  * Calculate pagination metadata
  */
 export function calculatePagination(params: {
-  page: number
-  limit: number
-  total: number
-}): TPaginatedResult<never>['pagination'] {
-  const { page, limit, total } = params
-  const totalPages = Math.ceil(total / limit)
+  page: number;
+  limit: number;
+  total: number;
+}): TPaginatedResult<never>["pagination"] {
+  const { page, limit, total } = params;
+  const totalPages = Math.ceil(total / limit);
 
   return {
     page,
@@ -39,33 +39,36 @@ export function calculatePagination(params: {
     totalPages,
     hasNext: page < totalPages,
     hasPrev: page > 1,
-  }
+  };
 }
 
 /**
  * Get pagination range for SQL queries
  * Returns { from, to } for use with Supabase .range()
  */
-export function getPaginationRange(page: number, limit: number): {
-  from: number
-  to: number
+export function getPaginationRange(
+  page: number,
+  limit: number,
+): {
+  from: number;
+  to: number;
 } {
-  const from = (page - 1) * limit
-  const to = from + limit - 1
+  const from = (page - 1) * limit;
+  const to = from + limit - 1;
 
-  return { from, to }
+  return { from, to };
 }
 
 /**
  * Validate and normalize pagination params
  */
 export function normalizePaginationParams(
-  params: TPaginationParams = {}
+  params: TPaginationParams = {},
 ): Required<TPaginationParams> {
-  const page = Math.max(1, params.page || 1)
-  const limit = Math.min(Math.max(1, params.limit || 50), 100) // Max 100
+  const page = Math.max(1, params.page || 1);
+  const limit = Math.min(Math.max(1, params.limit || 50), 100); // Max 100
 
-  return { page, limit }
+  return { page, limit };
 }
 
 /**
@@ -74,7 +77,7 @@ export function normalizePaginationParams(
 export function createPaginatedResponse<T>(
   data: T[],
   total: number,
-  params: Required<TPaginationParams>
+  params: Required<TPaginationParams>,
 ): TPaginatedResult<T> {
   return {
     data,
@@ -83,5 +86,5 @@ export function createPaginatedResponse<T>(
       limit: params.limit,
       total,
     }),
-  }
+  };
 }

@@ -1,21 +1,21 @@
-import { env, isDevelopment, isProduction } from './env'
+import { env, isDevelopment, isProduction } from "./env";
 
 /**
  * Log levels
  */
-export type LogLevel = 'debug' | 'info' | 'warn' | 'error'
+export type LogLevel = "debug" | "info" | "warn" | "error";
 
 /**
  * Log context with additional metadata
  */
 export interface LogContext {
-  userId?: string
-  accountId?: string
-  invoiceId?: string
-  transactionId?: string
-  action?: string
-  duration?: number
-  [key: string]: any
+  userId?: string;
+  accountId?: string;
+  invoiceId?: string;
+  transactionId?: string;
+  action?: string;
+  duration?: number;
+  [key: string]: any;
 }
 
 /**
@@ -27,14 +27,14 @@ class Logger {
    * Internal log method
    */
   private log(level: LogLevel, message: string, context?: LogContext) {
-    const timestamp = new Date().toISOString()
+    const timestamp = new Date().toISOString();
     const logData = {
       timestamp,
       level,
       message,
       env: env.NODE_ENV,
       ...context,
-    }
+    };
 
     // In production, send to logging service (Sentry, Datadog, etc)
     if (isProduction()) {
@@ -44,23 +44,23 @@ class Logger {
 
     // Console output with emoji for readability
     const emoji = {
-      debug: '🔍',
-      info: 'ℹ️',
-      warn: '⚠️',
-      error: '❌',
-    }[level]
+      debug: "🔍",
+      info: "ℹ️",
+      warn: "⚠️",
+      error: "❌",
+    }[level];
 
-    const consoleMethod = level === 'debug' ? 'log' : level
+    const consoleMethod = level === "debug" ? "log" : level;
 
     if (isDevelopment()) {
       // Detailed output in development
       console[consoleMethod](
         `${emoji} [${level.toUpperCase()}] ${message}`,
-        context ? JSON.stringify(context, null, 2) : ''
-      )
+        context ? JSON.stringify(context, null, 2) : "",
+      );
     } else {
       // Compact output in production
-      console[consoleMethod](JSON.stringify(logData))
+      console[consoleMethod](JSON.stringify(logData));
     }
   }
 
@@ -69,7 +69,7 @@ class Logger {
    */
   debug(message: string, context?: LogContext): void {
     if (isDevelopment()) {
-      this.log('debug', message, context)
+      this.log("debug", message, context);
     }
   }
 
@@ -77,14 +77,14 @@ class Logger {
    * Log info message
    */
   info(message: string, context?: LogContext): void {
-    this.log('info', message, context)
+    this.log("info", message, context);
   }
 
   /**
    * Log warning message
    */
   warn(message: string, context?: LogContext): void {
-    this.log('warn', message, context)
+    this.log("warn", message, context);
   }
 
   /**
@@ -93,17 +93,17 @@ class Logger {
   error(message: string, error?: Error | unknown, context?: LogContext): void {
     const errorContext: LogContext = {
       ...context,
-    }
+    };
 
     if (error instanceof Error) {
-      errorContext.error = error.message
-      errorContext.stack = error.stack
-      errorContext.errorName = error.name
+      errorContext.error = error.message;
+      errorContext.stack = error.stack;
+      errorContext.errorName = error.name;
     } else if (error) {
-      errorContext.error = String(error)
+      errorContext.error = String(error);
     }
 
-    this.log('error', message, errorContext)
+    this.log("error", message, errorContext);
   }
 
   /**
@@ -112,29 +112,29 @@ class Logger {
   async time<T>(
     label: string,
     fn: () => Promise<T>,
-    context?: LogContext
+    context?: LogContext,
   ): Promise<T> {
-    const start = Date.now()
+    const start = Date.now();
 
     try {
-      const result = await fn()
-      const duration = Date.now() - start
+      const result = await fn();
+      const duration = Date.now() - start;
 
       this.debug(`${label} completed`, {
         ...context,
         duration,
-      })
+      });
 
-      return result
+      return result;
     } catch (error) {
-      const duration = Date.now() - start
+      const duration = Date.now() - start;
 
       this.error(`${label} failed`, error, {
         ...context,
         duration,
-      })
+      });
 
-      throw error
+      throw error;
     }
   }
 }
@@ -142,28 +142,28 @@ class Logger {
 /**
  * Global logger instance
  */
-export const logger = new Logger()
+export const logger = new Logger();
 
 /**
  * Helper to create logger with default context
  */
 export function createLogger(defaultContext: LogContext): Logger {
-  const contextLogger = new Logger()
+  const contextLogger = new Logger();
 
   // Override methods to inject default context
-  const originalDebug = contextLogger.debug.bind(contextLogger)
-  const originalInfo = contextLogger.info.bind(contextLogger)
-  const originalWarn = contextLogger.warn.bind(contextLogger)
-  const originalError = contextLogger.error.bind(contextLogger)
+  const originalDebug = contextLogger.debug.bind(contextLogger);
+  const originalInfo = contextLogger.info.bind(contextLogger);
+  const originalWarn = contextLogger.warn.bind(contextLogger);
+  const originalError = contextLogger.error.bind(contextLogger);
 
   contextLogger.debug = (message, context?) =>
-    originalDebug(message, { ...defaultContext, ...context })
+    originalDebug(message, { ...defaultContext, ...context });
   contextLogger.info = (message, context?) =>
-    originalInfo(message, { ...defaultContext, ...context })
+    originalInfo(message, { ...defaultContext, ...context });
   contextLogger.warn = (message, context?) =>
-    originalWarn(message, { ...defaultContext, ...context })
+    originalWarn(message, { ...defaultContext, ...context });
   contextLogger.error = (message, error?, context?) =>
-    originalError(message, error, { ...defaultContext, ...context })
+    originalError(message, error, { ...defaultContext, ...context });
 
-  return contextLogger
+  return contextLogger;
 }

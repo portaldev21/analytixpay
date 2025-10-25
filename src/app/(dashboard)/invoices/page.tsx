@@ -1,23 +1,23 @@
-import { Suspense } from "react"
-import { FileText } from "lucide-react"
-import { createClient } from "@/lib/supabase/server"
-import { getInvoices, deleteInvoice } from "@/actions/invoice.actions"
-import { UploadInvoice } from "@/components/invoices/UploadInvoice"
-import { InvoiceCard } from "@/components/invoices/InvoiceCard"
-import { EmptyState } from "@/components/shared/EmptyState"
-import { Loading } from "@/components/shared/Loading"
-import { Button } from "@/components/ui/button"
+import { Suspense } from "react";
+import { FileText } from "lucide-react";
+import { createClient } from "@/lib/supabase/server";
+import { getInvoices, deleteInvoice } from "@/actions/invoice.actions";
+import { UploadInvoice } from "@/components/invoices/UploadInvoice";
+import { InvoiceCard } from "@/components/invoices/InvoiceCard";
+import { EmptyState } from "@/components/shared/EmptyState";
+import { Loading } from "@/components/shared/Loading";
+import { Button } from "@/components/ui/button";
 
 async function InvoicesList({ accountId }: { accountId: string }) {
-  const supabase = await createClient()
-  const result = await getInvoices(accountId)
+  const supabase = await createClient();
+  const result = await getInvoices(accountId);
 
   if (!result.success || !result.data) {
     return (
       <div className="text-center text-destructive p-8">
         Erro ao carregar faturas
       </div>
-    )
+    );
   }
 
   if (result.data.length === 0) {
@@ -27,23 +27,23 @@ async function InvoicesList({ accountId }: { accountId: string }) {
         title="Nenhuma fatura encontrada"
         description="Faça upload da sua primeira fatura de cartão de crédito"
       />
-    )
+    );
   }
 
   // Get transaction count for each invoice
   const invoicesWithCount = await Promise.all(
     result.data.map(async (invoice) => {
       const { count } = await supabase
-        .from('transactions')
-        .select('*', { count: 'exact', head: true })
-        .eq('invoice_id', invoice.id)
+        .from("transactions")
+        .select("*", { count: "exact", head: true })
+        .eq("invoice_id", invoice.id);
 
       return {
         ...invoice,
-        transaction_count: count || 0
-      }
-    })
-  )
+        transaction_count: count || 0,
+      };
+    }),
+  );
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -51,18 +51,18 @@ async function InvoicesList({ accountId }: { accountId: string }) {
         <InvoiceCard key={invoice.id} invoice={invoice} accountId={accountId} />
       ))}
     </div>
-  )
+  );
 }
 
 export default async function InvoicesPage() {
-  const supabase = await createClient()
+  const supabase = await createClient();
 
   const {
     data: { user },
-  } = await supabase.auth.getUser()
+  } = await supabase.auth.getUser();
 
   if (!user) {
-    return null
+    return null;
   }
 
   // Pegar a primeira conta do usuário
@@ -70,9 +70,9 @@ export default async function InvoicesPage() {
     .from("account_members")
     .select("account_id")
     .eq("user_id", user.id)
-    .single()
+    .single();
 
-  const accountId = (accountMember as any)?.account_id
+  const accountId = (accountMember as any)?.account_id;
 
   if (!accountId) {
     return (
@@ -90,7 +90,7 @@ export default async function InvoicesPage() {
           </p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -111,5 +111,5 @@ export default async function InvoicesPage() {
         </Suspense>
       </div>
     </div>
-  )
+  );
 }

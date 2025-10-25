@@ -1,32 +1,32 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Loader2, AlertCircle } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { loginWithGoogle } from "@/actions/auth.actions"
+import { useState } from "react";
+import { Loader2, AlertCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { loginWithGoogle } from "@/actions/auth.actions";
 
 export function GoogleButton() {
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleGoogleLogin = async () => {
     try {
-      setIsLoading(true)
-      setError(null)
-      const result = await loginWithGoogle()
+      setIsLoading(true);
+      setError(null);
+      const result = await loginWithGoogle();
 
       if (result.success && result.data?.url) {
         // Redirecionar para a URL de autenticação do Google
-        window.location.href = result.data.url
+        window.location.href = result.data.url;
       } else {
-        setError(result.error || 'Erro ao conectar com Google')
-        setIsLoading(false)
+        setError(result.error || "Erro ao conectar com Google");
+        setIsLoading(false);
       }
     } catch (error) {
-      setError('Erro ao fazer login com Google')
-      setIsLoading(false)
+      setError("Erro ao fazer login com Google");
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <div className="space-y-2">
@@ -73,5 +73,5 @@ export function GoogleButton() {
         </div>
       )}
     </div>
-  )
+  );
 }

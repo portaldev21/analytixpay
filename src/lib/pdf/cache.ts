@@ -1,31 +1,31 @@
-import crypto from 'crypto'
-import type { TPdfParseResult } from '@/db/types'
-import { logger } from '@/lib/logger'
+import crypto from "crypto";
+import type { TPdfParseResult } from "@/db/types";
+import { logger } from "@/lib/logger";
 
 /**
  * Cache entry interface
  */
 interface CacheEntry {
-  hash: string
-  result: TPdfParseResult
-  timestamp: number
+  hash: string;
+  result: TPdfParseResult;
+  timestamp: number;
 }
 
 /**
  * In-memory cache for PDF parse results
  * For production, consider using Redis or similar
  */
-const cache = new Map<string, CacheEntry>()
+const cache = new Map<string, CacheEntry>();
 
 /**
  * Cache time-to-live (24 hours)
  */
-const CACHE_TTL = 24 * 60 * 60 * 1000
+const CACHE_TTL = 24 * 60 * 60 * 1000;
 
 /**
  * Maximum cache size (prevent memory issues)
  */
-const MAX_CACHE_SIZE = 100
+const MAX_CACHE_SIZE = 100;
 
 /**
  * Generate SHA-256 hash from file buffer
@@ -33,9 +33,9 @@ const MAX_CACHE_SIZE = 100
  * @returns Hexadecimal hash string
  */
 export function generateFileHash(buffer: ArrayBuffer): string {
-  const hashSum = crypto.createHash('sha256')
-  hashSum.update(Buffer.from(buffer))
-  return hashSum.digest('hex')
+  const hashSum = crypto.createHash("sha256");
+  hashSum.update(Buffer.from(buffer));
+  return hashSum.digest("hex");
 }
 
 /**
@@ -44,27 +44,27 @@ export function generateFileHash(buffer: ArrayBuffer): string {
  * @returns Cached result or null if not found/expired
  */
 export function getCachedResult(hash: string): TPdfParseResult | null {
-  const entry = cache.get(hash)
+  const entry = cache.get(hash);
 
   if (!entry) {
-    logger.debug('Cache miss', { hash })
-    return null
+    logger.debug("Cache miss", { hash });
+    return null;
   }
 
   // Check if expired
   if (Date.now() - entry.timestamp > CACHE_TTL) {
-    cache.delete(hash)
-    logger.debug('Cache expired', { hash, age: Date.now() - entry.timestamp })
-    return null
+    cache.delete(hash);
+    logger.debug("Cache expired", { hash, age: Date.now() - entry.timestamp });
+    return null;
   }
 
-  logger.info('Cache hit', {
+  logger.info("Cache hit", {
     hash,
     age: Date.now() - entry.timestamp,
     transactionCount: entry.result.transactions.length,
-  })
+  });
 
-  return entry.result
+  return entry.result;
 }
 
 /**
@@ -77,15 +77,15 @@ export function cacheResult(hash: string, result: TPdfParseResult): void {
   if (cache.size >= MAX_CACHE_SIZE) {
     // Evict oldest entry
     const oldest = Array.from(cache.entries()).sort(
-      (a, b) => a[1].timestamp - b[1].timestamp
-    )[0]
+      (a, b) => a[1].timestamp - b[1].timestamp,
+    )[0];
 
     if (oldest) {
-      cache.delete(oldest[0])
-      logger.debug('Cache eviction', {
+      cache.delete(oldest[0]);
+      logger.debug("Cache eviction", {
         evictedHash: oldest[0],
         cacheSize: cache.size,
-      })
+      });
     }
   }
 
@@ -93,41 +93,41 @@ export function cacheResult(hash: string, result: TPdfParseResult): void {
     hash,
     result,
     timestamp: Date.now(),
-  })
+  });
 
-  logger.info('Result cached', {
+  logger.info("Result cached", {
     hash,
     transactionCount: result.transactions.length,
     cacheSize: cache.size,
-  })
+  });
 }
 
 /**
  * Clear entire cache
  */
 export function clearCache(): void {
-  const size = cache.size
-  cache.clear()
-  logger.info('Cache cleared', { entriesRemoved: size })
+  const size = cache.size;
+  cache.clear();
+  logger.info("Cache cleared", { entriesRemoved: size });
 }
 
 /**
  * Get cache statistics
  */
 export function getCacheStats(): {
-  size: number
-  entries: { hash: string; age: number; transactionCount: number }[]
+  size: number;
+  entries: { hash: string; age: number; transactionCount: number }[];
 } {
   const entries = Array.from(cache.entries()).map(([hash, entry]) => ({
     hash,
     age: Date.now() - entry.timestamp,
     transactionCount: entry.result.transactions.length,
-  }))
+  }));
 
   return {
     size: cache.size,
     entries,
-  }
+  };
 }
 
 /**
@@ -135,19 +135,22 @@ export function getCacheStats(): {
  * Call periodically to free memory
  */
 export function cleanExpiredEntries(): number {
-  const now = Date.now()
-  let removed = 0
+  const now = Date.now();
+  let removed = 0;
 
   for (const [hash, entry] of cache.entries()) {
     if (now - entry.timestamp > CACHE_TTL) {
-      cache.delete(hash)
-      removed++
+      cache.delete(hash);
+      removed++;
     }
   }
 
   if (removed > 0) {
-    logger.info('Expired cache entries cleaned', { removed, remaining: cache.size })
+    logger.info("Expired cache entries cleaned", {
+      removed,
+      remaining: cache.size,
+    });
   }
 
-  return removed
+  return removed;
 }

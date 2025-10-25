@@ -15,7 +15,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "AnalytiXPay - Gestão de Faturas",
-  description: "Gestão inteligente de faturas de cartão de crédito com extração automática de transações",
+  description:
+    "Gestão inteligente de faturas de cartão de crédito com extração automática de transações",
 };
 
 export default function RootLayout({

@@ -1,29 +1,35 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { Loader2 } from "lucide-react"
-import { z } from "zod"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2 } from "lucide-react";
+import { z } from "zod";
 
-import { createAccount } from "@/actions/account.actions"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { createAccount } from "@/actions/account.actions";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 const createAccountSchema = z.object({
   name: z.string().min(3, "Nome deve ter no mínimo 3 caracteres"),
-})
+});
 
-type CreateAccountFormData = z.infer<typeof createAccountSchema>
+type CreateAccountFormData = z.infer<typeof createAccountSchema>;
 
 export function CreateAccountForm() {
-  const router = useRouter()
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [success, setSuccess] = useState(false)
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
 
   const {
     register,
@@ -32,25 +38,25 @@ export function CreateAccountForm() {
     reset,
   } = useForm<CreateAccountFormData>({
     resolver: zodResolver(createAccountSchema),
-  })
+  });
 
   const onSubmit = async (data: CreateAccountFormData) => {
-    setIsLoading(true)
-    setError(null)
+    setIsLoading(true);
+    setError(null);
 
-    const result = await createAccount(data.name)
+    const result = await createAccount(data.name);
 
     if (result.success) {
-      setSuccess(true)
-      reset()
-      router.refresh()
-      setTimeout(() => setSuccess(false), 3000)
+      setSuccess(true);
+      reset();
+      router.refresh();
+      setTimeout(() => setSuccess(false), 3000);
     } else {
-      setError(result.error || "Erro ao criar conta")
+      setError(result.error || "Erro ao criar conta");
     }
 
-    setIsLoading(false)
-  }
+    setIsLoading(false);
+  };
 
   return (
     <Card>
@@ -100,5 +106,5 @@ export function CreateAccountForm() {
         </CardContent>
       </form>
     </Card>
-  )
+  );
 }

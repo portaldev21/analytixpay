@@ -44,7 +44,7 @@ export function DeleteInvoiceButton({
 
       if (result.success && result.data) {
         toast.success(
-          `Fatura deletada! ${result.data.deletedTransactions} ${result.data.deletedTransactions === 1 ? "transação removida" : "transações removidas"}.`
+          `Fatura deletada! ${result.data.deletedTransactions} ${result.data.deletedTransactions === 1 ? "transação removida" : "transações removidas"}.`,
         );
         setIsOpen(false);
       } else {

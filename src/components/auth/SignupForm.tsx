@@ -1,30 +1,37 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import Link from "next/link"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { Loader2 } from "lucide-react"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2 } from "lucide-react";
 
-import { signupSchema } from "@/lib/validations"
-import { signup } from "@/actions/auth.actions"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { signupSchema } from "@/lib/validations";
+import { signup } from "@/actions/auth.actions";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 type SignupFormData = {
-  fullName?: string
-  email: string
-  password: string
-  confirmPassword: string
-}
+  fullName?: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+};
 
 export function SignupForm() {
-  const router = useRouter()
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const {
     register,
@@ -32,22 +39,27 @@ export function SignupForm() {
     formState: { errors },
   } = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
-  })
+  });
 
   const onSubmit = async (data: SignupFormData) => {
-    setIsLoading(true)
-    setError(null)
+    setIsLoading(true);
+    setError(null);
 
-    const result = await signup(data.email, data.password, data.confirmPassword, data.fullName)
+    const result = await signup(
+      data.email,
+      data.password,
+      data.confirmPassword,
+      data.fullName,
+    );
 
     if (result.success) {
-      router.push("/dashboard")
-      router.refresh()
+      router.push("/dashboard");
+      router.refresh();
     } else {
-      setError(result.error || "Erro ao criar conta")
-      setIsLoading(false)
+      setError(result.error || "Erro ao criar conta");
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <Card className="w-full max-w-md">
@@ -75,7 +87,9 @@ export function SignupForm() {
               disabled={isLoading}
             />
             {errors.fullName && (
-              <p className="text-sm text-destructive">{errors.fullName.message}</p>
+              <p className="text-sm text-destructive">
+                {errors.fullName.message}
+              </p>
             )}
           </div>
 
@@ -103,7 +117,9 @@ export function SignupForm() {
               disabled={isLoading}
             />
             {errors.password && (
-              <p className="text-sm text-destructive">{errors.password.message}</p>
+              <p className="text-sm text-destructive">
+                {errors.password.message}
+              </p>
             )}
           </div>
 
@@ -117,7 +133,9 @@ export function SignupForm() {
               disabled={isLoading}
             />
             {errors.confirmPassword && (
-              <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>
+              <p className="text-sm text-destructive">
+                {errors.confirmPassword.message}
+              </p>
             )}
           </div>
         </CardContent>
@@ -143,5 +161,5 @@ export function SignupForm() {
         </CardFooter>
       </form>
     </Card>
-  )
+  );
 }

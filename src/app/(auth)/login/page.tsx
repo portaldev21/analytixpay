@@ -1,5 +1,5 @@
-import { LoginForm } from "@/components/auth/LoginForm"
-import { GoogleButton } from "@/components/auth/GoogleButton"
+import { LoginForm } from "@/components/auth/LoginForm";
+import { GoogleButton } from "@/components/auth/GoogleButton";
 
 export default function LoginPage() {
   return (
@@ -17,5 +17,5 @@ export default function LoginPage() {
       </div>
       <GoogleButton />
     </div>
-  )
+  );
 }

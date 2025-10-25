@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Trash2 } from "lucide-react"
-import { toast } from "sonner"
-import { deleteTransaction } from "@/actions/transaction.actions"
-import { Button } from "@/components/ui/button"
+import { useState } from "react";
+import { Trash2 } from "lucide-react";
+import { toast } from "sonner";
+import { deleteTransaction } from "@/actions/transaction.actions";
+import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,40 +15,47 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
-import type { TTransaction } from "@/db/types"
+} from "@/components/ui/alert-dialog";
+import type { TTransaction } from "@/db/types";
 
 interface DeleteTransactionButtonProps {
-  transaction: TTransaction
-  onDeleteStart?: () => void
+  transaction: TTransaction;
+  onDeleteStart?: () => void;
 }
 
-export function DeleteTransactionButton({ transaction, onDeleteStart }: DeleteTransactionButtonProps) {
-  const [deleting, setDeleting] = useState(false)
+export function DeleteTransactionButton({
+  transaction,
+  onDeleteStart,
+}: DeleteTransactionButtonProps) {
+  const [deleting, setDeleting] = useState(false);
 
   const handleDelete = async () => {
-    setDeleting(true)
-    onDeleteStart?.() // Chama callback para iniciar animação
+    setDeleting(true);
+    onDeleteStart?.(); // Chama callback para iniciar animação
 
     try {
-      const result = await deleteTransaction(transaction.id)
+      const result = await deleteTransaction(transaction.id);
 
       if (result.success) {
-        toast.success("Transação deletada com sucesso!")
+        toast.success("Transação deletada com sucesso!");
       } else {
-        toast.error(result.error || "Erro ao deletar transação")
-        setDeleting(false)
+        toast.error(result.error || "Erro ao deletar transação");
+        setDeleting(false);
       }
     } catch (error) {
-      toast.error("Erro ao deletar transação")
-      setDeleting(false)
+      toast.error("Erro ao deletar transação");
+      setDeleting(false);
     }
-  }
+  };
 
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-500/10">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-500/10"
+        >
           <Trash2 className="h-4 w-4" />
           <span className="sr-only">Deletar transação</span>
         </Button>
@@ -57,7 +64,8 @@ export function DeleteTransactionButton({ transaction, onDeleteStart }: DeleteTr
         <AlertDialogHeader>
           <AlertDialogTitle>Deletar Transação</AlertDialogTitle>
           <AlertDialogDescription>
-            Tem certeza que deseja deletar a transação "{transaction.description}"? Esta ação não pode ser desfeita.
+            Tem certeza que deseja deletar a transação "
+            {transaction.description}"? Esta ação não pode ser desfeita.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -72,5 +80,5 @@ export function DeleteTransactionButton({ transaction, onDeleteStart }: DeleteTr
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
-  )
+  );
 }

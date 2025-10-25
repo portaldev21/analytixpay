@@ -1,12 +1,18 @@
-import { Suspense } from "react"
-import { createClient } from "@/lib/supabase/server"
-import { CreateAccountForm } from "@/components/settings/CreateAccountForm"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Loading } from "@/components/shared/Loading"
-import { Badge } from "@/components/ui/badge"
+import { Suspense } from "react";
+import { createClient } from "@/lib/supabase/server";
+import { CreateAccountForm } from "@/components/settings/CreateAccountForm";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Loading } from "@/components/shared/Loading";
+import { Badge } from "@/components/ui/badge";
 
 async function AccountInfo({ userId }: { userId: string }) {
-  const supabase = await createClient()
+  const supabase = await createClient();
 
   const { data: accounts } = await supabase
     .from("account_members")
@@ -18,10 +24,10 @@ async function AccountInfo({ userId }: { userId: string }) {
         created_at
       )
     `)
-    .eq("user_id", userId)
+    .eq("user_id", userId);
 
   if (!accounts || accounts.length === 0) {
-    return null
+    return null;
   }
 
   return (
@@ -40,7 +46,10 @@ async function AccountInfo({ userId }: { userId: string }) {
               <div>
                 <p className="font-medium">{item.account.name}</p>
                 <p className="text-sm text-muted-foreground">
-                  Criada em {new Date(item.account.created_at).toLocaleDateString("pt-BR")}
+                  Criada em{" "}
+                  {new Date(item.account.created_at).toLocaleDateString(
+                    "pt-BR",
+                  )}
                 </p>
               </div>
               <Badge variant={item.role === "owner" ? "default" : "secondary"}>
@@ -51,18 +60,18 @@ async function AccountInfo({ userId }: { userId: string }) {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 export default async function SettingsPage() {
-  const supabase = await createClient()
+  const supabase = await createClient();
 
   const {
     data: { user },
-  } = await supabase.auth.getUser()
+  } = await supabase.auth.getUser();
 
   if (!user) {
-    return null
+    return null;
   }
 
   return (
@@ -88,12 +97,16 @@ export default async function SettingsPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label className="text-sm font-medium text-muted-foreground">Email</Label>
+              <Label className="text-sm font-medium text-muted-foreground">
+                Email
+              </Label>
               <p className="mt-1">{user.email}</p>
             </div>
             {user.user_metadata?.name && (
               <div>
-                <Label className="text-sm font-medium text-muted-foreground">Nome</Label>
+                <Label className="text-sm font-medium text-muted-foreground">
+                  Nome
+                </Label>
                 <p className="mt-1">{user.user_metadata.name}</p>
               </div>
             )}
@@ -101,9 +114,15 @@ export default async function SettingsPage() {
         </Card>
       </div>
     </div>
-  )
+  );
 }
 
-function Label({ className, children }: { className?: string; children: React.ReactNode }) {
-  return <div className={className}>{children}</div>
+function Label({
+  className,
+  children,
+}: {
+  className?: string;
+  children: React.ReactNode;
+}) {
+  return <div className={className}>{children}</div>;
 }

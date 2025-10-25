@@ -24,12 +24,8 @@ const COLORS = [
   "hsl(0, 100%, 60%)", // red
 ];
 
-export function CategoryBreakdownChart({
-  data,
-}: CategoryBreakdownChartProps) {
-  const chartData = data
-    .sort((a, b) => b.total - a.total)
-    .slice(0, 8); // Top 8 categories
+export function CategoryBreakdownChart({ data }: CategoryBreakdownChartProps) {
+  const chartData = data.sort((a, b) => b.total - a.total).slice(0, 8); // Top 8 categories
 
   return (
     <Card className="p-6">

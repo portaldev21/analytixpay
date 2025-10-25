@@ -1,16 +1,16 @@
-"use client"
+"use client";
 
-import { Bell, Menu } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { UserAvatar } from "@/components/shared/UserAvatar"
+import { Bell, Menu } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { UserAvatar } from "@/components/shared/UserAvatar";
 
 interface HeaderProps {
   user?: {
-    name?: string
-    email?: string
-    avatarUrl?: string
-  }
-  onMenuClick?: () => void
+    name?: string;
+    email?: string;
+    avatarUrl?: string;
+  };
+  onMenuClick?: () => void;
 }
 
 export function Header({ user, onMenuClick }: HeaderProps) {
@@ -43,5 +43,5 @@ export function Header({ user, onMenuClick }: HeaderProps) {
         />
       </div>
     </header>
-  )
+  );
 }

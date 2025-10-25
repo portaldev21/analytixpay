@@ -1,20 +1,20 @@
-import { Suspense } from "react"
-import { CreditCard } from "lucide-react"
-import { createClient } from "@/lib/supabase/server"
-import { getTransactions } from "@/actions/transaction.actions"
-import { TransactionsTable } from "@/components/transactions/TransactionsTable"
-import { EmptyState } from "@/components/shared/EmptyState"
-import { Loading } from "@/components/shared/Loading"
+import { Suspense } from "react";
+import { CreditCard } from "lucide-react";
+import { createClient } from "@/lib/supabase/server";
+import { getTransactions } from "@/actions/transaction.actions";
+import { TransactionsTable } from "@/components/transactions/TransactionsTable";
+import { EmptyState } from "@/components/shared/EmptyState";
+import { Loading } from "@/components/shared/Loading";
 
 async function TransactionsList({ accountId }: { accountId: string }) {
-  const result = await getTransactions(accountId, {})
+  const result = await getTransactions(accountId, {});
 
   if (!result.success || !result.data) {
     return (
       <div className="text-center text-destructive p-8">
         Erro ao carregar transações
       </div>
-    )
+    );
   }
 
   if (result.data.length === 0) {
@@ -24,30 +24,30 @@ async function TransactionsList({ accountId }: { accountId: string }) {
         title="Nenhuma transação encontrada"
         description="Faça upload de uma fatura para ver suas transações aqui"
       />
-    )
+    );
   }
 
-  return <TransactionsTable transactions={result.data} />
+  return <TransactionsTable transactions={result.data} />;
 }
 
 export default async function TransactionsPage() {
-  const supabase = await createClient()
+  const supabase = await createClient();
 
   const {
     data: { user },
-  } = await supabase.auth.getUser()
+  } = await supabase.auth.getUser();
 
   if (!user) {
-    return null
+    return null;
   }
 
   const { data: accountMember } = await supabase
     .from("account_members")
     .select("account_id")
     .eq("user_id", user.id)
-    .single()
+    .single();
 
-  const accountId = (accountMember as any)?.account_id
+  const accountId = (accountMember as any)?.account_id;
 
   if (!accountId) {
     return (
@@ -65,7 +65,7 @@ export default async function TransactionsPage() {
           </p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -81,5 +81,5 @@ export default async function TransactionsPage() {
         <TransactionsList accountId={accountId} />
       </Suspense>
     </div>
-  )
+  );
 }

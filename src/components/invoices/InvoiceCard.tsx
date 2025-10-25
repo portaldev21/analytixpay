@@ -113,7 +113,9 @@ export function InvoiceCard({
           {invoice.card_last_digits && (
             <div className="mt-4 text-sm">
               <span className="text-muted-foreground">Cartão: </span>
-              <span className="font-medium">**** {invoice.card_last_digits}</span>
+              <span className="font-medium">
+                **** {invoice.card_last_digits}
+              </span>
             </div>
           )}
 
@@ -153,4 +155,3 @@ export function InvoiceCard({
     </motion.div>
   );
 }
-

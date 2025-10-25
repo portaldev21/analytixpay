@@ -1,12 +1,12 @@
-import { LucideIcon } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { LucideIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface EmptyStateProps {
-  icon: LucideIcon
-  title: string
-  description?: string
-  action?: React.ReactNode
-  className?: string
+  icon: LucideIcon;
+  title: string;
+  description?: string;
+  action?: React.ReactNode;
+  className?: string;
 }
 
 export function EmptyState({
@@ -20,7 +20,7 @@ export function EmptyState({
     <div
       className={cn(
         "flex flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center",
-        className
+        className,
       )}
     >
       <Icon className="h-12 w-12 text-muted-foreground" />
@@ -30,5 +30,5 @@ export function EmptyState({
       )}
       {action && <div className="mt-4">{action}</div>}
     </div>
-  )
+  );
 }

@@ -1,17 +1,17 @@
-import { LucideIcon } from "lucide-react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { cn } from "@/lib/utils"
+import { LucideIcon } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 interface StatsCardProps {
-  title: string
-  value: string | number
-  icon: LucideIcon
-  description?: string
+  title: string;
+  value: string | number;
+  icon: LucideIcon;
+  description?: string;
   trend?: {
-    value: number
-    isPositive: boolean
-  }
-  className?: string
+    value: number;
+    isPositive: boolean;
+  };
+  className?: string;
 }
 
 export function StatsCard({
@@ -40,16 +40,18 @@ export function StatsCard({
             <span
               className={cn(
                 "text-xs font-medium",
-                trend.isPositive ? "text-green-600" : "text-red-600"
+                trend.isPositive ? "text-green-600" : "text-red-600",
               )}
             >
               {trend.isPositive ? "+" : "-"}
               {Math.abs(trend.value)}%
             </span>
-            <span className="text-xs text-muted-foreground">vs mês anterior</span>
+            <span className="text-xs text-muted-foreground">
+              vs mês anterior
+            </span>
           </div>
         )}
       </CardContent>
     </Card>
-  )
+  );
 }

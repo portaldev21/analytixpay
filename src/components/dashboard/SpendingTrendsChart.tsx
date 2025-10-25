@@ -2,6 +2,7 @@
 
 import { Card } from "@/components/ui/card";
 import { formatCurrency } from "@/lib/utils";
+import { useMediaQuery } from "@/hooks/use-media-query";
 import {
   LineChart,
   Line,
@@ -27,6 +28,8 @@ function formatMonth(monthStr: string) {
 }
 
 export function SpendingTrendsChart({ data }: SpendingTrendsChartProps) {
+  const isMobile = useMediaQuery("(max-width: 768px)");
+
   const chartData = data.map((item) => ({
     ...item,
     monthLabel: formatMonth(item.month),
@@ -41,18 +44,27 @@ export function SpendingTrendsChart({ data }: SpendingTrendsChartProps) {
         </p>
       </div>
 
-      <ResponsiveContainer width="100%" height={300}>
+      <ResponsiveContainer width="100%" height={isMobile ? 250 : 300}>
         <LineChart data={chartData}>
           <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
           <XAxis
             dataKey="monthLabel"
-            className="text-xs"
-            tick={{ fill: "hsl(var(--muted-foreground))" }}
+            angle={isMobile ? -45 : 0}
+            textAnchor={isMobile ? "end" : "middle"}
+            height={isMobile ? 60 : 30}
+            tick={{
+              fill: "hsl(var(--muted-foreground))",
+              fontSize: isMobile ? 10 : 12,
+            }}
           />
           <YAxis
-            className="text-xs"
-            tick={{ fill: "hsl(var(--muted-foreground))" }}
-            tickFormatter={(value) => formatCurrency(value)}
+            tick={{
+              fill: "hsl(var(--muted-foreground))",
+              fontSize: isMobile ? 10 : 12,
+            }}
+            tickFormatter={(value) =>
+              isMobile ? `${(value / 1000).toFixed(0)}k` : formatCurrency(value)
+            }
           />
           <Tooltip
             content={({ active, payload }) => {
