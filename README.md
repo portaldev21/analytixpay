@@ -41,13 +41,13 @@ node scripts/setup-supabase.js
 
 1. Acesse seu projeto no [Supabase](https://supabase.com)
 2. Vá em **SQL Editor**
-3. Execute o conteúdo de `db/schema.sql`
+3. Execute o conteúdo de [src/db/schema.sql](src/db/schema.sql)
 
 ### 4. Criar Storage Bucket
 
 1. Vá em **Storage**
 2. Crie um bucket chamado `invoices` (privado)
-3. Configure as políticas (veja `db/schema.sql`)
+3. Configure as políticas (veja [src/db/schema.sql](src/db/schema.sql) ou [docs/setup/CREATE_STORAGE_BUCKET.md](docs/setup/CREATE_STORAGE_BUCKET.md))
 
 ### 5. Rodar o Projeto
 

@@ -167,6 +167,12 @@ PDF processing uses a **hybrid AI + regex approach** for universal invoice parsi
 
 ### Database Schema
 
+**Location:** All database files in `src/db/`
+- `src/db/schema.sql` - Main schema (execute in Supabase)
+- `src/db/types.ts` - TypeScript types
+- `src/db/migrations/` - Applied migrations
+- `src/db/README.md` - Complete database documentation
+
 Main tables:
 - `accounts` - Shared payment accounts
 - `account_members` - User-account relationships with roles
@@ -176,6 +182,8 @@ Main tables:
 - `profiles` - User profile data
 
 **Important:** All tables have RLS enabled. Server-side access checks complement database policies.
+
+**See:** [src/db/README.md](src/db/README.md) for complete database documentation.
 
 ### Type System
 

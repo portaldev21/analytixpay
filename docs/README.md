@@ -200,6 +200,35 @@ Mantidos na raiz por importância:
 
 ---
 
+## 🗄️ Database (SQL)
+
+Todos os arquivos SQL estão organizados em `src/db/`:
+
+### Schema Principal
+- **[src/db/schema.sql](../src/db/schema.sql)** ⭐
+  - Schema completo do banco
+  - Todas as tabelas, RLS policies, triggers
+  - Execute no Supabase SQL Editor no setup inicial
+
+### Types
+- **[src/db/types.ts](../src/db/types.ts)**
+  - TypeScript types do banco
+  - Type-safe database access
+
+### Migrations
+- **[src/db/migrations/](../src/db/migrations/)**
+  - Migrations e hotfixes aplicados
+  - Organizado por número sequencial
+
+### Documentação Completa
+- **[src/db/README.md](../src/db/README.md)** ⭐
+  - Guia completo do banco de dados
+  - Como criar migrations
+  - RLS policies explicadas
+  - Schema overview
+
+---
+
 ## 📊 Organização da Documentação
 
 ```
