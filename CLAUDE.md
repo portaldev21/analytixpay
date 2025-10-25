@@ -48,6 +48,18 @@ The project uses Next.js 15 App Router with route groups:
 3. **Supabase Helpers** (`src/lib/supabase/`) manage database access
 4. **Database** enforces Row Level Security (RLS) policies
 
+### New Utility Libraries (2025-10-24 Update)
+
+The project now includes centralized utility modules for better code organization:
+
+- **Environment Validation** (`src/lib/env.ts`) - Type-safe env vars with Zod validation
+- **Logging** (`src/lib/logger.ts`) - Structured logging with context support
+- **Rate Limiting** (`src/lib/rate-limit.ts`) - LRU cache-based rate limiting
+- **Pagination** (`src/lib/pagination.ts`) - Reusable pagination helpers
+- **Sanitization** (`src/lib/sanitize.ts`) - Input sanitization utilities
+- **Analytics** (`src/lib/analytics/stats.ts`) - Centralized stats calculations
+- **PDF Cache** (`src/lib/pdf/cache.ts`) - Hash-based PDF result caching
+
 ### Supabase Client Pattern
 
 The codebase uses **two separate Supabase clients**:
@@ -64,36 +76,52 @@ All data mutations use Server Actions with consistent patterns:
 - Located in `src/actions/*.actions.ts`
 - Return type: `TApiResponse<T>` with `{ data, error, success }`
 - Always call `revalidatePath()` after mutations
-- Validate access with `hasAccessToAccount()` before operations
+- Use helper functions for access validation (NEW: `requireAuth()`, `requireAccountAccess()`, `requireAccountOwnership()`)
+- Include structured logging with `logger` (NEW)
+- Apply rate limiting where appropriate (NEW)
 - Handle errors with try-catch and return structured responses
 
-Example pattern:
+**NEW: Updated pattern with utilities:**
 ```typescript
 'use server'
 
+import { requireAccountAccess } from '@/lib/supabase/server'
+import { logger } from '@/lib/logger'
+import { uploadLimiter } from '@/lib/rate-limit'
+
 export async function actionName(params): Promise<TApiResponse<ReturnType>> {
   try {
-    const supabase = await createClient()
-    const user = await getCurrentUser()
+    // Option 1: Use helper for auth + access validation (throws on fail)
+    const { user, supabase, accountId } = await requireAccountAccess(accountId)
 
-    // Validate access
-    if (!user) return { data: null, error: 'Not authenticated', success: false }
-    if (!(await hasAccessToAccount(accountId))) {
-      return { data: null, error: 'Access denied', success: false }
-    }
+    // Option 2: Manual rate limiting (for sensitive operations)
+    await uploadLimiter.check(5, user.id) // 5 requests per window
+
+    // Log action
+    logger.info('Action started', { userId: user.id, accountId, action: 'actionName' })
 
     // Perform operation
     const { data, error } = await supabase.from('table').select()
 
-    if (error) return { data: null, error: error.message, success: false }
+    if (error) {
+      logger.error('Action failed', error, { userId: user.id, accountId })
+      return { data: null, error: error.message, success: false }
+    }
 
     revalidatePath('/relevant-path')
+    logger.info('Action completed', { userId: user.id, accountId })
     return { data, error: null, success: true }
   } catch (error) {
+    logger.error('Action exception', error, { action: 'actionName' })
     return { data: null, error: error.message, success: false }
   }
 }
 ```
+
+**Available Helper Functions:**
+- `requireAuth()` - Throws if not authenticated, returns `{ user, supabase }`
+- `requireAccountAccess(accountId)` - Throws if no access, returns `{ user, supabase, accountId }`
+- `requireAccountOwnership(accountId)` - Throws if not owner, returns `{ user, account, supabase, accountId }`
 
 ### PDF Parsing System
 
@@ -208,11 +236,21 @@ All types in `src/db/types.ts`:
 
 ### Testing & Quality
 
+**NEW: Test Suite Available**
+```bash
+npm run test          # Run unit tests with Vitest
+npm run test:coverage # Run tests with coverage report
+```
+
+Test files location: `src/**/__tests__/*.test.ts`
+
 When making changes:
-1. Verify TypeScript compilation (`npm run build`)
-2. Run linter (`npm run lint`)
-3. Test in browser (ask user to start dev server)
-4. Validate database operations in Supabase dashboard
+1. Write tests for new utility functions
+2. Verify TypeScript compilation (`npm run build`)
+3. Run linter (`npm run lint`)
+4. Run test suite (`npm run test`)
+5. Test in browser (ask user to start dev server)
+6. Validate database operations in Supabase dashboard
 
 ## Project-Specific Notes
 
@@ -249,6 +287,8 @@ Auto-categorization uses keyword matching against Brazilian merchant patterns:
 
 ## Environment Variables
 
+**NEW: Environment variables are now validated at build time using Zod** (see `src/lib/env.ts`)
+
 Required in `.env.local`:
 ```
 # Supabase
@@ -261,6 +301,22 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 
 # OpenAI (optional - for AI-powered PDF parsing)
 OPENAI_API_KEY=sk-proj-... (see OPENAI_SETUP.md)
+
+# Node
+NODE_ENV=development|production|test
+```
+
+**Usage:**
+```typescript
+import { env, hasOpenAI, isDevelopment } from '@/lib/env'
+
+// Type-safe access
+const url = env.NEXT_PUBLIC_SUPABASE_URL
+
+// Helper functions
+if (hasOpenAI()) {
+  // Use AI parsing
+}
 ```
 
 ## Documentation References

@@ -3,6 +3,8 @@
 import { revalidatePath } from 'next/cache'
 import { createClient, getCurrentUser, hasAccessToAccount } from '@/lib/supabase/server'
 import { parsePdfFile } from '@/lib/pdf/parser'
+import { uploadLimiter } from '@/lib/rate-limit'
+import { logger } from '@/lib/logger'
 import type { TApiResponse, TInvoice, TInvoiceWithTransactions } from '@/db/types'
 
 /**
@@ -16,18 +18,40 @@ export async function uploadInvoice(
     const user = await getCurrentUser()
 
     if (!user) {
+      logger.warn('Upload attempt without authentication')
       return { data: null, error: 'Usuário não autenticado', success: false }
+    }
+
+    // Rate limiting: 5 uploads per 10 minutes
+    try {
+      await uploadLimiter.check(5, user.id)
+    } catch (error) {
+      logger.warn('Upload rate limit exceeded', { userId: user.id })
+      return {
+        data: null,
+        error: 'Limite de uploads excedido. Aguarde alguns minutos e tente novamente.',
+        success: false,
+      }
     }
 
     const file = formData.get('file') as File
     const accountId = formData.get('accountId') as string
 
     if (!file || !accountId) {
+      logger.warn('Upload missing required fields', { userId: user.id, hasFile: !!file, hasAccountId: !!accountId })
       return { data: null, error: 'Arquivo e conta são obrigatórios', success: false }
     }
 
+    logger.info('Starting invoice upload', {
+      userId: user.id,
+      accountId,
+      fileName: file.name,
+      fileSize: file.size,
+    })
+
     // Check access
     if (!(await hasAccessToAccount(accountId))) {
+      logger.warn('Upload access denied', { userId: user.id, accountId })
       return { data: null, error: 'Acesso negado', success: false }
     }
 

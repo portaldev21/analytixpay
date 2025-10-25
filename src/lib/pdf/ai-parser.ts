@@ -1,5 +1,6 @@
 import OpenAI from 'openai'
 import type { TParsedTransaction, TPdfParseResult } from '@/db/types'
+import { env, hasOpenAI } from '@/lib/env'
 
 /**
  * AI-extracted invoice data structure
@@ -76,8 +77,7 @@ function normalizeCategory(aiCategory?: string): string {
 export async function parseInvoiceWithAI(text: string): Promise<TPdfParseResult> {
   try {
     // Validate API key
-    const apiKey = process.env.OPENAI_API_KEY
-    if (!apiKey) {
+    if (!hasOpenAI()) {
       console.error('OPENAI_API_KEY not configured')
       return {
         transactions: [],
@@ -86,7 +86,7 @@ export async function parseInvoiceWithAI(text: string): Promise<TPdfParseResult>
     }
 
     // Initialize OpenAI client
-    const openai = new OpenAI({ apiKey })
+    const openai = new OpenAI({ apiKey: env.OPENAI_API_KEY })
 
     // Prepare prompt
     const prompt = `Você é um assistente especializado em extrair dados de faturas de cartão de crédito brasileiras.
