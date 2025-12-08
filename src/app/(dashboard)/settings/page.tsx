@@ -1,6 +1,8 @@
 import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { CreateAccountForm } from "@/components/settings/CreateAccountForm";
+import { RecategorizeButton } from "@/components/settings/RecategorizeButton";
+import { MigrateInvoices } from "@/components/settings/MigrateInvoices";
 import {
   Card,
   CardContent,
@@ -30,36 +32,45 @@ async function AccountInfo({ userId }: { userId: string }) {
     return null;
   }
 
+  // Get primary account ID for AI features
+  const primaryAccountId = (accounts[0] as any)?.account?.id;
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Suas Contas</CardTitle>
-        <CardDescription>Contas às quais você tem acesso</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-3">
-          {accounts.map((item: any) => (
-            <div
-              key={item.account.id}
-              className="flex items-center justify-between p-3 border rounded-lg"
-            >
-              <div>
-                <p className="font-medium">{item.account.name}</p>
-                <p className="text-sm text-muted-foreground">
-                  Criada em{" "}
-                  {new Date(item.account.created_at).toLocaleDateString(
-                    "pt-BR",
-                  )}
-                </p>
+    <>
+      <Card>
+        <CardHeader>
+          <CardTitle>Suas Contas</CardTitle>
+          <CardDescription>Contas às quais você tem acesso</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            {accounts.map((item: any) => (
+              <div
+                key={item.account.id}
+                className="flex items-center justify-between p-3 border rounded-lg"
+              >
+                <div>
+                  <p className="font-medium">{item.account.name}</p>
+                  <p className="text-sm text-muted-foreground">
+                    Criada em{" "}
+                    {new Date(item.account.created_at).toLocaleDateString(
+                      "pt-BR",
+                    )}
+                  </p>
+                </div>
+                <Badge variant={item.role === "owner" ? "default" : "secondary"}>
+                  {item.role === "owner" ? "Proprietário" : "Membro"}
+                </Badge>
               </div>
-              <Badge variant={item.role === "owner" ? "default" : "secondary"}>
-                {item.role === "owner" ? "Proprietário" : "Membro"}
-              </Badge>
-            </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {primaryAccountId && <RecategorizeButton accountId={primaryAccountId} />}
+
+      {primaryAccountId && <MigrateInvoices accountId={primaryAccountId} />}
+    </>
   );
 }
 

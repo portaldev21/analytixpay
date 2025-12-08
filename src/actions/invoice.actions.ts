@@ -45,16 +45,18 @@ export async function uploadInvoice(
 
     const file = formData.get("file") as File;
     const accountId = formData.get("accountId") as string;
+    const billingDate = formData.get("billingDate") as string;
 
-    if (!file || !accountId) {
+    if (!file || !accountId || !billingDate) {
       logger.warn("Upload missing required fields", {
         userId: user.id,
         hasFile: !!file,
         hasAccountId: !!accountId,
+        hasBillingDate: !!billingDate,
       });
       return {
         data: null,
-        error: "Arquivo e conta são obrigatórios",
+        error: "Arquivo, conta e data de vencimento são obrigatórios",
         success: false,
       };
     }
@@ -117,6 +119,7 @@ export async function uploadInvoice(
         period: parseResult.period,
         card_last_digits: parseResult.cardLastDigits,
         total_amount: parseResult.totalAmount,
+        billing_date: billingDate, // Data de vencimento informada pelo usuário
         status: "completed",
       } as any)
       .select()
@@ -134,10 +137,11 @@ export async function uploadInvoice(
     // Type assertion for invoice
     const createdInvoice = invoice as TInvoice;
 
-    // Insert transactions
+    // Insert transactions with billing_date
     const transactions = parseResult.transactions.map((t) => ({
       invoice_id: createdInvoice.id,
       account_id: accountId,
+      billing_date: billingDate, // Propagar data de vencimento para todas as transações
       ...t,
     }));
 
