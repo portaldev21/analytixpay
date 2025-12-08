@@ -1,5 +1,7 @@
 # AnalytiXPay 💳
 
+PORTAL DEV SUPABASE
+
 Sistema moderno de gestão de faturas de cartão de crédito com extração automática de transações via PDF parsing.
 
 ![Next.js](https://img.shields.io/badge/Next.js-15-black)

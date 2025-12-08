@@ -6,7 +6,11 @@
       "Bash(npm run build:*)",
       "Bash(cat:*)",
       "Bash(npm install:*)",
-      "Bash(npm run format:*)"
+      "Bash(npm run format:*)",
+      "Bash(grep:*)",
+      "Bash(head:*)",
+      "Bash(sort:*)",
+      "Bash(claude mcp list:*)"
     ],
     "deny": [],
     "ask": []
