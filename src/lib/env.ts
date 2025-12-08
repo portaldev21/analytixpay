@@ -35,7 +35,7 @@ function validateEnv(): Env {
     if (error instanceof z.ZodError) {
       console.error("❌ Erro na validação de variáveis de ambiente:");
       console.error(
-        error.errors
+        error.issues
           .map((e) => `  - ${e.path.join(".")}: ${e.message}`)
           .join("\n"),
       );

@@ -98,13 +98,30 @@ export async function signup(
     }
 
     // Create default account for new user
-    const { error: accountError } = await supabase.from("accounts").insert({
-      name: "Minha Conta",
-      owner_id: data.user.id,
-    } as any);
+    const { data: account, error: accountError } = await supabase
+      .from("accounts")
+      .insert({
+        name: "Minha Conta",
+        owner_id: data.user.id,
+      } as any)
+      .select()
+      .single();
 
     if (accountError) {
       console.error("Error creating default account:", accountError);
+    } else if (account) {
+      // Add user as owner member of the account
+      const { error: memberError } = await supabase
+        .from("account_members")
+        .insert({
+          account_id: (account as any).id,
+          user_id: data.user.id,
+          role: "owner",
+        } as any);
+
+      if (memberError) {
+        console.error("Error adding member to account:", memberError);
+      }
     }
 
     revalidatePath("/", "layout");

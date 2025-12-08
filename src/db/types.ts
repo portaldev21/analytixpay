@@ -111,6 +111,7 @@ export type TInvoice = {
   period: string | null;
   card_last_digits: string | null;
   total_amount: number | null;
+  billing_date: string | null; // Data de vencimento da fatura
   status: TInvoiceStatus;
   error_message: string | null;
   created_at: string;
@@ -126,6 +127,7 @@ export type TInvoiceInsert = {
   period?: string | null;
   card_last_digits?: string | null;
   total_amount?: number | null;
+  billing_date?: string | null;
   status?: TInvoiceStatus;
   error_message?: string | null;
   created_at?: string;
@@ -142,7 +144,8 @@ export type TTransaction = {
   id: string;
   invoice_id: string;
   account_id: string;
-  date: string;
+  date: string; // Data da compra
+  billing_date: string | null; // Data de vencimento da fatura
   description: string;
   category: string;
   amount: number;
@@ -157,6 +160,7 @@ export type TTransactionInsert = {
   invoice_id: string;
   account_id: string;
   date: string;
+  billing_date?: string | null;
   description: string;
   category?: string;
   amount: number;
@@ -335,6 +339,7 @@ export type TAddMemberForm = {
 export type TUploadInvoiceForm = {
   file: File;
   accountId: string;
+  billingDate: string; // Data de vencimento (obrigatório)
   period?: string;
   cardLastDigits?: string;
 };
@@ -354,6 +359,7 @@ export type TEditTransactionForm = {
 
 export type TParsedTransaction = {
   date: string;
+  billing_date?: string; // Data de vencimento (propagada da fatura)
   description: string;
   amount: number;
   category?: string;
