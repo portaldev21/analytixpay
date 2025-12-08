@@ -41,9 +41,9 @@ export function InsightsPanel({ insights }: InsightsPanelProps) {
       <Card className="p-6">
         <div className="text-center text-muted-foreground">
           <Sparkles className="h-12 w-12 mx-auto mb-3 opacity-50" />
-          <p>No new insights at the moment.</p>
+          <p>Nenhum insight no momento.</p>
           <p className="text-sm mt-1">
-            Keep tracking your expenses to get personalized tips!
+            Continue acompanhando seus gastos para receber dicas personalizadas!
           </p>
         </div>
       </Card>
@@ -54,7 +54,7 @@ export function InsightsPanel({ insights }: InsightsPanelProps) {
     <Card className="p-6">
       <div className="flex items-center gap-2 mb-4">
         <Sparkles className="h-5 w-5 text-primary" />
-        <h3 className="text-lg font-semibold">Smart Insights</h3>
+        <h3 className="text-lg font-semibold">Insights Inteligentes</h3>
       </div>
 
       <div className="space-y-3">

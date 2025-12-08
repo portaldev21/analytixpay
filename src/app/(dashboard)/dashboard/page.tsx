@@ -16,6 +16,7 @@ import {
 import {
   getPeriodDateRange,
   getPreviousPeriodDateRange,
+  type StatsWithComparison,
 } from "@/lib/analytics/stats";
 import { StatsCard } from "@/components/dashboard/StatsCard";
 import { SpendingTrendsChart } from "@/components/dashboard/SpendingTrendsChart";
@@ -33,40 +34,28 @@ import {
   ListSkeleton,
 } from "@/components/dashboard/DashboardSkeleton";
 import { formatCurrency } from "@/lib/utils";
+import type { TTransaction } from "@/db/types";
+import type { HealthScore } from "@/lib/analytics/health-score";
+import type { Insight } from "@/lib/analytics/insights";
+import type { RecurringTransaction } from "@/lib/analytics/recurring";
 
 // Opt into dynamic rendering for real-time data
 export const dynamic = "force-dynamic";
 
 interface SearchParams {
   period?: string;
+  dateType?: "purchase" | "billing";
 }
 
 /**
- * Dashboard stats component with comparison
+ * Dashboard stats cards - receives pre-fetched data
  */
-async function DashboardStats({
-  accountId,
-  period,
-  previousPeriod,
+function DashboardStatsCards({
+  stats,
 }: {
-  accountId: string;
-  period?: { startDate: string; endDate: string };
-  previousPeriod?: { startDate: string; endDate: string };
+  stats: StatsWithComparison;
 }) {
-  const statsResult = await getTransactionStatsWithComparison(
-    accountId,
-    period,
-  );
-
-  if (!statsResult.success || !statsResult.data) {
-    return (
-      <div className="text-center text-muted-foreground p-8">
-        Erro ao carregar estatísticas
-      </div>
-    );
-  }
-
-  const { current, comparison } = statsResult.data;
+  const { current, comparison } = stats;
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -75,30 +64,42 @@ async function DashboardStats({
         value={formatCurrency(current.totalSpent)}
         icon={DollarSign}
         description="Total gasto no período"
-        trend={{
-          value: Math.abs(comparison.totalSpentChange),
-          isPositive: comparison.totalSpentChange < 0, // Negative spending = good
-        }}
+        trend={
+          comparison.totalSpentChange !== null
+            ? {
+                value: comparison.totalSpentChange,
+                isPositive: comparison.totalSpentChange < 0,
+              }
+            : undefined
+        }
       />
       <StatsCard
         title="Média por Transação"
         value={formatCurrency(current.averageTransaction)}
         icon={TrendingUp}
         description="Valor médio das compras"
-        trend={{
-          value: Math.abs(comparison.averageChange),
-          isPositive: comparison.averageChange < 0,
-        }}
+        trend={
+          comparison.averageChange !== null
+            ? {
+                value: comparison.averageChange,
+                isPositive: comparison.averageChange < 0,
+              }
+            : undefined
+        }
       />
       <StatsCard
         title="Total de Transações"
         value={current.transactionCount}
         icon={ShoppingCart}
         description="Compras realizadas"
-        trend={{
-          value: Math.abs(comparison.transactionCountChange),
-          isPositive: comparison.transactionCountChange > 0,
-        }}
+        trend={
+          comparison.transactionCountChange !== null
+            ? {
+                value: comparison.transactionCountChange,
+                isPositive: comparison.transactionCountChange > 0,
+              }
+            : undefined
+        }
       />
       <StatsCard
         title="Categorias"
@@ -111,105 +112,12 @@ async function DashboardStats({
 }
 
 /**
- * Dashboard charts and visualizations
- */
-async function DashboardCharts({
-  accountId,
-  period,
-}: {
-  accountId: string;
-  period?: { startDate: string; endDate: string };
-}) {
-  const [trendsResult, statsResult, invoicesResult, topExpensesResult] =
-    await Promise.all([
-      getSpendingTrends(accountId, 6, period),
-      getTransactionStatsWithComparison(accountId, period),
-      getInvoicesSummary(accountId),
-      getTopExpenses(accountId, 5, period),
-    ]);
-
-  return (
-    <div className="grid gap-6 lg:grid-cols-2">
-      {trendsResult.success &&
-        trendsResult.data &&
-        trendsResult.data.length > 0 && (
-          <div className="lg:col-span-2">
-            <SpendingTrendsChart data={trendsResult.data} />
-          </div>
-        )}
-
-      {statsResult.success && statsResult.data && (
-        <CategoryBreakdownChart
-          data={statsResult.data.current.categoryBreakdown}
-        />
-      )}
-
-      {topExpensesResult.success &&
-        topExpensesResult.data &&
-        topExpensesResult.data.length > 0 && (
-          <TopExpenses data={topExpensesResult.data} />
-        )}
-
-      {invoicesResult.success &&
-        invoicesResult.data &&
-        invoicesResult.data.length > 0 && (
-          <div className="lg:col-span-2">
-            <InvoicesSummary data={invoicesResult.data} />
-          </div>
-        )}
-    </div>
-  );
-}
-
-/**
- * Advanced analytics section
- */
-async function AdvancedAnalytics({
-  accountId,
-  period,
-  previousPeriod,
-}: {
-  accountId: string;
-  period?: { startDate: string; endDate: string };
-  previousPeriod?: { startDate: string; endDate: string };
-}) {
-  const [recurringResult, insightsResult, healthScoreResult] =
-    await Promise.all([
-      getRecurringTransactions(accountId),
-      getSmartInsights(accountId, period, previousPeriod),
-      getFinancialHealthScore(accountId, undefined, period, previousPeriod),
-    ]);
-
-  return (
-    <div className="grid gap-6 lg:grid-cols-2">
-      {insightsResult.success && insightsResult.data && (
-        <div className="lg:col-span-2">
-          <InsightsPanel insights={insightsResult.data} />
-        </div>
-      )}
-
-      {recurringResult.success &&
-        recurringResult.data &&
-        recurringResult.data.length > 0 && (
-          <div className="lg:col-span-2">
-            <RecurringExpenses data={recurringResult.data} />
-          </div>
-        )}
-
-      {healthScoreResult.success && healthScoreResult.data && (
-        <HealthScoreCard data={healthScoreResult.data} />
-      )}
-    </div>
-  );
-}
-
-/**
- * Main dashboard page
+ * Main dashboard page - fetches all data once
  */
 export default async function DashboardPage({
   searchParams,
 }: {
-  searchParams: SearchParams;
+  searchParams: Promise<SearchParams>;
 }) {
   const supabase = await createClient();
 
@@ -228,18 +136,53 @@ export default async function DashboardPage({
     .eq("user_id", user.id)
     .single();
 
-  const accountId = accountMember?.account_id;
+  const accountId = (accountMember as { account_id: string } | null)
+    ?.account_id;
 
   if (!accountId) {
     return <EmptyDashboard />;
   }
 
+  // Await searchParams (Next.js 15 requirement)
+  const params = await searchParams;
+
   // Calculate date range from period filter
-  const period = searchParams.period || "30";
+  const period = params.period || "30";
+  const dateType = params.dateType || "billing";
   const dateFilter = getPeriodDateRange(period);
   const previousDateFilter = dateFilter
     ? getPreviousPeriodDateRange(dateFilter)
     : undefined;
+
+  // Fetch ALL data in parallel (single batch)
+  const [
+    statsResult,
+    trendsResult,
+    topExpensesResult,
+    invoicesResult,
+    recurringResult,
+    insightsResult,
+    healthScoreResult,
+  ] = await Promise.all([
+    getTransactionStatsWithComparison(accountId, dateFilter, dateType),
+    getSpendingTrends(accountId, 6, dateFilter, dateType),
+    getTopExpenses(accountId, 5, dateFilter, dateType),
+    getInvoicesSummary(accountId),
+    getRecurringTransactions(accountId),
+    getSmartInsights(accountId, dateFilter, previousDateFilter),
+    getFinancialHealthScore(accountId, undefined, dateFilter, previousDateFilter),
+  ]);
+
+  // Extract data with defaults
+  const stats = statsResult.success ? statsResult.data : null;
+  const trends = trendsResult.success ? trendsResult.data : null;
+  const topExpenses = topExpensesResult.success ? topExpensesResult.data : null;
+  const invoices = invoicesResult.success ? invoicesResult.data : null;
+  const recurring = recurringResult.success ? recurringResult.data : null;
+  const insights = insightsResult.success ? insightsResult.data : null;
+  const healthScore = healthScoreResult.success ? healthScoreResult.data : null;
+
+  const hasTransactions = stats && stats.current.transactionCount > 0;
 
   return (
     <div className="space-y-6">
@@ -254,28 +197,56 @@ export default async function DashboardPage({
         <PeriodSelector />
       </div>
 
-      {/* Stats cards with comparison */}
-      <Suspense fallback={<StatsCardSkeleton />}>
-        <DashboardStats
-          accountId={accountId}
-          period={dateFilter}
-          previousPeriod={previousDateFilter}
-        />
-      </Suspense>
+      {/* Stats cards */}
+      {stats ? (
+        <DashboardStatsCards stats={stats} />
+      ) : (
+        <div className="text-center text-muted-foreground p-8">
+          Erro ao carregar estatísticas
+        </div>
+      )}
 
       {/* Main charts */}
-      <Suspense fallback={<ChartSkeleton />}>
-        <DashboardCharts accountId={accountId} period={dateFilter} />
-      </Suspense>
+      <div className="grid gap-6 lg:grid-cols-2">
+        {trends && trends.length > 0 && (
+          <div className="lg:col-span-2">
+            <SpendingTrendsChart data={trends} />
+          </div>
+        )}
 
-      {/* Advanced analytics */}
-      <Suspense fallback={<ListSkeleton />}>
-        <AdvancedAnalytics
-          accountId={accountId}
-          period={dateFilter}
-          previousPeriod={previousDateFilter}
-        />
-      </Suspense>
+        {stats && (
+          <CategoryBreakdownChart data={stats.current.categoryBreakdown} />
+        )}
+
+        {topExpenses && topExpenses.length > 0 && (
+          <TopExpenses data={topExpenses} />
+        )}
+
+        {invoices && invoices.length > 0 && (
+          <div className="lg:col-span-2">
+            <InvoicesSummary data={invoices} />
+          </div>
+        )}
+      </div>
+
+      {/* Advanced analytics - only show if there are transactions */}
+      {hasTransactions && (
+        <div className="grid gap-6 lg:grid-cols-2">
+          {insights && insights.length > 0 && (
+            <div className="lg:col-span-2">
+              <InsightsPanel insights={insights} />
+            </div>
+          )}
+
+          {recurring && recurring.length > 0 && (
+            <div className="lg:col-span-2">
+              <RecurringExpenses data={recurring} />
+            </div>
+          )}
+
+          {healthScore && <HealthScoreCard data={healthScore} />}
+        </div>
+      )}
     </div>
   );
 }

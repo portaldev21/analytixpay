@@ -57,18 +57,18 @@ export function calculateHealthScore(
     } else if (budgetUsage <= 110) {
       factors.budgetAdherence = 10;
       recommendations.push(
-        "You're over budget this month. Review your spending to get back on track.",
+        "Você está acima do orçamento este mês. Revise seus gastos.",
       );
     } else {
       factors.budgetAdherence = 0;
       recommendations.push(
-        "Significantly over budget! Consider cutting non-essential expenses.",
+        "Muito acima do orçamento! Considere cortar gastos não essenciais.",
       );
     }
   } else {
     // Neutral score if no budget set
     factors.budgetAdherence = 15;
-    recommendations.push("Set a monthly budget to better track your spending.");
+    recommendations.push("Defina um orçamento mensal para acompanhar melhor seus gastos.");
   }
 
   // ============================================
@@ -97,13 +97,13 @@ export function calculateHealthScore(
       // Moderate increase (5-10%)
       factors.savingsRate = 10;
       recommendations.push(
-        `Spending increased ${spendingChange.toFixed(1)}% vs last period.`,
+        `Gastos aumentaram ${spendingChange.toFixed(1)}% em relação ao período anterior.`,
       );
     } else {
       // Large increase (>10%)
       factors.savingsRate = 5;
       recommendations.push(
-        `Spending increased significantly (${spendingChange.toFixed(1)}%). Review recent purchases.`,
+        `Gastos aumentaram significativamente (${spendingChange.toFixed(1)}%). Revise suas compras recentes.`,
       );
     }
   } else {
@@ -131,11 +131,11 @@ export function calculateHealthScore(
       factors.spendingTrend = 20;
     } else if (avgChange < 15) {
       factors.spendingTrend = 12;
-      recommendations.push("Average transaction amount is increasing.");
+      recommendations.push("O valor médio das transações está aumentando.");
     } else {
       factors.spendingTrend = 5;
       recommendations.push(
-        "Large increase in average spending. Review recent large purchases.",
+        "Grande aumento no gasto médio. Revise compras recentes de alto valor.",
       );
     }
   } else {
@@ -166,7 +166,7 @@ export function calculateHealthScore(
       // High concentration
       factors.diversification = 12;
       recommendations.push(
-        `${topCategoryPercentage.toFixed(0)}% of spending in one category.`,
+        `${topCategoryPercentage.toFixed(0)}% dos gastos em uma única categoria.`,
       );
     } else if (topCategoryPercentage < 75) {
       // Very high concentration
@@ -175,7 +175,7 @@ export function calculateHealthScore(
         (c) => c.percentage === topCategoryPercentage,
       );
       recommendations.push(
-        `Over ${topCategoryPercentage.toFixed(0)}% in ${topCategory?.category}. Consider diversifying expenses.`,
+        `Mais de ${topCategoryPercentage.toFixed(0)}% em ${topCategory?.category}. Considere diversificar os gastos.`,
       );
     } else {
       // Extreme concentration
@@ -184,7 +184,7 @@ export function calculateHealthScore(
         (c) => c.percentage === topCategoryPercentage,
       );
       recommendations.push(
-        `Extreme concentration in ${topCategory?.category} (${topCategoryPercentage.toFixed(0)}%). This limits financial flexibility.`,
+        `Concentração extrema em ${topCategory?.category} (${topCategoryPercentage.toFixed(0)}%). Isso limita a flexibilidade financeira.`,
       );
     }
   }
@@ -214,7 +214,7 @@ export function calculateHealthScore(
   // ============================================
   if (score >= 85 && recommendations.length === 0) {
     recommendations.push(
-      "Excellent financial health! Keep maintaining these good spending habits.",
+      "Excelente saúde financeira! Continue mantendo esses bons hábitos de consumo.",
     );
   }
 
@@ -232,15 +232,15 @@ export function calculateHealthScore(
 export function getHealthScoreDescription(grade: HealthGrade): string {
   switch (grade) {
     case "A":
-      return "Excellent financial health";
+      return "Saúde financeira excelente";
     case "B":
-      return "Good financial health";
+      return "Saúde financeira boa";
     case "C":
-      return "Fair financial health";
+      return "Saúde financeira regular";
     case "D":
-      return "Poor financial health";
+      return "Saúde financeira fraca";
     case "F":
-      return "Critical financial health";
+      return "Saúde financeira crítica";
   }
 }
 

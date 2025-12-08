@@ -8,7 +8,7 @@ interface StatsCardProps {
   icon: LucideIcon;
   description?: string;
   trend?: {
-    value: number;
+    value: number | null;
     isPositive: boolean;
   };
   className?: string;
@@ -35,7 +35,7 @@ export function StatsCard({
         {description && (
           <p className="text-xs text-muted-foreground mt-1">{description}</p>
         )}
-        {trend && (
+        {trend && trend.value !== null && (
           <div className="flex items-center gap-1 mt-2">
             <span
               className={cn(
@@ -44,10 +44,10 @@ export function StatsCard({
               )}
             >
               {trend.isPositive ? "+" : "-"}
-              {Math.abs(trend.value)}%
+              {Math.abs(trend.value).toFixed(0)}%
             </span>
             <span className="text-xs text-muted-foreground">
-              vs mês anterior
+              vs período anterior
             </span>
           </div>
         )}

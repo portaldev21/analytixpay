@@ -3,6 +3,7 @@
 import { Card } from "@/components/ui/card";
 import { formatCurrency } from "@/lib/utils";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
+import { PieChart as PieChartIcon } from "lucide-react";
 
 interface CategoryBreakdownChartProps {
   data: {
@@ -27,6 +28,25 @@ const COLORS = [
 export function CategoryBreakdownChart({ data }: CategoryBreakdownChartProps) {
   const chartData = data.sort((a, b) => b.total - a.total).slice(0, 8); // Top 8 categories
 
+  // Empty state
+  if (!data || data.length === 0) {
+    return (
+      <Card className="p-6">
+        <div className="mb-4">
+          <h3 className="text-lg font-semibold">Gastos por Categoria</h3>
+          <p className="text-sm text-muted-foreground">
+            Distribuição percentual dos gastos
+          </p>
+        </div>
+        <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+          <PieChartIcon className="h-12 w-12 mb-3 opacity-50" />
+          <p className="text-sm">Nenhuma transação encontrada</p>
+          <p className="text-xs mt-1">Faça upload de uma fatura para começar</p>
+        </div>
+      </Card>
+    );
+  }
+
   return (
     <Card className="p-6">
       <div className="mb-4">
@@ -49,7 +69,9 @@ export function CategoryBreakdownChart({ data }: CategoryBreakdownChartProps) {
                 fill="#8884d8"
                 paddingAngle={2}
                 dataKey="total"
-                label={({ percentage }) => `${percentage.toFixed(0)}%`}
+                label={({ payload }: { payload?: { percentage: number } }) =>
+                  payload ? `${payload.percentage.toFixed(0)}%` : ""
+                }
               >
                 {chartData.map((entry, index) => (
                   <Cell

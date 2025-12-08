@@ -208,12 +208,13 @@ export function groupTransactionsByCategory(
 
 /**
  * Calculate percentage change between two values
+ * Returns null when there's no valid comparison (oldValue is 0)
  */
 export function calculatePercentageChange(
   oldValue: number,
   newValue: number,
-): number {
-  if (oldValue === 0) return newValue > 0 ? 100 : 0;
+): number | null {
+  if (oldValue === 0) return null; // No valid comparison when previous value is 0
   return ((newValue - oldValue) / oldValue) * 100;
 }
 
@@ -289,9 +290,9 @@ export interface StatsWithComparison {
   current: TransactionStats;
   previous: TransactionStats;
   comparison: {
-    totalSpentChange: number;
-    transactionCountChange: number;
-    averageChange: number;
+    totalSpentChange: number | null;
+    transactionCountChange: number | null;
+    averageChange: number | null;
   };
 }
 

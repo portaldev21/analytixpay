@@ -1,7 +1,12 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireAuth, requireAccountAccess } from "@/lib/supabase/server";
+import {
+  createClient,
+  hasAccessToAccount,
+  requireAuth,
+  requireAccountAccess,
+} from "@/lib/supabase/server";
 import { logger } from "@/lib/logger";
 import {
   calculateTransactionStats,
@@ -147,12 +152,15 @@ export async function getTransactionStats(
 
 /**
  * Get transaction stats with comparison to previous period
+ * @param dateType - "purchase" filters by transaction date, "billing" filters by billing_date
  */
 export async function getTransactionStatsWithComparison(
   accountId: string,
   period?: PeriodDateRange,
+  dateType: "purchase" | "billing" = "billing",
 ): Promise<TApiResponse<StatsWithComparison>> {
   const startTime = Date.now();
+  const dateField = dateType === "billing" ? "billing_date" : "date";
 
   try {
     const { supabase } = await requireAccountAccess(accountId);
@@ -160,6 +168,8 @@ export async function getTransactionStatsWithComparison(
     logger.info("Fetching transaction stats with comparison", {
       accountId,
       period,
+      dateType,
+      dateField,
     });
 
     // Fetch current period transactions
@@ -170,8 +180,8 @@ export async function getTransactionStatsWithComparison(
 
     if (period) {
       currentQuery = currentQuery
-        .gte("date", period.startDate)
-        .lte("date", period.endDate);
+        .gte(dateField, period.startDate)
+        .lte(dateField, period.endDate);
     }
 
     const { data: currentTransactions, error: currentError } =
@@ -199,8 +209,8 @@ export async function getTransactionStatsWithComparison(
         .from("transactions")
         .select("*")
         .eq("account_id", accountId)
-        .gte("date", previousPeriod.startDate)
-        .lte("date", previousPeriod.endDate);
+        .gte(dateField, previousPeriod.startDate)
+        .lte(dateField, previousPeriod.endDate);
 
       if (!error && data) {
         previousTransactions = data as TTransaction[];
@@ -436,18 +446,21 @@ export async function deleteTransaction(
 
 /**
  * Get spending trends (monthly or weekly)
+ * @param dateType - "purchase" filters by transaction date, "billing" filters by billing_date
  */
 export async function getSpendingTrends(
   accountId: string,
   months: number = 6,
   period?: PeriodDateRange,
+  dateType: "purchase" | "billing" = "billing",
 ): Promise<TApiResponse<{ month: string; total: number; count: number }[]>> {
   const startTime = Date.now();
+  const dateField = dateType === "billing" ? "billing_date" : "date";
 
   try {
     const { supabase } = await requireAccountAccess(accountId);
 
-    logger.info("Fetching spending trends", { accountId, months });
+    logger.info("Fetching spending trends", { accountId, months, dateType });
 
     const startDate = new Date();
     startDate.setMonth(startDate.getMonth() - months);
@@ -459,9 +472,9 @@ export async function getSpendingTrends(
 
     // Apply period filter or use default months
     if (period) {
-      query = query.gte("date", period.startDate).lte("date", period.endDate);
+      query = query.gte(dateField, period.startDate).lte(dateField, period.endDate);
     } else {
-      query = query.gte("date", startDate.toISOString());
+      query = query.gte(dateField, startDate.toISOString());
     }
 
     const { data: transactions, error } = await query;
@@ -473,12 +486,14 @@ export async function getSpendingTrends(
       return { data: null, error: error.message, success: false };
     }
 
-    // Group by month
+    // Group by month using the selected date field
     const monthMap = new Map<string, { total: number; count: number }>();
     const transactionList = (transactions || []) as TTransaction[];
 
     for (const t of transactionList) {
-      const date = new Date(t.date);
+      // Use billing_date if available and dateType is billing, otherwise use date
+      const dateValue = dateType === "billing" && t.billing_date ? t.billing_date : t.date;
+      const date = new Date(dateValue);
       const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
 
       const existing = monthMap.get(monthKey) || { total: 0, count: 0 };
@@ -521,18 +536,21 @@ export async function getSpendingTrends(
 
 /**
  * Get top expenses
+ * @param dateType - "purchase" filters by transaction date, "billing" filters by billing_date
  */
 export async function getTopExpenses(
   accountId: string,
   limit: number = 5,
   period?: PeriodDateRange,
+  dateType: "purchase" | "billing" = "billing",
 ): Promise<TApiResponse<TTransaction[]>> {
   const startTime = Date.now();
+  const dateField = dateType === "billing" ? "billing_date" : "date";
 
   try {
     const { supabase } = await requireAccountAccess(accountId);
 
-    logger.info("Fetching top expenses", { accountId, limit });
+    logger.info("Fetching top expenses", { accountId, limit, dateType });
 
     let query = supabase
       .from("transactions")
@@ -541,7 +559,7 @@ export async function getTopExpenses(
 
     // Apply period filter if provided
     if (period) {
-      query = query.gte("date", period.startDate).lte("date", period.endDate);
+      query = query.gte(dateField, period.startDate).lte(dateField, period.endDate);
     }
 
     query = query.order("amount", { ascending: false }).limit(limit);
