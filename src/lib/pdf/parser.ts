@@ -1,4 +1,5 @@
 import type { TParsedTransaction, TPdfParseResult } from "@/db/types";
+import { logger } from "@/lib/logger";
 
 /**
  * Categories and their keywords for auto-categorization
@@ -241,29 +242,55 @@ export function parseTransactionsFromText(
   const lines = text.split("\n");
 
   if (debug) {
-    console.log("=== PDF TEXT DEBUG ===");
-    console.log("Total lines:", lines.length);
-    console.log("First 20 lines:");
-    lines.slice(0, 20).forEach((line, i) => {
-      console.log(`${i + 1}: ${line}`);
+    logger.debug("PDF Text Debug", {
+      totalLines: lines.length,
+      firstLines: lines.slice(0, 20),
     });
-    console.log("=====================");
   }
 
-  // Common patterns for Brazilian credit card invoices
+  // Common patterns for Brazilian credit card invoices (ordered by specificity)
   const patterns = [
     // Pattern 1: Banco Inter format - DD de MES. YYYY DESCRIPTION - R$ 1.234,56
     /(\d{1,2}\s+de\s+[a-z]+\.?\s+\d{4})\s+(.+?)\s+-\s+R\$\s*([\d.,]+)/gi,
     // Pattern 2: DD/MM/YYYY DESCRIPTION R$ 1.234,56
     /(\d{2}\/\d{2}\/\d{4})\s+(.+?)\s+R\$\s*([\d.,]+)/gi,
-    // Pattern 3: DD/MM DESCRIPTION 1.234,56
-    /(\d{2}\/\d{2})\s+(.+?)\s+([\d.,]+)/gi,
-    // Pattern 4: DD/MM/YY DESCRIPTION $ 1.234,56
-    /(\d{2}\/\d{2}\/\d{2})\s+(.+?)\s+\$?\s*([\d.,]+)/gi,
+    // Pattern 3: DD/MM/YY DESCRIPTION R$ 1.234,56 (requires R$)
+    /(\d{2}\/\d{2}\/\d{2})\s+(.+?)\s+R\$\s*([\d.,]+)/gi,
+    // Pattern 4: DD/MM DESCRIPTION R$ 1.234,56 (requires R$)
+    /(\d{2}\/\d{2})\s+(.+?)\s+R\$\s*([\d.,]+)/gi,
+  ];
+
+  // Words that indicate a line is a total/header, not a transaction
+  const excludePatterns = [
+    /^total/i,
+    /total\s*(cart[aã]o|fatura)/i,
+    /pagto?\s+debito/i,
+    /pagamento/i,
+    /saldo\s+(anterior|atual)/i,
+    /encargos/i,
+    /juros/i,
+    /limite\s+dispon[ií]vel/i,
+    /cr[eé]dito/i,
+    /valor\s+m[ií]nimo/i,
   ];
 
   for (const line of lines) {
+    // Skip lines that look like totals or headers
+    const shouldExclude = excludePatterns.some((pattern) =>
+      pattern.test(line),
+    );
+    if (shouldExclude) {
+      if (debug) {
+        logger.debug("Skipping excluded line", { line: line.substring(0, 100) });
+      }
+      continue;
+    }
+
+    let foundMatch = false;
+
     for (const pattern of patterns) {
+      if (foundMatch) break; // Stop after first pattern match per line
+
       const matches = [...line.matchAll(pattern)];
 
       for (const match of matches) {
@@ -273,17 +300,26 @@ export function parseTransactionsFromText(
           const amountStr = match[3]?.trim() || "0";
 
           if (debug && match) {
-            console.log("Match found:", {
+            logger.debug("Match found", {
               date: dateStr,
               description,
               amountStr,
-              fullLine: line,
             });
           }
 
           // Skip if description or amount is invalid
           if (!description || description.length < 3) continue;
           if (!amountStr || amountStr === "0") continue;
+
+          // Skip descriptions that look like totals
+          const descLower = description.toLowerCase();
+          if (
+            descLower.includes("total") ||
+            descLower.includes("pagamento") ||
+            descLower.includes("saldo")
+          ) {
+            continue;
+          }
 
           // Convert date to ISO format
           let isoDate: string;
@@ -313,7 +349,8 @@ export function parseTransactionsFromText(
               .replace(",", "."), // Replace decimal separator
           );
 
-          if (isNaN(amount) || amount <= 0) continue;
+          // Validate amount: must be positive and reasonable (R$ 0.01 - R$ 100,000)
+          if (isNaN(amount) || amount < 0.01 || amount > 100000) continue;
 
           // Detect installment (e.g., "PARC 01/12", "1/6")
           const installmentMatch = description.match(/(\d+)\/(\d+)/i);
@@ -337,8 +374,10 @@ export function parseTransactionsFromText(
             installment,
             is_international: isInternational,
           });
-        } catch (error) {
-          console.error("Error parsing line:", line, error);
+
+          foundMatch = true; // Mark that we found a match for this line
+        } catch {
+          // Skip malformed lines silently
           continue;
         }
       }
@@ -482,23 +521,10 @@ export async function parsePdfFile(
     });
 
     if (debug) {
-      console.log("=== RAW PDF TEXT ===");
-      console.log("Text length:", text.length);
-      console.log("First 500 chars:", text.substring(0, 500));
-      console.log("====================");
-
-      // Save to file for analysis (Node.js environment only)
-      try {
-        const fs = await import("fs/promises");
-        const path = await import("path");
-        const debugDir = path.join(process.cwd(), "debug");
-        await fs.mkdir(debugDir, { recursive: true });
-        const debugFile = path.join(debugDir, `pdf-debug-${Date.now()}.txt`);
-        await fs.writeFile(debugFile, text, "utf-8");
-        console.log(`Debug file saved to: ${debugFile}`);
-      } catch (err) {
-        console.error("Could not save debug file:", err);
-      }
+      logger.debug("Raw PDF text", {
+        textLength: text.length,
+        preview: text.substring(0, 500),
+      });
     }
 
     if (!text || text.length < 50) {
@@ -513,24 +539,20 @@ export async function parsePdfFile(
 
     // Try AI parsing first if enabled
     if (useAI) {
-      console.log("Attempting AI-based parsing...");
       const { parseInvoiceWithAI } = await import("./ai-parser");
       const aiResult = await parseInvoiceWithAI(text);
 
       // If AI parsing succeeded, return result
       if (aiResult.transactions.length > 0) {
-        console.log("✓ AI parsing successful");
         return aiResult;
       }
-
-      console.log("AI parsing returned no transactions");
 
       // If AI failed and no fallback, return AI error
       if (!fallbackToRegex) {
         return aiResult;
       }
 
-      console.log("Falling back to regex parsing...");
+      logger.debug("AI parsing failed, falling back to regex");
     }
 
     // Fallback to regex parsing
@@ -555,7 +577,7 @@ export async function parsePdfFile(
       totalAmount,
     };
   } catch (error) {
-    console.error("Error parsing PDF:", error);
+    logger.error("Error parsing PDF", error);
     return {
       transactions: [],
       error: `Erro ao processar PDF: ${error instanceof Error ? error.message : "Erro desconhecido"}`,
