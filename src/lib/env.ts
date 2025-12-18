@@ -16,6 +16,9 @@ const envSchema = z.object({
   // OpenAI (optional - for AI-powered PDF parsing)
   OPENAI_API_KEY: z.string().optional(),
 
+  // Anthropic (optional - for Claude PDF parsing)
+  ANTHROPIC_API_KEY: z.string().optional(),
+
   // Node
   NODE_ENV: z
     .enum(["development", "production", "test"])
@@ -58,6 +61,13 @@ export const env = validateEnv();
  */
 export const hasOpenAI = (): boolean => {
   return !!env.OPENAI_API_KEY && env.OPENAI_API_KEY.length > 0;
+};
+
+/**
+ * Check if Anthropic is configured
+ */
+export const hasAnthropic = (): boolean => {
+  return !!env.ANTHROPIC_API_KEY && env.ANTHROPIC_API_KEY.length > 0;
 };
 
 /**

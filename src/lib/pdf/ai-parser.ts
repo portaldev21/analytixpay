@@ -1,6 +1,6 @@
-import OpenAI from "openai";
+import Anthropic from "@anthropic-ai/sdk";
 import type { TParsedTransaction, TPdfParseResult } from "@/db/types";
-import { env, hasOpenAI } from "@/lib/env";
+import { env, hasAnthropic } from "@/lib/env";
 import { logger } from "@/lib/logger";
 
 /**
@@ -55,6 +55,18 @@ const AI_CATEGORY_MAP: Record<string, string> = {
   electronics: "Tecnologia",
   services: "Serviços",
   subscription: "Serviços",
+  // Taxas e encargos
+  iof: "Taxas e Encargos",
+  tax: "Taxas e Encargos",
+  fee: "Taxas e Encargos",
+  interest: "Taxas e Encargos",
+  annuity: "Taxas e Encargos",
+  anuidade: "Taxas e Encargos",
+  juros: "Taxas e Encargos",
+  multa: "Taxas e Encargos",
+  tarifa: "Taxas e Encargos",
+  encargo: "Taxas e Encargos",
+  seguro: "Taxas e Encargos",
 };
 
 /**
@@ -72,6 +84,7 @@ const VALID_CATEGORIES = [
   "Beleza",
   "Tecnologia",
   "Serviços",
+  "Taxas e Encargos",
   "Outros",
 ];
 
@@ -98,105 +111,116 @@ function normalizeCategory(aiCategory?: string): string {
 }
 
 /**
- * Parse invoice using OpenAI GPT-4o-mini
+ * Parse invoice using Anthropic Claude with native PDF support
  */
 export async function parseInvoiceWithAI(
-  text: string,
+  pdfBuffer: ArrayBuffer,
 ): Promise<TPdfParseResult> {
   try {
     // Validate API key
-    if (!hasOpenAI()) {
-      logger.warn("OPENAI_API_KEY not configured");
+    if (!hasAnthropic()) {
+      logger.warn("ANTHROPIC_API_KEY not configured");
       return {
         transactions: [],
         error:
-          "Configuração de IA não encontrada. Configure OPENAI_API_KEY no arquivo .env.local",
+          "Configuração de IA não encontrada. Configure ANTHROPIC_API_KEY no arquivo .env.local",
       };
     }
 
-    // Initialize OpenAI client
-    const openai = new OpenAI({ apiKey: env.OPENAI_API_KEY });
+    // Initialize Anthropic client
+    const anthropic = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY });
 
-    // Prepare prompt
-    const prompt = `Você é um assistente especializado em extrair dados de faturas de cartão de crédito brasileiras.
+    // Convert PDF to base64
+    const pdfBase64 = Buffer.from(pdfBuffer).toString("base64");
 
-Extraia as seguintes informações do texto abaixo e retorne APENAS um JSON válido (sem markdown, sem explicações):
+    // Prepare prompt - optimized for Banco Inter format
+    const prompt = `Você é um extrator de dados de faturas de cartão de crédito brasileiras.
 
+TAREFA: Extrair transações da seção "Despesas da fatura" deste PDF.
+
+RETORNE APENAS JSON (sem markdown):
 {
   "period": "MM/YYYY",
   "dueDate": "YYYY-MM-DD",
-  "totalAmountCents": number (total da fatura em CENTAVOS),
+  "totalAmountCents": number,
   "cardLastDigits": "1234",
   "transactions": [
     {
       "date": "YYYY-MM-DD",
-      "description": "Nome do estabelecimento limpo (sem parcelas, sem caracteres especiais desnecessários)",
-      "amountCents": number (valor em CENTAVOS - número inteiro. Ex: R$ 1.234,56 = 123456, R$ 45,90 = 4590),
-      "installment": "1/12" (se houver parcela, extrair no formato X/Y),
-      "isInternational": boolean (true se transação internacional),
-      "category": "categoria da transação"
+      "description": "Nome do estabelecimento",
+      "amountCents": number,
+      "installment": "1/12" ou null,
+      "isInternational": boolean,
+      "category": "categoria"
     }
   ]
 }
 
-IMPORTANTE - VALORES EM CENTAVOS:
-- Todos os valores monetários devem ser convertidos para CENTAVOS (inteiros)
-- R$ 1.234,56 → 123456
-- R$ 45,90 → 4590
-- R$ 1.000,00 → 100000
-- Isso evita confusão com separadores decimais brasileiros
+=== SEÇÕES DO PDF A EXTRAIR ===
+EXTRAIR APENAS da seção "Despesas da fatura" que lista transações por cartão:
+- Cada cartão tem formato: "CARTÃO XXXX****XXXX" seguido de tabela com Data, Movimentação, Valor
+- Extrair TODAS as transações de TODOS os cartões listados
+- A soma dos "Total CARTÃO" deve bater com o "Total da sua fatura"
 
-CATEGORIAS VÁLIDAS (use exatamente estes nomes):
-- "Alimentação" - restaurantes, lanchonetes, mercados, supermercados, padarias, delivery, iFood, Rappi
-- "Transporte" - Uber, 99, táxi, combustível, gasolina, estacionamento, pedágio, postos
-- "Saúde" - farmácias, drogarias, clínicas, hospitais, médicos, laboratórios
-- "Lazer" - cinema, teatro, shows, streaming (Netflix, Spotify, Disney+), games, parques
-- "Compras" - lojas, shopping, marketplaces (Amazon, Mercado Livre, Shopee, Shein)
-- "Educação" - escolas, cursos, faculdades, livros, Udemy, Coursera, Alura
-- "Casa" - água, luz, energia, gás, internet, condomínio, aluguel, telecom (Tim, Vivo, Claro)
-- "Vestuário" - roupas, calçados, sapatos, tênis, acessórios, Nike, Adidas
-- "Beleza" - salões, cabeleireiros, cosméticos, perfumes, O Boticário, Natura
-- "Tecnologia" - eletrônicos, computadores, celulares, notebooks, KaBuM, Apple, Samsung
-- "Serviços" - manutenção, consertos, assinaturas diversas
-- "Outros" - quando não se encaixar em nenhuma categoria acima
+=== SEÇÕES A IGNORAR COMPLETAMENTE ===
+1. "Precisa de uma força para pagar?" - opções de parcelamento da fatura (1+2, 1+3, etc.)
+2. "Próxima fatura" - são parcelas FUTURAS, não desta fatura
+3. "Encargos financeiros" - tabela de taxas informativas
+4. "Limite de crédito" - informações de limite
+5. Boleto e dados de pagamento
 
-REGRAS IMPORTANTES:
-1. Datas sempre no formato ISO (YYYY-MM-DD)
-2. Valores sempre como números decimais (ex: 123.45, não "123,45")
-3. Ignorar linhas de cabeçalho, totais de seções, propagandas
-4. Extrair APENAS transações reais (compras, pagamentos)
-5. Se houver parcelas no formato "Parcela 01 de 12" ou "(1/12)", extrair como "1/12"
-6. Limpar descrição: remover textos como "Parcela X de Y", manter apenas nome do estabelecimento
-7. Não incluir linhas de "Total CARTÃO", "PAGTO DEBITO AUTOMATICO" com valor negativo ou positivo que sejam totalizadores
-8. Para o período, usar o mês/ano de vencimento da fatura
-9. SEMPRE categorizar cada transação - analise o nome do estabelecimento para determinar a categoria correta
+=== LINHAS A IGNORAR ===
+- "Total CARTÃO XXXX" (são subtotais, não transações)
+- "PAGTO DEBITO AUTOMATICO" com sinal + (é crédito/pagamento anterior)
+- Linhas de resumo: "Despesas do mês", "Fatura atual", "Valor antecipado"
 
-Texto da fatura:
----
-${text}
----
+=== VALORES EM CENTAVOS ===
+R$ 1.234,56 → 123456
+R$ 45,90 → 4590
 
-Retorne APENAS o JSON, sem markdown ou explicações.`;
+=== CATEGORIAS ===
+Alimentação, Transporte, Saúde, Lazer, Compras, Educação, Casa, Vestuário, Beleza, Tecnologia, Serviços, Taxas e Encargos, Outros
 
-    // Call OpenAI API
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+=== VALIDAÇÃO ===
+A soma de amountCents de todas as transações DEVE ser igual ao totalAmountCents (que é o "Total da sua fatura").
+
+Retorne APENAS o JSON.`;
+
+    // Call Anthropic API with native PDF support
+    const response = await anthropic.messages.create({
+      model: "claude-haiku-4-5-20251001",
+      max_tokens: 16384,
       messages: [
         {
-          role: "system",
-          content:
-            "Você é um assistente que extrai dados estruturados de faturas de cartão de crédito e retorna APENAS JSON válido.",
-        },
-        {
           role: "user",
-          content: prompt,
+          content: [
+            {
+              type: "document",
+              source: {
+                type: "base64",
+                media_type: "application/pdf",
+                data: pdfBase64,
+              },
+            },
+            {
+              type: "text",
+              text: prompt,
+            },
+          ],
         },
       ],
-      temperature: 0.1, // Low temperature for consistent extraction
-      response_format: { type: "json_object" },
     });
 
-    const content = response.choices[0]?.message?.content;
+    // Extract text content from response
+    const contentBlock = response.content[0];
+    if (contentBlock.type !== "text") {
+      return {
+        transactions: [],
+        error: "Resposta inesperada da IA (tipo não é texto)",
+      };
+    }
+
+    const content = contentBlock.text;
     if (!content) {
       return {
         transactions: [],
@@ -204,8 +228,45 @@ Retorne APENAS o JSON, sem markdown ou explicações.`;
       };
     }
 
-    // Parse JSON response
-    const extracted: AIExtractedInvoice = JSON.parse(content);
+    // Clean possible markdown code blocks
+    let cleanJson = content
+      .replace(/```json\n?/g, "")
+      .replace(/```\n?/g, "")
+      .trim();
+
+    // Try to repair truncated JSON by closing open brackets
+    let extracted: AIExtractedInvoice;
+    try {
+      extracted = JSON.parse(cleanJson);
+    } catch {
+      // Try to repair truncated JSON
+      logger.warn("JSON parse failed, attempting repair", {
+        jsonLength: cleanJson.length,
+        lastChars: cleanJson.slice(-100),
+      });
+
+      // Find the last complete transaction and close the JSON
+      const lastCompleteTransaction = cleanJson.lastIndexOf("},");
+      if (lastCompleteTransaction > 0) {
+        cleanJson = cleanJson.slice(0, lastCompleteTransaction + 1) + "]}";
+        try {
+          extracted = JSON.parse(cleanJson);
+          logger.info("JSON repair successful", {
+            transactionCount: extracted.transactions?.length,
+          });
+        } catch {
+          return {
+            transactions: [],
+            error: "Falha ao processar resposta da IA (JSON inválido)",
+          };
+        }
+      } else {
+        return {
+          transactions: [],
+          error: "Falha ao processar resposta da IA (JSON truncado)",
+        };
+      }
+    }
 
     // Validate extracted data
     if (!extracted.transactions || !Array.isArray(extracted.transactions)) {
@@ -223,7 +284,7 @@ Retorne APENAS o JSON, sem markdown ou explicações.`;
     }
 
     // Log raw AI response for debugging
-    logger.info("AI extracted raw response", {
+    logger.info("Claude AI extracted raw response", {
       transactionCount: extracted.transactions.length,
       firstTransaction: extracted.transactions[0],
       totalAmountCents: extracted.totalAmountCents,
@@ -237,36 +298,62 @@ Retorne APENAS o JSON, sem markdown ou explicações.`;
     });
 
     // Transform to our format - convert centavos to reais
-    const transactions: TParsedTransaction[] = validTransactions.map(
-      (t) => ({
-        date: t.date,
-        description: t.description,
-        amount: t.amountCents / 100, // Convert centavos to reais
-        installment: t.installment,
-        is_international: t.isInternational || false,
-        category: normalizeCategory(t.category),
-      }),
-    );
+    const transactions: TParsedTransaction[] = validTransactions.map((t) => ({
+      date: t.date,
+      description: t.description,
+      amount: t.amountCents / 100, // Convert centavos to reais
+      installment: t.installment,
+      is_international: t.isInternational || false,
+      category: normalizeCategory(t.category),
+    }));
 
-    // Calculate total from converted values
-    const totalAmount = transactions.reduce((sum, t) => sum + t.amount, 0);
+    // Calculate total from converted values (soma das transações)
+    const calculatedTotal = transactions.reduce((sum, t) => sum + t.amount, 0);
 
-    logger.info("AI parsing completed", {
+    // Get original invoice total from PDF header
+    const originalInvoiceTotal = extracted.totalAmountCents
+      ? extracted.totalAmountCents / 100
+      : null;
+
+    // Check for discrepancy between invoice total and sum of transactions
+    if (originalInvoiceTotal !== null) {
+      const difference = Math.abs(originalInvoiceTotal - calculatedTotal);
+      const percentDiff = (difference / originalInvoiceTotal) * 100;
+
+      if (percentDiff > 1) {
+        // More than 1% difference
+        logger.warn(
+          "Discrepancy detected between invoice total and transactions sum",
+          {
+            originalInvoiceTotal,
+            calculatedTotal,
+            difference,
+            percentDiff: `${percentDiff.toFixed(2)}%`,
+            transactionCount: transactions.length,
+            hint: "Possíveis causas: IOF, anuidade, juros ou taxas não extraídos",
+          },
+        );
+      }
+    }
+
+    logger.info("Claude AI parsing completed", {
       transactionCount: transactions.length,
-      totalAmount,
+      calculatedTotal,
+      originalInvoiceTotal,
       filteredOut: extracted.transactions.length - validTransactions.length,
     });
 
+    // SEMPRE usar a soma das transações como total (não o valor do cabeçalho)
+    // Isso garante consistência entre total_amount e as transações no banco
     return {
       transactions,
       period: extracted.period,
       cardLastDigits: extracted.cardLastDigits,
-      totalAmount: extracted.totalAmountCents
-        ? extracted.totalAmountCents / 100
-        : totalAmount,
+      totalAmount: calculatedTotal, // Usar soma das transações, não o cabeçalho
+      dueDate: extracted.dueDate,
     };
   } catch (error) {
-    logger.error("Error parsing invoice with AI", error);
+    logger.error("Error parsing invoice with Claude AI", error);
     return {
       transactions: [],
       error: `Erro ao processar fatura com IA: ${error instanceof Error ? error.message : "Erro desconhecido"}`,

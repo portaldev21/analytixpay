@@ -68,7 +68,9 @@ export function calculateHealthScore(
   } else {
     // Neutral score if no budget set
     factors.budgetAdherence = 15;
-    recommendations.push("Defina um orçamento mensal para acompanhar melhor seus gastos.");
+    recommendations.push(
+      "Defina um orçamento mensal para acompanhar melhor seus gastos.",
+    );
   }
 
   // ============================================

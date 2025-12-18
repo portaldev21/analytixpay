@@ -1,10 +1,10 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import OpenAI from "openai";
+import Anthropic from "@anthropic-ai/sdk";
 import { requireAccountAccess } from "@/lib/supabase/server";
 import { logger } from "@/lib/logger";
-import { env, hasOpenAI } from "@/lib/env";
+import { env, hasAnthropic } from "@/lib/env";
 import {
   detectRecurringTransactions,
   type RecurringTransaction,
@@ -18,7 +18,13 @@ import {
   calculateTransactionStats,
   type PeriodDateRange,
 } from "@/lib/analytics/stats";
-import type { TApiResponse, TTransaction } from "@/db/types";
+import type {
+  TApiResponse,
+  TTransaction,
+  TDailySpending,
+  TSpendingByCard,
+  TInstallmentProjection,
+} from "@/db/types";
 
 /**
  * Get recurring transactions for account
@@ -291,11 +297,11 @@ export async function recategorizeTransactionsWithAI(
   const startTime = Date.now();
 
   try {
-    if (!hasOpenAI()) {
+    if (!hasAnthropic()) {
       return {
         data: null,
         error:
-          "OPENAI_API_KEY não configurada. Configure no arquivo .env.local",
+          "ANTHROPIC_API_KEY não configurada. Configure no arquivo .env.local",
         success: false,
       };
     }
@@ -311,9 +317,13 @@ export async function recategorizeTransactionsWithAI(
       .eq("account_id", accountId);
 
     if (fetchError) {
-      logger.error("Failed to fetch transactions for recategorization", fetchError, {
-        accountId,
-      });
+      logger.error(
+        "Failed to fetch transactions for recategorization",
+        fetchError,
+        {
+          accountId,
+        },
+      );
       return { data: null, error: fetchError.message, success: false };
     }
 
@@ -325,7 +335,11 @@ export async function recategorizeTransactionsWithAI(
       };
     }
 
-    const transactionList = transactions as { id: string; description: string; category: string }[];
+    const transactionList = transactions as {
+      id: string;
+      description: string;
+      category: string;
+    }[];
 
     // Prepare descriptions for AI
     const descriptionsMap = transactionList.map((t) => ({
@@ -333,8 +347,8 @@ export async function recategorizeTransactionsWithAI(
       description: t.description,
     }));
 
-    // Call OpenAI to categorize all transactions at once
-    const openai = new OpenAI({ apiKey: env.OPENAI_API_KEY });
+    // Call Anthropic to categorize all transactions at once
+    const anthropic = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY });
 
     const prompt = `Categorize as seguintes transações de cartão de crédito brasileiro.
 
@@ -363,24 +377,20 @@ Retorne APENAS um JSON no formato:
   }
 }`;
 
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+    const response = await anthropic.messages.create({
+      model: "claude-haiku-4-5-20251001",
+      max_tokens: 8192,
       messages: [
-        {
-          role: "system",
-          content: "Você categoriza transações de cartão de crédito. Retorne APENAS JSON válido.",
-        },
         {
           role: "user",
           content: prompt,
         },
       ],
-      temperature: 0.1,
-      response_format: { type: "json_object" },
     });
 
-    const content = response.choices[0]?.message?.content;
-    if (!content) {
+    const contentBlock = response.content[0];
+    const rawContent = contentBlock.type === "text" ? contentBlock.text : null;
+    if (!rawContent) {
       return {
         data: null,
         error: "Resposta vazia da IA",
@@ -388,7 +398,15 @@ Retorne APENAS um JSON no formato:
       };
     }
 
-    const result = JSON.parse(content) as { categories: Record<string, string> };
+    // Clean possible markdown code blocks
+    const content = rawContent
+      .replace(/```json\n?/g, "")
+      .replace(/```\n?/g, "")
+      .trim();
+
+    const result = JSON.parse(content) as {
+      categories: Record<string, string>;
+    };
 
     if (!result.categories) {
       return {
@@ -402,10 +420,13 @@ Retorne APENAS um JSON no formato:
     let updatedCount = 0;
     for (const [id, category] of Object.entries(result.categories)) {
       // Validate category
-      const validCategory = VALID_CATEGORIES.includes(category) ? category : "Outros";
+      const validCategory = VALID_CATEGORIES.includes(category)
+        ? category
+        : "Outros";
 
-      const { error: updateError } = await (supabase
-        .from("transactions") as any)
+      const { error: updateError } = await (
+        supabase.from("transactions") as any
+      )
         .update({ category: validCategory })
         .eq("id", id)
         .eq("account_id", accountId);
@@ -451,9 +472,16 @@ Retorne APENAS um JSON no formato:
 /**
  * Get invoices without billing_date for migration
  */
-export async function getInvoicesWithoutBillingDate(
-  accountId: string,
-): Promise<TApiResponse<{ id: string; period: string | null; file_name: string | null; created_at: string }[]>> {
+export async function getInvoicesWithoutBillingDate(accountId: string): Promise<
+  TApiResponse<
+    {
+      id: string;
+      period: string | null;
+      file_name: string | null;
+      created_at: string;
+    }[]
+  >
+> {
   try {
     const { supabase } = await requireAccountAccess(accountId);
 
@@ -480,10 +508,7 @@ export async function getInvoicesWithoutBillingDate(
     });
     return {
       data: null,
-      error:
-        error instanceof Error
-          ? error.message
-          : "Erro ao buscar faturas",
+      error: error instanceof Error ? error.message : "Erro ao buscar faturas",
       success: false,
     };
   }
@@ -507,8 +532,7 @@ export async function updateInvoiceBillingDate(
     });
 
     // Update invoice billing_date
-    const { error: invoiceError } = await (supabase
-      .from("invoices") as any)
+    const { error: invoiceError } = await (supabase.from("invoices") as any)
       .update({ billing_date: billingDate })
       .eq("id", invoiceId)
       .eq("account_id", accountId);
@@ -522,8 +546,9 @@ export async function updateInvoiceBillingDate(
     }
 
     // Update all transactions from this invoice
-    const { data: updateResult, error: transError } = await (supabase
-      .from("transactions") as any)
+    const { data: updateResult, error: transError } = await (
+      supabase.from("transactions") as any
+    )
       .update({ billing_date: billingDate })
       .eq("invoice_id", invoiceId)
       .eq("account_id", accountId)
@@ -568,6 +593,340 @@ export async function updateInvoiceBillingDate(
         error instanceof Error
           ? error.message
           : "Erro ao atualizar data de vencimento",
+      success: false,
+    };
+  }
+}
+
+/**
+ * Get daily spending for heatmap visualization
+ */
+export async function getDailySpending(
+  accountId: string,
+  period?: PeriodDateRange,
+): Promise<TApiResponse<TDailySpending[]>> {
+  const startTime = Date.now();
+
+  try {
+    const { supabase } = await requireAccountAccess(accountId);
+
+    logger.info("Fetching daily spending", { accountId, period });
+
+    let query = supabase
+      .from("transactions")
+      .select("date, amount")
+      .eq("account_id", accountId);
+
+    if (period) {
+      query = query.gte("date", period.startDate).lte("date", period.endDate);
+    }
+
+    const { data: transactions, error } = await query;
+
+    if (error) {
+      logger.error("Failed to fetch daily spending", error, { accountId });
+      return { data: null, error: error.message, success: false };
+    }
+
+    // Group by date
+    const dailyMap = new Map<string, { total: number; count: number }>();
+    const typedTransactions = transactions as {
+      date: string;
+      amount: number;
+    }[];
+
+    for (const t of typedTransactions || []) {
+      const existing = dailyMap.get(t.date) || { total: 0, count: 0 };
+      dailyMap.set(t.date, {
+        total: existing.total + Number(t.amount),
+        count: existing.count + 1,
+      });
+    }
+
+    const dailySpending: TDailySpending[] = Array.from(dailyMap.entries())
+      .map(([date, data]) => ({
+        date,
+        total: data.total,
+        count: data.count,
+      }))
+      .sort((a, b) => a.date.localeCompare(b.date));
+
+    const duration = Date.now() - startTime;
+    logger.info("Daily spending fetched", {
+      accountId,
+      duration,
+      days: dailySpending.length,
+    });
+
+    return { data: dailySpending, error: null, success: true };
+  } catch (error) {
+    logger.error("Exception in getDailySpending", error, {
+      accountId,
+      duration: Date.now() - startTime,
+    });
+    return {
+      data: null,
+      error:
+        error instanceof Error
+          ? error.message
+          : "Erro ao buscar gastos diários",
+      success: false,
+    };
+  }
+}
+
+/**
+ * Get spending by card (grouped by card_last_digits)
+ */
+export async function getSpendingByCard(
+  accountId: string,
+  period?: PeriodDateRange,
+): Promise<TApiResponse<TSpendingByCard[]>> {
+  const startTime = Date.now();
+
+  try {
+    const { supabase } = await requireAccountAccess(accountId);
+
+    logger.info("Fetching spending by card", { accountId, period });
+
+    // First get transactions with their invoice to get card_last_digits
+    let query = supabase
+      .from("transactions")
+      .select("amount, invoice:invoices!inner(card_last_digits)")
+      .eq("account_id", accountId);
+
+    if (period) {
+      query = query.gte("date", period.startDate).lte("date", period.endDate);
+    }
+
+    const { data: transactions, error } = await query;
+
+    if (error) {
+      logger.error("Failed to fetch spending by card", error, { accountId });
+      return { data: null, error: error.message, success: false };
+    }
+
+    // Group by card
+    const cardMap = new Map<string, { total: number; count: number }>();
+    const typedTransactions = transactions as {
+      amount: number;
+      invoice: { card_last_digits: string | null };
+    }[];
+
+    for (const t of typedTransactions || []) {
+      const cardDigits = t.invoice?.card_last_digits || "Desconhecido";
+      const existing = cardMap.get(cardDigits) || { total: 0, count: 0 };
+      cardMap.set(cardDigits, {
+        total: existing.total + Number(t.amount),
+        count: existing.count + 1,
+      });
+    }
+
+    const spendingByCard: TSpendingByCard[] = Array.from(cardMap.entries())
+      .map(([card_last_digits, data]) => ({
+        card_last_digits,
+        total: data.total,
+        count: data.count,
+      }))
+      .sort((a, b) => b.total - a.total);
+
+    const duration = Date.now() - startTime;
+    logger.info("Spending by card fetched", {
+      accountId,
+      duration,
+      cards: spendingByCard.length,
+    });
+
+    return { data: spendingByCard, error: null, success: true };
+  } catch (error) {
+    logger.error("Exception in getSpendingByCard", error, {
+      accountId,
+      duration: Date.now() - startTime,
+    });
+    return {
+      data: null,
+      error:
+        error instanceof Error
+          ? error.message
+          : "Erro ao buscar gastos por cartão",
+      success: false,
+    };
+  }
+}
+
+/**
+ * Get installments projection (future payments)
+ */
+export async function getInstallmentsProjection(
+  accountId: string,
+): Promise<TApiResponse<TInstallmentProjection[]>> {
+  const startTime = Date.now();
+
+  try {
+    const { supabase } = await requireAccountAccess(accountId);
+
+    logger.info("Fetching installments projection", { accountId });
+
+    // Get transactions with installments
+    const { data: transactions, error } = await supabase
+      .from("transactions")
+      .select("description, amount, installment, date")
+      .eq("account_id", accountId)
+      .not("installment", "is", null)
+      .order("date", { ascending: false });
+
+    if (error) {
+      logger.error("Failed to fetch installments", error, { accountId });
+      return { data: null, error: error.message, success: false };
+    }
+
+    // Parse installments and group by description
+    const installmentMap = new Map<
+      string,
+      {
+        amount: number;
+        current: number;
+        total: number;
+        date: string;
+      }
+    >();
+
+    const typedTransactions = transactions as {
+      description: string;
+      amount: number;
+      installment: string | null;
+      date: string;
+    }[];
+
+    for (const t of typedTransactions || []) {
+      if (!t.installment) continue;
+
+      // Parse installment format: "1/12", "3/6", etc.
+      const match = t.installment.match(/(\d+)\/(\d+)/);
+      if (!match) continue;
+
+      const current = Number.parseInt(match[1], 10);
+      const total = Number.parseInt(match[2], 10);
+
+      // Get latest installment for each description
+      const key = t.description.toLowerCase().trim();
+      const existing = installmentMap.get(key);
+
+      if (!existing || current > existing.current) {
+        installmentMap.set(key, {
+          amount: Number(t.amount),
+          current,
+          total,
+          date: t.date,
+        });
+      }
+    }
+
+    // Build projection
+    const projections: TInstallmentProjection[] = [];
+
+    for (const [description, data] of installmentMap.entries()) {
+      // Only include if there are remaining installments
+      if (data.current >= data.total) continue;
+
+      const remaining = data.total - data.current;
+      const nextMonth = new Date(data.date);
+      nextMonth.setMonth(nextMonth.getMonth() + 1);
+
+      projections.push({
+        description: description.charAt(0).toUpperCase() + description.slice(1),
+        current_installment: data.current,
+        total_installments: data.total,
+        amount: data.amount,
+        next_date: nextMonth.toISOString().split("T")[0],
+        remaining_amount: data.amount * remaining,
+        remaining_installments: remaining,
+      });
+    }
+
+    // Sort by remaining amount (highest first)
+    projections.sort((a, b) => b.remaining_amount - a.remaining_amount);
+
+    const duration = Date.now() - startTime;
+    logger.info("Installments projection fetched", {
+      accountId,
+      duration,
+      projections: projections.length,
+    });
+
+    return { data: projections, error: null, success: true };
+  } catch (error) {
+    logger.error("Exception in getInstallmentsProjection", error, {
+      accountId,
+      duration: Date.now() - startTime,
+    });
+    return {
+      data: null,
+      error:
+        error instanceof Error
+          ? error.message
+          : "Erro ao buscar projeção de parcelas",
+      success: false,
+    };
+  }
+}
+
+/**
+ * Get top transactions by amount
+ */
+export async function getTopTransactions(
+  accountId: string,
+  limit: number = 10,
+  period?: PeriodDateRange,
+): Promise<TApiResponse<TTransaction[]>> {
+  const startTime = Date.now();
+
+  try {
+    const { supabase } = await requireAccountAccess(accountId);
+
+    logger.info("Fetching top transactions", { accountId, limit, period });
+
+    let query = supabase
+      .from("transactions")
+      .select("*")
+      .eq("account_id", accountId)
+      .order("amount", { ascending: false })
+      .limit(limit);
+
+    if (period) {
+      query = query.gte("date", period.startDate).lte("date", period.endDate);
+    }
+
+    const { data: transactions, error } = await query;
+
+    if (error) {
+      logger.error("Failed to fetch top transactions", error, { accountId });
+      return { data: null, error: error.message, success: false };
+    }
+
+    const duration = Date.now() - startTime;
+    logger.info("Top transactions fetched", {
+      accountId,
+      duration,
+      count: transactions?.length || 0,
+    });
+
+    return {
+      data: (transactions as TTransaction[]) || [],
+      error: null,
+      success: true,
+    };
+  } catch (error) {
+    logger.error("Exception in getTopTransactions", error, {
+      accountId,
+      duration: Date.now() - startTime,
+    });
+    return {
+      data: null,
+      error:
+        error instanceof Error
+          ? error.message
+          : "Erro ao buscar maiores transações",
       success: false,
     };
   }

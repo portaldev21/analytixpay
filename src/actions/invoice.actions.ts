@@ -45,18 +45,17 @@ export async function uploadInvoice(
 
     const file = formData.get("file") as File;
     const accountId = formData.get("accountId") as string;
-    const billingDate = formData.get("billingDate") as string;
+    const userBillingDate = formData.get("billingDate") as string | null;
 
-    if (!file || !accountId || !billingDate) {
+    if (!file || !accountId) {
       logger.warn("Upload missing required fields", {
         userId: user.id,
         hasFile: !!file,
         hasAccountId: !!accountId,
-        hasBillingDate: !!billingDate,
       });
       return {
         data: null,
-        error: "Arquivo, conta e data de vencimento são obrigatórios",
+        error: "Arquivo e conta são obrigatórios",
         success: false,
       };
     }
@@ -108,6 +107,27 @@ export async function uploadInvoice(
       };
     }
 
+    // Determinar a data de vencimento:
+    // 1. Usar data extraída do PDF (dueDate) se disponível
+    // 2. Caso contrário, usar data informada pelo usuário
+    // 3. Se nenhuma disponível, retornar erro
+    const billingDate = parseResult.dueDate || userBillingDate;
+
+    if (!billingDate) {
+      await supabase.storage.from("invoices").remove([filePath]);
+      return {
+        data: null,
+        error:
+          "DATA_VENCIMENTO_NAO_ENCONTRADA:Não foi possível detectar a data de vencimento automaticamente. Por favor, informe manualmente.",
+        success: false,
+      };
+    }
+
+    logger.info("Billing date determined", {
+      source: parseResult.dueDate ? "PDF" : "user",
+      billingDate,
+    });
+
     // Create invoice
     const { data: invoice, error: invoiceError } = await supabase
       .from("invoices")
@@ -119,7 +139,7 @@ export async function uploadInvoice(
         period: parseResult.period,
         card_last_digits: parseResult.cardLastDigits,
         total_amount: parseResult.totalAmount,
-        billing_date: billingDate, // Data de vencimento informada pelo usuário
+        billing_date: billingDate, // Data de vencimento (do PDF ou informada pelo usuário)
         status: "completed",
       } as any)
       .select()
@@ -364,6 +384,63 @@ export async function getInvoicesSummary(accountId: string): Promise<
         error instanceof Error
           ? error.message
           : "Erro ao buscar resumo de faturas",
+      success: false,
+    };
+  }
+}
+
+/**
+ * Get single invoice with all its transactions
+ */
+export async function getInvoiceWithTransactions(
+  invoiceId: string,
+  accountId: string,
+): Promise<TApiResponse<TInvoiceWithTransactions>> {
+  try {
+    const supabase = await createClient();
+
+    if (!(await hasAccessToAccount(accountId))) {
+      return { data: null, error: "Acesso negado", success: false };
+    }
+
+    // Fetch invoice
+    const { data: invoice, error: invoiceError } = await supabase
+      .from("invoices")
+      .select("*")
+      .eq("id", invoiceId)
+      .eq("account_id", accountId)
+      .single();
+
+    if (invoiceError || !invoice) {
+      return {
+        data: null,
+        error: invoiceError?.message || "Fatura não encontrada",
+        success: false,
+      };
+    }
+
+    // Fetch transactions for this invoice
+    const { data: transactions, error: transError } = await supabase
+      .from("transactions")
+      .select("*")
+      .eq("invoice_id", invoiceId)
+      .order("date", { ascending: false });
+
+    if (transError) {
+      return { data: null, error: transError.message, success: false };
+    }
+
+    const invoiceWithTransactions: TInvoiceWithTransactions = {
+      ...(invoice as TInvoice),
+      transactions: transactions || [],
+      _count: { transactions: transactions?.length || 0 },
+    };
+
+    return { data: invoiceWithTransactions, error: null, success: true };
+  } catch (error) {
+    return {
+      data: null,
+      error: error instanceof Error ? error.message : "Erro ao buscar fatura",
       success: false,
     };
   }

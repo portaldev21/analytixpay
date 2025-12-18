@@ -276,12 +276,12 @@ export function parseTransactionsFromText(
 
   for (const line of lines) {
     // Skip lines that look like totals or headers
-    const shouldExclude = excludePatterns.some((pattern) =>
-      pattern.test(line),
-    );
+    const shouldExclude = excludePatterns.some((pattern) => pattern.test(line));
     if (shouldExclude) {
       if (debug) {
-        logger.debug("Skipping excluded line", { line: line.substring(0, 100) });
+        logger.debug("Skipping excluded line", {
+          line: line.substring(0, 100),
+        });
       }
       continue;
     }
@@ -483,7 +483,7 @@ export function calculateTotalAmount(
 
 /**
  * Main parser function - to be used in Server Actions
- * Uses pdf2json library with zero dependencies
+ * Uses pdf-parse library (Mozilla PDF.js) for better multi-page extraction
  * Supports AI-based parsing with regex fallback
  */
 export async function parsePdfFile(
@@ -493,54 +493,10 @@ export async function parsePdfFile(
   const { debug = false, useAI = true, fallbackToRegex = true } = options;
 
   try {
-    // Dynamic import - pdf2json has zero dependencies (default export)
-    const PDFParser = (await import("pdf2json")).default;
-
-    // Create parser instance (null context, true for raw text)
-    const pdfParser = new PDFParser(null, true);
-
-    // Parse PDF using promise wrapper
-    const text = await new Promise<string>((resolve, reject) => {
-      // Handle parsing completion
-      pdfParser.on("pdfParser_dataReady", () => {
-        try {
-          const rawText = pdfParser.getRawTextContent();
-          resolve(rawText);
-        } catch (err) {
-          reject(err);
-        }
-      });
-
-      // Handle parsing errors
-      pdfParser.on("pdfParser_dataError", (errData: any) => {
-        reject(errData.parserError || new Error("PDF parsing failed"));
-      });
-
-      // Start parsing
-      pdfParser.parseBuffer(Buffer.from(file));
-    });
-
-    if (debug) {
-      logger.debug("Raw PDF text", {
-        textLength: text.length,
-        preview: text.substring(0, 500),
-      });
-    }
-
-    if (!text || text.length < 50) {
-      return {
-        transactions: [],
-        error: "PDF vazio ou inválido",
-      };
-    }
-
-    // Clean up PDF parser resources
-    pdfParser.destroy();
-
-    // Try AI parsing first if enabled
+    // Try AI parsing first if enabled (Claude processes PDF natively, no text extraction needed)
     if (useAI) {
       const { parseInvoiceWithAI } = await import("./ai-parser");
-      const aiResult = await parseInvoiceWithAI(text);
+      const aiResult = await parseInvoiceWithAI(file);
 
       // If AI parsing succeeded, return result
       if (aiResult.transactions.length > 0) {
@@ -555,7 +511,31 @@ export async function parsePdfFile(
       logger.debug("AI parsing failed, falling back to regex");
     }
 
-    // Fallback to regex parsing
+    // Fallback to regex parsing - needs text extraction
+    const { extractText } = await import("unpdf");
+
+    // Extract text from all pages
+    const result = await extractText(new Uint8Array(file), {
+      mergePages: true,
+    });
+    const text = result.text;
+
+    if (debug) {
+      logger.debug("Raw PDF text for regex fallback", {
+        textLength: text.length,
+        totalPages: result.totalPages,
+        preview: text.substring(0, 500),
+      });
+    }
+
+    if (!text || text.length < 50) {
+      return {
+        transactions: [],
+        error: "PDF vazio ou inválido",
+      };
+    }
+
+    // Regex parsing
     const transactions = parseTransactionsFromText(text, debug);
 
     if (transactions.length === 0) {

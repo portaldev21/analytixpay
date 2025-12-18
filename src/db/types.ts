@@ -46,6 +46,16 @@ export interface Database {
         Insert: TProfileInsert;
         Update: TProfileUpdate;
       };
+      chat_conversations: {
+        Row: TChatConversation;
+        Insert: TChatConversationInsert;
+        Update: TChatConversationUpdate;
+      };
+      chat_messages: {
+        Row: TChatMessage;
+        Insert: TChatMessageInsert;
+        Update: TChatMessageUpdate;
+      };
     };
   };
 }
@@ -314,6 +324,7 @@ export type TTransactionFilters = {
   search?: string;
   invoiceId?: string;
   accountId?: string;
+  installmentType?: "all" | "current" | "past" | "none";
 };
 
 export type TInvoiceFilters = {
@@ -372,6 +383,7 @@ export type TPdfParseResult = {
   period?: string;
   cardLastDigits?: string;
   totalAmount?: number;
+  dueDate?: string; // Data de vencimento extraída do PDF (YYYY-MM-DD)
   error?: string;
 };
 
@@ -392,4 +404,118 @@ export type TPagination = {
   page: number;
   limit: number;
   offset: number;
+};
+
+// =====================================================
+// CHAT TYPES (AI Financial Agent)
+// =====================================================
+
+export type TChatMessageRole = "user" | "assistant";
+
+export type TChatConversation = {
+  id: string;
+  account_id: string;
+  user_id: string | null;
+  title: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type TChatConversationInsert = {
+  id?: string;
+  account_id: string;
+  user_id?: string | null;
+  title?: string | null;
+  created_at?: string;
+  updated_at?: string;
+};
+
+export type TChatConversationUpdate = Partial<TChatConversationInsert>;
+
+export type TChatMessage = {
+  id: string;
+  conversation_id: string;
+  role: TChatMessageRole;
+  content: string;
+  metadata: Json | null;
+  created_at: string;
+};
+
+export type TChatMessageInsert = {
+  id?: string;
+  conversation_id: string;
+  role: TChatMessageRole;
+  content: string;
+  metadata?: Json | null;
+  created_at?: string;
+};
+
+export type TChatMessageUpdate = Partial<TChatMessageInsert>;
+
+export type TChatConversationWithMessages = TChatConversation & {
+  messages: TChatMessage[];
+};
+
+// =====================================================
+// ANALYTICS TYPES
+// =====================================================
+
+export type TDailySpending = {
+  date: string;
+  total: number;
+  count: number;
+};
+
+export type TSpendingByCard = {
+  card_last_digits: string;
+  total: number;
+  count: number;
+};
+
+export type TInstallmentProjection = {
+  description: string;
+  current_installment: number;
+  total_installments: number;
+  amount: number;
+  next_date: string;
+  remaining_amount: number;
+  remaining_installments: number;
+};
+
+export type TFinancialContext = {
+  period: {
+    startDate: string;
+    endDate: string;
+  };
+  stats: {
+    totalSpent: number;
+    transactionCount: number;
+    averageTransaction: number;
+    dailyAverage: number;
+  };
+  categoryBreakdown: {
+    category: string;
+    total: number;
+    percentage: number;
+  }[];
+  comparison: {
+    previousPeriodTotal: number;
+    percentageChange: number;
+  };
+  topExpenses: {
+    description: string;
+    amount: number;
+    date: string;
+    category: string;
+  }[];
+  recurring: {
+    description: string;
+    amount: number;
+    frequency: string;
+  }[];
+  healthScore: {
+    score: number;
+    grade: string;
+    recommendations: string[];
+  };
 };

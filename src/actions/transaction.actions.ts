@@ -60,6 +60,9 @@ export async function getTransactions(
     if (filters?.maxAmount) {
       query = query.lte("amount", filters.maxAmount);
     }
+    if (filters?.invoiceId) {
+      query = query.eq("invoice_id", filters.invoiceId);
+    }
 
     query = query.order("date", { ascending: false });
 
@@ -472,7 +475,9 @@ export async function getSpendingTrends(
 
     // Apply period filter or use default months
     if (period) {
-      query = query.gte(dateField, period.startDate).lte(dateField, period.endDate);
+      query = query
+        .gte(dateField, period.startDate)
+        .lte(dateField, period.endDate);
     } else {
       query = query.gte(dateField, startDate.toISOString());
     }
@@ -492,7 +497,8 @@ export async function getSpendingTrends(
 
     for (const t of transactionList) {
       // Use billing_date if available and dateType is billing, otherwise use date
-      const dateValue = dateType === "billing" && t.billing_date ? t.billing_date : t.date;
+      const dateValue =
+        dateType === "billing" && t.billing_date ? t.billing_date : t.date;
       const date = new Date(dateValue);
       const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
 
@@ -559,7 +565,9 @@ export async function getTopExpenses(
 
     // Apply period filter if provided
     if (period) {
-      query = query.gte(dateField, period.startDate).lte(dateField, period.endDate);
+      query = query
+        .gte(dateField, period.startDate)
+        .lte(dateField, period.endDate);
     }
 
     query = query.order("amount", { ascending: false }).limit(limit);
