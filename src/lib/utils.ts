@@ -204,25 +204,33 @@ export function formatCardNumber(lastDigits: string): string {
 }
 
 /**
- * Color by category
+ * Color by category - Dark Premium Fintech palette
  */
 export function getCategoryColor(category: string): string {
   const colors: Record<string, string> = {
-    Alimentação: "#10b981",
-    Transporte: "#3b82f6",
-    Saúde: "#ef4444",
-    Lazer: "#8b5cf6",
-    Compras: "#ec4899",
-    Educação: "#f59e0b",
-    Casa: "#06b6d4",
-    Vestuário: "#14b8a6",
-    Beleza: "#f97316",
-    Tecnologia: "#6366f1",
-    Serviços: "#64748b",
-    Outros: "#94a3b8",
+    Alimentação: "#32E68A", // positive green
+    Transporte: "#42A7A4", // primary teal
+    Saúde: "#FF4F66", // negative/alert red
+    Lazer: "#AA88F5", // purple light
+    Compras: "#EC4899", // pink
+    Educação: "#F59E0B", // amber
+    Casa: "#6E88BA", // blue card start
+    Vestuário: "#5F57B7", // purple mid
+    Beleza: "#F97316", // orange
+    Tecnologia: "#214E98", // blue card end
+    Serviços: "#91919F", // text muted
+    Outros: "#DCDDE3", // text secondary
   };
 
   return colors[category] || colors["Outros"];
+}
+
+/**
+ * Get category background with opacity for cards
+ */
+export function getCategoryBgColor(category: string): string {
+  const color = getCategoryColor(category);
+  return `${color}20`; // 20 = 12.5% opacity in hex
 }
 
 /**

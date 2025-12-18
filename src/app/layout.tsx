@@ -1,17 +1,13 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "@/components/shared/ThemeProvider";
 import { Toaster } from "sonner";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const plusJakarta = Plus_Jakarta_Sans({
+  variable: "--font-jakarta",
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -20,20 +16,34 @@ export const metadata: Metadata = {
     "Gestão inteligente de faturas de cartão de crédito com extração automática de transações",
 };
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  viewportFit: "cover",
+  themeColor: "#070D3D",
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR" suppressHydrationWarning>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <ThemeProvider defaultTheme="dark" storageKey="analytixpay-theme">
-          {children}
-          <Toaster richColors position="top-right" />
-        </ThemeProvider>
+    <html lang="pt-BR" className="dark">
+      <body className={`${plusJakarta.variable} font-sans antialiased`}>
+        {children}
+        <Toaster
+          richColors
+          position="top-right"
+          toastOptions={{
+            style: {
+              background: "var(--color-card-dark-1)",
+              border: "1px solid var(--glass-border)",
+              color: "var(--color-text-primary)",
+            },
+          }}
+        />
       </body>
     </html>
   );
