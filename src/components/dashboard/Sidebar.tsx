@@ -2,12 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { motion } from "framer-motion";
 import {
   LayoutDashboard,
   FileText,
   CreditCard,
   Settings,
   LogOut,
+  BarChart3,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { logout } from "@/actions/auth.actions";
@@ -15,9 +17,10 @@ import { Button } from "@/components/ui/button";
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { name: "Analytics", href: "/analytics", icon: BarChart3 },
   { name: "Faturas", href: "/invoices", icon: FileText },
-  { name: "Transações", href: "/transactions", icon: CreditCard },
-  { name: "Configurações", href: "/settings", icon: Settings },
+  { name: "Transacoes", href: "/transactions", icon: CreditCard },
+  { name: "Configuracoes", href: "/settings", icon: Settings },
 ];
 
 export function Sidebar() {
@@ -28,43 +31,100 @@ export function Sidebar() {
   };
 
   return (
-    <div className="flex flex-col h-full bg-card border-r">
-      <div className="p-6">
-        <h1 className="text-2xl font-bold tracking-tight">AnalytiXPay</h1>
+    <div
+      className={cn(
+        "hidden lg:flex flex-col h-full w-[280px]",
+        "bg-[var(--color-card-dark-1)]",
+        "border-r border-[var(--glass-border)]",
+      )}
+    >
+      {/* Logo */}
+      <div className="p-6 pb-8">
+        <Link href="/dashboard" className="block">
+          <h1 className="text-2xl font-bold tracking-tight text-gradient-green">
+            AnalytiXPay
+          </h1>
+          <p className="text-xs text-[var(--color-text-muted)] mt-1">
+            Gestao de Faturas
+          </p>
+        </Link>
       </div>
 
+      {/* Navigation */}
       <nav className="flex-1 px-3 space-y-1">
         {navigation.map((item) => {
-          const isActive = pathname === item.href;
+          const isActive =
+            pathname === item.href ||
+            (item.href !== "/dashboard" && pathname.startsWith(item.href));
           const Icon = item.icon;
 
           return (
-            <Link
-              key={item.name}
-              href={item.href}
-              className={cn(
-                "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
-                isActive
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+            <Link key={item.name} href={item.href} className="relative block">
+              {/* Active background */}
+              {isActive && (
+                <motion.div
+                  layoutId="sidebar-active-bg"
+                  className={cn(
+                    "absolute inset-0",
+                    "bg-gradient-to-r from-[var(--color-primary-start)]/20 to-transparent",
+                    "rounded-xl",
+                    "border-l-2 border-[var(--color-primary-start)]",
+                  )}
+                  transition={{
+                    type: "spring",
+                    stiffness: 500,
+                    damping: 35,
+                  }}
+                />
               )}
-            >
-              <Icon className="h-5 w-5" />
-              {item.name}
+
+              <div
+                className={cn(
+                  "relative flex items-center gap-3 px-4 py-3 rounded-xl",
+                  "text-sm font-medium transition-colors",
+                  isActive
+                    ? "text-[var(--color-text-primary)]"
+                    : "text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] hover:bg-[var(--color-card-dark-2)]/50",
+                )}
+              >
+                <Icon
+                  className={cn(
+                    "size-5",
+                    isActive && "text-[var(--color-primary-start)]",
+                  )}
+                />
+                {item.name}
+              </div>
             </Link>
           );
         })}
       </nav>
 
+      {/* Divider */}
+      <div className="mx-4 my-4 h-px bg-[var(--glass-border)]" />
+
+      {/* Logout */}
       <div className="p-3">
         <Button
           variant="ghost"
-          className="w-full justify-start gap-3"
+          className="w-full justify-start gap-3 text-[var(--color-text-muted)] hover:text-[var(--color-negative)]"
           onClick={handleLogout}
         >
-          <LogOut className="h-5 w-5" />
+          <LogOut className="size-5" />
           Sair
         </Button>
+      </div>
+
+      {/* Footer */}
+      <div className="p-4 pt-0">
+        <div className="p-3 rounded-xl bg-[var(--color-card-dark-2)]/50 border border-[var(--glass-border)]">
+          <p className="text-xs text-[var(--color-text-muted)]">
+            Dark Premium Fintech
+          </p>
+          <p className="text-[10px] text-[var(--color-text-muted)]/60 mt-1">
+            v2.0 - Design System
+          </p>
+        </div>
       </div>
     </div>
   );
