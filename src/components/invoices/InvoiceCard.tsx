@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { FileText, Calendar, CreditCard } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import Link from "next/link";
+import { motion } from "framer-motion";
+import { FileText, Calendar, CreditCard, ChevronRight } from "lucide-react";
+import { CardGlass } from "@/components/ui/card-glass";
 import { Badge } from "@/components/ui/badge";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { DeleteInvoiceButton } from "./DeleteInvoiceButton";
@@ -38,120 +39,143 @@ export function InvoiceCard({
       }}
       transition={{ duration: 0.2 }}
     >
-      <Card
-        className={`transition-all ${
+      <CardGlass
+        variant="dark-2"
+        size="lg"
+        interactive
+        hoverGlow={invoice.status === "completed" ? "green" : "none"}
+        className={
           isDeleting
-            ? "bg-destructive/10 border-destructive/50 shadow-lg shadow-destructive/20"
+            ? "!bg-[var(--color-negative)]/10 !border-[var(--color-negative)]/50"
             : ""
-        }`}
+        }
       >
-        <CardContent className="pt-6">
-          <div className="flex items-start justify-between">
-            <div className="flex items-start gap-3 flex-1 min-w-0">
-              <div
-                className={`rounded-lg p-2 flex-shrink-0 transition-colors ${
-                  isDeleting ? "bg-destructive/20" : "bg-primary/10"
+        <div className="flex items-start justify-between">
+          <div className="flex items-start gap-3 flex-1 min-w-0">
+            <div
+              className={`rounded-xl p-2.5 flex-shrink-0 transition-colors ${
+                isDeleting
+                  ? "bg-[var(--color-negative)]/20"
+                  : "bg-gradient-to-br from-[var(--color-primary-start)]/20 to-[var(--color-primary-end)]/20"
+              }`}
+            >
+              <FileText
+                className={`h-5 w-5 transition-colors ${
+                  isDeleting
+                    ? "text-[var(--color-negative)]"
+                    : "text-[var(--color-primary-start)]"
+                }`}
+              />
+            </div>
+            <div className="min-w-0 flex-1">
+              <h3
+                className={`font-semibold text-[var(--color-text-primary)] truncate transition-colors ${
+                  isDeleting ? "text-[var(--color-negative)]" : ""
                 }`}
               >
-                <FileText
-                  className={`h-5 w-5 transition-colors ${
-                    isDeleting ? "text-destructive" : "text-primary"
-                  }`}
-                />
-              </div>
-              <div className="min-w-0 flex-1">
-                <h3
-                  className={`font-semibold truncate transition-colors ${
-                    isDeleting ? "text-destructive" : ""
-                  }`}
-                >
-                  {invoice.file_name}
-                </h3>
-                <div className="flex flex-wrap gap-3 mt-2 text-sm text-muted-foreground">
-                  <div className="flex items-center gap-1">
-                    <Calendar className="h-4 w-4" />
-                    {formatDate(invoice.created_at)}
-                  </div>
-                  {invoice.period && (
-                    <div className="flex items-center gap-1">
-                      <CreditCard className="h-4 w-4" />
-                      {invoice.period}
-                    </div>
+                {invoice.file_name}
+              </h3>
+              <div className="flex flex-wrap gap-3 mt-2 text-sm text-[var(--color-text-muted)]">
+                <div className="flex items-center gap-1">
+                  <Calendar className="h-4 w-4" />
+                  {invoice.billing_date ? (
+                    <span>
+                      {formatDate(invoice.billing_date)}{" "}
+                      <span className="text-xs opacity-70">(Vencimento)</span>
+                    </span>
+                  ) : (
+                    formatDate(invoice.created_at)
                   )}
                 </div>
+                {invoice.period && (
+                  <div className="flex items-center gap-1">
+                    <CreditCard className="h-4 w-4" />
+                    {invoice.period}
+                  </div>
+                )}
               </div>
-            </div>
-
-            <div className="flex items-center gap-2 flex-shrink-0">
-              <Badge
-                variant={
-                  invoice.status === "completed"
-                    ? "default"
-                    : invoice.status === "error"
-                      ? "destructive"
-                      : "secondary"
-                }
-              >
-                {invoice.status === "completed"
-                  ? "Processado"
-                  : invoice.status === "error"
-                    ? "Erro"
-                    : "Processando"}
-              </Badge>
-              {showDelete && (
-                <DeleteInvoiceButton
-                  invoiceId={invoice.id}
-                  accountId={accountId}
-                  invoiceName={invoice.period || invoice.file_name}
-                  transactionCount={invoice.transaction_count}
-                  onDeleteStart={() => setIsDeleting(true)}
-                />
-              )}
             </div>
           </div>
 
-          {invoice.card_last_digits && (
-            <div className="mt-4 text-sm">
-              <span className="text-muted-foreground">Cartão: </span>
-              <span className="font-medium">
-                **** {invoice.card_last_digits}
-              </span>
-            </div>
-          )}
-
-          {invoice.total_amount && (
-            <div className="mt-2 text-sm">
-              <span className="text-muted-foreground">Total: </span>
-              <span className="font-semibold text-lg">
-                {formatCurrency(Number(invoice.total_amount))}
-              </span>
-            </div>
-          )}
-
-          {invoice.transaction_count !== undefined &&
-            invoice.transaction_count > 0 && (
-              <div className="mt-2 text-sm text-muted-foreground">
-                {invoice.transaction_count}{" "}
-                {invoice.transaction_count === 1
-                  ? "transação extraída"
-                  : "transações extraídas"}
-              </div>
-            )}
-
-          {isDeleting && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              className="mt-3 pt-3 border-t border-destructive/20"
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <Badge
+              variant={
+                invoice.status === "completed"
+                  ? "positive"
+                  : invoice.status === "error"
+                    ? "destructive"
+                    : "purple"
+              }
             >
-              <p className="text-sm text-destructive font-medium flex items-center gap-2">
-                <span className="animate-pulse">🗑️</span>
-                Deletando fatura...
-              </p>
-            </motion.div>
+              {invoice.status === "completed"
+                ? "Processado"
+                : invoice.status === "error"
+                  ? "Erro"
+                  : "Processando"}
+            </Badge>
+            {showDelete && (
+              <DeleteInvoiceButton
+                invoiceId={invoice.id}
+                accountId={accountId}
+                invoiceName={invoice.period || invoice.file_name}
+                transactionCount={invoice.transaction_count}
+                onDeleteStart={() => setIsDeleting(true)}
+              />
+            )}
+          </div>
+        </div>
+
+        {invoice.card_last_digits && (
+          <div className="mt-4 text-sm">
+            <span className="text-[var(--color-text-muted)]">Cartão: </span>
+            <span className="font-medium text-[var(--color-text-secondary)]">
+              **** {invoice.card_last_digits}
+            </span>
+          </div>
+        )}
+
+        {invoice.total_amount && (
+          <div className="mt-2 text-sm">
+            <span className="text-[var(--color-text-muted)]">Total: </span>
+            <span className="font-semibold text-lg text-[var(--color-text-primary)] tabular-nums">
+              {formatCurrency(Number(invoice.total_amount))}
+            </span>
+          </div>
+        )}
+
+        {invoice.transaction_count !== undefined &&
+          invoice.transaction_count > 0 && (
+            <div className="mt-2 text-sm text-[var(--color-text-muted)]">
+              {invoice.transaction_count}{" "}
+              {invoice.transaction_count === 1
+                ? "transação extraída"
+                : "transações extraídas"}
+            </div>
           )}
-        </CardContent>
-      </Card>
+
+        {!isDeleting && invoice.status === "completed" && (
+          <Link
+            href={`/invoices/${invoice.id}?accountId=${accountId}`}
+            className="mt-4 pt-4 border-t border-[var(--glass-border)] flex items-center justify-between text-sm text-[var(--color-primary-start)] hover:text-[var(--color-positive)] transition-colors group"
+          >
+            <span>Ver detalhes da fatura</span>
+            <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+          </Link>
+        )}
+
+        {isDeleting && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            className="mt-4 pt-4 border-t border-[var(--color-negative)]/20"
+          >
+            <p className="text-sm text-[var(--color-negative)] font-medium flex items-center gap-2">
+              <span className="animate-pulse">🗑️</span>
+              Deletando fatura...
+            </p>
+          </motion.div>
+        )}
+      </CardGlass>
     </motion.div>
   );
 }

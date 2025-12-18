@@ -3,8 +3,16 @@
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useDropzone } from "react-dropzone";
-import { Upload, FileText, Loader2, CheckCircle, XCircle, Calendar } from "lucide-react";
-import { Card } from "@/components/ui/card";
+import {
+  Upload,
+  FileText,
+  Loader2,
+  CheckCircle,
+  XCircle,
+  Calendar,
+  AlertCircle,
+} from "lucide-react";
+import { CardGlass } from "@/components/ui/card-glass";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,13 +26,15 @@ interface UploadInvoiceProps {
 export function UploadInvoice({ accountId }: UploadInvoiceProps) {
   const router = useRouter();
   const [uploading, setUploading] = useState(false);
-  const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
+  const [status, setStatus] = useState<
+    "idle" | "success" | "error" | "need_date"
+  >("idle");
   const [message, setMessage] = useState("");
   const [billingDate, setBillingDate] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  const handleUpload = async () => {
-    if (!selectedFile || !billingDate) return;
+  const handleUpload = async (manualDate?: string) => {
+    if (!selectedFile) return;
 
     setUploading(true);
     setStatus("idle");
@@ -34,7 +44,11 @@ export function UploadInvoice({ accountId }: UploadInvoiceProps) {
       const formData = new FormData();
       formData.append("file", selectedFile);
       formData.append("accountId", accountId);
-      formData.append("billingDate", billingDate);
+
+      // Só envia billingDate se foi informado manualmente
+      if (manualDate) {
+        formData.append("billingDate", manualDate);
+      }
 
       const result = await uploadInvoice(formData);
 
@@ -46,6 +60,10 @@ export function UploadInvoice({ accountId }: UploadInvoiceProps) {
         setSelectedFile(null);
         setBillingDate("");
         router.refresh();
+      } else if (result.error?.startsWith("DATA_VENCIMENTO_NAO_ENCONTRADA:")) {
+        // Parser não conseguiu detectar a data - pedir para o usuário
+        setStatus("need_date");
+        setMessage(result.error.split(":")[1]);
       } else {
         setStatus("error");
         setMessage(result.error || "Erro ao processar fatura");
@@ -58,12 +76,19 @@ export function UploadInvoice({ accountId }: UploadInvoiceProps) {
     }
   };
 
+  const handleRetryWithDate = () => {
+    if (billingDate) {
+      handleUpload(billingDate);
+    }
+  };
+
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
     if (file) {
       setSelectedFile(file);
       setStatus("idle");
       setMessage("");
+      setBillingDate("");
     }
   }, []);
 
@@ -78,54 +103,112 @@ export function UploadInvoice({ accountId }: UploadInvoiceProps) {
   return (
     <div className="space-y-4">
       {/* Step 1: Select file */}
-      <Card
+      <div
         {...getRootProps()}
         className={cn(
-          "border-2 border-dashed cursor-pointer transition-all",
-          isDragActive && "border-primary bg-primary/5",
+          "border-2 border-dashed rounded-[var(--radius-lg)] cursor-pointer transition-all",
+          "bg-[var(--color-card-dark-2)] border-[var(--glass-border)]",
+          isDragActive &&
+            "border-[var(--color-primary-start)] bg-[var(--color-primary-start)]/10",
           uploading && "opacity-50 cursor-not-allowed",
-          selectedFile && "border-primary/50 bg-primary/5",
+          selectedFile &&
+            "border-[var(--color-primary-start)]/50 bg-[var(--color-primary-start)]/5",
         )}
       >
         <input {...getInputProps()} />
         <div className="p-8 text-center">
           {uploading ? (
             <>
-              <Loader2 className="mx-auto h-10 w-10 animate-spin text-primary" />
-              <h3 className="mt-4 font-semibold">Processando fatura...</h3>
-              <p className="text-sm text-muted-foreground mt-2">
-                Extraindo transações do PDF
+              <div className="mx-auto size-16 rounded-2xl bg-gradient-to-br from-[var(--color-primary-start)]/20 to-[var(--color-primary-end)]/20 flex items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin text-[var(--color-primary-start)]" />
+              </div>
+              <h3 className="mt-4 font-semibold text-[var(--color-text-primary)]">
+                Processando fatura...
+              </h3>
+              <p className="text-sm text-[var(--color-text-muted)] mt-2">
+                Extraindo transações do PDF com IA
               </p>
             </>
           ) : selectedFile ? (
             <>
-              <FileText className="mx-auto h-10 w-10 text-primary" />
-              <h3 className="mt-4 font-semibold">{selectedFile.name}</h3>
-              <p className="text-sm text-muted-foreground mt-2">
+              <div className="mx-auto size-16 rounded-2xl bg-gradient-to-br from-[var(--color-primary-start)]/20 to-[var(--color-primary-end)]/20 flex items-center justify-center">
+                <FileText className="h-8 w-8 text-[var(--color-primary-start)]" />
+              </div>
+              <h3 className="mt-4 font-semibold text-[var(--color-text-primary)]">
+                {selectedFile.name}
+              </h3>
+              <p className="text-sm text-[var(--color-text-muted)] mt-2">
                 Clique para trocar o arquivo
               </p>
             </>
           ) : (
             <>
-              <Upload className="mx-auto h-10 w-10 text-muted-foreground" />
-              <h3 className="mt-4 font-semibold">Upload de Fatura</h3>
-              <p className="text-sm text-muted-foreground mt-2">
+              <div className="mx-auto size-16 rounded-2xl bg-[var(--color-card-dark-3)] flex items-center justify-center">
+                <Upload className="h-8 w-8 text-[var(--color-text-muted)]" />
+              </div>
+              <h3 className="mt-4 font-semibold text-[var(--color-text-primary)]">
+                Upload de Fatura
+              </h3>
+              <p className="text-sm text-[var(--color-text-muted)] mt-2">
                 Arraste um PDF ou clique para selecionar
               </p>
-              <p className="text-xs text-muted-foreground mt-1">Máximo 10MB</p>
+              <p className="text-xs text-[var(--color-text-muted)]/60 mt-1">
+                Máximo 10MB
+              </p>
             </>
           )}
         </div>
-      </Card>
+      </div>
 
-      {/* Step 2: Select billing date and upload */}
-      {selectedFile && (
-        <Card className="p-4">
+      {/* Step 2: Process button (no date required initially) */}
+      {selectedFile && status !== "need_date" && status !== "success" && (
+        <Button
+          onClick={() => handleUpload()}
+          disabled={uploading}
+          className="w-full"
+          size="xl"
+        >
+          {uploading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Processando...
+            </>
+          ) : (
+            <>
+              <Upload className="mr-2 h-4 w-4" />
+              Processar Fatura
+            </>
+          )}
+        </Button>
+      )}
+
+      {/* Step 3: Ask for date if not detected */}
+      {status === "need_date" && (
+        <CardGlass
+          variant="dark-2"
+          size="md"
+          className="border-[var(--color-purple-light)]/30"
+        >
           <div className="space-y-4">
+            <div className="flex items-start gap-3">
+              <div className="p-1.5 rounded-lg bg-[var(--color-purple-light)]/10">
+                <AlertCircle className="h-5 w-5 text-[var(--color-purple-light)]" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-[var(--color-text-primary)]">
+                  Data de vencimento não detectada
+                </p>
+                <p className="text-sm text-[var(--color-text-muted)] mt-1">
+                  Não foi possível extrair a data de vencimento do PDF
+                  automaticamente. Por favor, informe abaixo:
+                </p>
+              </div>
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="billingDate" className="flex items-center gap-2">
                 <Calendar className="h-4 w-4" />
-                Data de Vencimento da Fatura
+                Data de Vencimento
               </Label>
               <Input
                 id="billingDate"
@@ -135,55 +218,51 @@ export function UploadInvoice({ accountId }: UploadInvoiceProps) {
                 className="w-full"
                 disabled={uploading}
               />
-              <p className="text-xs text-muted-foreground">
-                Informe a data de vencimento desta fatura para organizar seus gastos corretamente
-              </p>
             </div>
 
-            <Button
-              onClick={handleUpload}
-              disabled={!billingDate || uploading}
-              className="w-full"
-            >
-              {uploading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Processando...
-                </>
-              ) : (
-                <>
-                  <Upload className="mr-2 h-4 w-4" />
-                  Processar Fatura
-                </>
-              )}
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                onClick={handleRetryWithDate}
+                disabled={!billingDate || uploading}
+                className="flex-1"
+              >
+                {uploading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Processando...
+                  </>
+                ) : (
+                  "Continuar"
+                )}
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setStatus("idle");
+                  setSelectedFile(null);
+                  setBillingDate("");
+                }}
+              >
+                Cancelar
+              </Button>
+            </div>
           </div>
-        </Card>
+        </CardGlass>
       )}
 
-      {/* Status message */}
-      {status !== "idle" && (
-        <Card
-          className={cn(
-            "p-4 border-2",
-            status === "success" && "bg-green-500/10 border-green-500/30",
-            status === "error" && "bg-red-500/10 border-red-500/30",
-          )}
+      {/* Success message */}
+      {status === "success" && (
+        <CardGlass
+          variant="dark-2"
+          size="md"
+          className="border-[var(--color-positive)]/30"
         >
           <div className="flex items-start gap-3">
-            {status === "success" ? (
-              <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />
-            ) : (
-              <XCircle className="h-5 w-5 text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0" />
-            )}
+            <div className="p-1.5 rounded-lg bg-[var(--color-positive)]/10">
+              <CheckCircle className="h-5 w-5 text-[var(--color-positive)]" />
+            </div>
             <div className="flex-1">
-              <p
-                className={cn(
-                  "text-sm font-medium",
-                  status === "success" && "text-green-700 dark:text-green-300",
-                  status === "error" && "text-red-700 dark:text-red-300",
-                )}
-              >
+              <p className="text-sm font-medium text-[var(--color-positive)]">
                 {message}
               </p>
             </div>
@@ -191,7 +270,30 @@ export function UploadInvoice({ accountId }: UploadInvoiceProps) {
               Fechar
             </Button>
           </div>
-        </Card>
+        </CardGlass>
+      )}
+
+      {/* Error message */}
+      {status === "error" && (
+        <CardGlass
+          variant="dark-2"
+          size="md"
+          className="border-[var(--color-negative)]/30"
+        >
+          <div className="flex items-start gap-3">
+            <div className="p-1.5 rounded-lg bg-[var(--color-negative)]/10">
+              <XCircle className="h-5 w-5 text-[var(--color-negative)]" />
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-medium text-[var(--color-negative)]">
+                {message}
+              </p>
+            </div>
+            <Button variant="ghost" size="sm" onClick={() => setStatus("idle")}>
+              Fechar
+            </Button>
+          </div>
+        </CardGlass>
       )}
     </div>
   );
