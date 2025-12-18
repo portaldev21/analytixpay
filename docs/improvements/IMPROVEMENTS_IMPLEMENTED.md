@@ -24,7 +24,7 @@ Foram implementadas **12 melhorias significativas** no projeto AnalytiXPay, foca
 **O que foi feito:**
 - Validação de env vars com Zod em build time
 - Type-safe access a variáveis de ambiente
-- Helper functions: `hasOpenAI()`, `isDevelopment()`, `isProduction()`
+- Helper functions: `hasAnthropic()`, `hasOpenAI()`, `isDevelopment()`, `isProduction()`
 
 **Impacto:**
 - ✅ Erros detectados no build (não em runtime)
@@ -34,7 +34,7 @@ Foram implementadas **12 melhorias significativas** no projeto AnalytiXPay, foca
 **Arquivos atualizados:**
 - [src/lib/supabase/server.ts](src/lib/supabase/server.ts) - Usa `env` ao invés de `process.env`
 - [src/lib/supabase/client.ts](src/lib/supabase/client.ts) - Usa `env` ao invés de `process.env`
-- [src/lib/pdf/ai-parser.ts](src/lib/pdf/ai-parser.ts) - Usa `hasOpenAI()` helper
+- [src/lib/pdf/ai-parser.ts](src/lib/pdf/ai-parser.ts) - Parser com Anthropic Claude (suporte nativo a PDF)
 
 ---
 
@@ -51,7 +51,7 @@ Foram implementadas **12 melhorias significativas** no projeto AnalytiXPay, foca
 
 **Impacto:**
 - 🔒 Proteção contra abuse
-- 💰 Redução de custos OpenAI
+- 💰 Redução de custos de API (Anthropic Claude)
 - ⚡ Melhor controle de recursos
 
 **Arquivos atualizados:**
@@ -153,7 +153,7 @@ const { user, supabase, accountId } = await requireAccountAccess(accountId)
 - Stats de cache
 
 **Impacto:**
-- 💰 Economia significativa OpenAI (PDFs idênticos)
+- 💰 Economia significativa Anthropic Claude (PDFs idênticos)
 - ⚡ Upload instantâneo em cache hit
 - 🌍 Melhor UX
 
@@ -335,7 +335,7 @@ As seguintes melhorias do plano **NÃO foram implementadas** ainda:
 - [ ] Processamento assíncrono com queues (requer Redis/BullMQ)
 - [ ] Monitoramento com Sentry
 - [ ] Analytics tracking
-- [ ] Cost tracking OpenAI
+- [ ] Cost tracking Anthropic Claude
 
 ### P3 Pendente
 - [ ] CSRF protection
@@ -372,8 +372,9 @@ As seguintes melhorias do plano **NÃO foram implementadas** ainda:
 
 ### 1. Environment Variables
 ```typescript
-import { env, hasOpenAI } from '@/lib/env'
+import { env, hasAnthropic } from '@/lib/env'
 const url = env.NEXT_PUBLIC_SUPABASE_URL
+const aiEnabled = hasAnthropic() // Check if Anthropic API key is configured
 ```
 
 ### 2. Logging
@@ -437,20 +438,139 @@ npm run test:coverage # With coverage
 
 ---
 
+---
+
+## 🤖 Feature: Pagina de Analytics com Agente IA (2025-12-15)
+
+### Status: IMPLEMENTADO - Pendente Migration
+
+Uma nova pagina de analytics completa com agente de IA financeiro foi implementada.
+
+### Arquivos Criados
+
+**Database:**
+- `src/db/migrations/005_add_chat_tables.sql` - Tabelas para chat (chat_conversations, chat_messages)
+
+**Backend:**
+- `src/actions/chat.actions.ts` - CRUD para conversas de chat
+- `src/lib/ai/prompts.ts` - System prompts e perguntas sugeridas
+- `src/lib/ai/financial-agent.ts` - Context builder para o agente
+- `src/app/api/chat/route.ts` - Endpoint de streaming (SSE) com Anthropic Claude Haiku
+
+**Analytics Actions (em `src/actions/analytics.actions.ts`):**
+- `getDailySpending()` - Dados para heatmap de calendario
+- `getSpendingByCard()` - Gastos por cartao
+- `getInstallmentsProjection()` - Projecao de parcelas futuras
+- `getTopTransactions()` - Top N maiores gastos
+
+**UI Components:**
+- `src/components/analytics/AnalyticsPage.tsx` - Pagina principal (client)
+- `src/components/analytics/AnalyticsKPIs.tsx` - 5 KPI cards
+- `src/components/analytics/ExpenseHeatmap.tsx` - Calendario heatmap (react-calendar-heatmap)
+- `src/components/analytics/SpendingByCardChart.tsx` - Grafico de barras horizontais
+- `src/components/analytics/InstallmentsTable.tsx` - Tabela de parcelas futuras
+- `src/components/analytics/TopExpensesTable.tsx` - Top 10 gastos rankeados
+- `src/components/analytics/ai-chat/ChatContainer.tsx` - Container do chat com streaming
+- `src/components/analytics/ai-chat/ChatInput.tsx` - Input de texto
+- `src/components/analytics/ai-chat/ChatMessage.tsx` - Bolhas de mensagem
+- `src/components/analytics/ai-chat/ChatSuggestions.tsx` - Perguntas sugeridas
+
+**Pages:**
+- `src/app/(dashboard)/analytics/page.tsx` - Server component com data fetching
+
+### Arquivos Modificados
+
+- `src/db/types.ts` - Tipos TChatConversation, TChatMessage, TDailySpending, etc
+- `src/components/dashboard/Sidebar.tsx` - Link para Analytics
+
+### Dependencias Adicionadas
+
+```json
+{
+  "dependencies": {
+    "react-calendar-heatmap": "^1.9.0"
+  },
+  "devDependencies": {
+    "@types/react-calendar-heatmap": "^1.6.8"
+  }
+}
+```
+
+### Funcionalidades
+
+1. **KPIs:**
+   - Total do periodo
+   - Comparacao vs periodo anterior
+   - Media diaria
+   - Maior gasto
+   - Contagem de transacoes
+
+2. **Graficos:**
+   - Evolucao mensal (reutiliza SpendingTrendsChart)
+   - Categorias (reutiliza CategoryBreakdownChart)
+   - Gastos por cartao (novo)
+   - Heatmap de calendario (novo)
+
+3. **Tabelas:**
+   - Top 10 maiores gastos
+   - Projecao de parcelas futuras
+   - Gastos recorrentes
+
+4. **Agente IA:**
+   - Chat com streaming em tempo real
+   - Context injection de dados financeiros
+   - Perguntas sugeridas pre-definidas
+   - Historico persistido no banco
+
+### PENDENCIA IMPORTANTE
+
+**⚠️ Executar a migration antes de testar:**
+
+Abra o Supabase SQL Editor e execute o arquivo:
+```
+src/db/migrations/005_add_chat_tables.sql
+```
+
+Isso criara as tabelas necessarias para o chat funcionar:
+- `chat_conversations` - Armazena conversas
+- `chat_messages` - Armazena mensagens
+- RLS policies para seguranca
+- Indices para performance
+
+### Como Testar
+
+1. Execute a migration no Supabase
+2. Inicie o servidor: `npm run dev`
+3. Acesse: http://localhost:3000/analytics
+4. Verifique os KPIs e graficos
+5. Teste o chat com o agente IA
+
+### Proximos Passos
+
+- [ ] Executar migration 005 no Supabase
+- [ ] Testar pagina de analytics no browser
+- [ ] Ajustar estilos do heatmap se necessario
+- [ ] Adicionar mais perguntas sugeridas
+- [ ] Implementar delete de conversas na UI
+
+---
+
 ## 🎉 Conclusão
 
-Foram implementadas **9 melhorias principais** + configuração de testes + documentação completa.
+Foram implementadas **9 melhorias principais** + configuração de testes + documentação completa + **pagina de analytics com IA**.
 
 **Impacto geral:**
 - ✅ +100% em segurança (validation, rate limit, sanitization)
 - ✅ +80% em organização de código (helpers, centralization)
 - ✅ +60% em manutenibilidade (logging, testing)
 - ✅ Preparado para escala (cache, pagination)
+- ✅ Nova feature: Analytics com Agente IA
 
-**Próximo passo:** Integrar os helpers nas actions existentes e expandir cobertura de testes.
+**Próximo passo:** Executar migration 005 e testar a pagina de analytics.
 
 ---
 
 **Documento gerado em:** 2025-10-24
+**Ultima atualizacao:** 2025-12-15
 **Autor:** Claude Code
-**Versão:** 1.0
+**Versão:** 1.1

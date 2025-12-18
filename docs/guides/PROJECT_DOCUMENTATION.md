@@ -340,7 +340,7 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 ## 🎯 Roadmap Futuro
 
 - [ ] Suporte a múltiplos idiomas (i18n)
-- [ ] OCR avançado com IA (OpenAI Vision API)
+- [x] Parsing de PDF com IA (Anthropic Claude)
 - [ ] Notificações push
 - [ ] App mobile (React Native)
 - [ ] Integração com bancos (Open Banking)

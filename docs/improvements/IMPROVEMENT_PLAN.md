@@ -51,8 +51,8 @@ const envSchema = z.object({
   // App
   NEXT_PUBLIC_APP_URL: z.string().url().default('http://localhost:3000'),
 
-  // OpenAI (opcional)
-  OPENAI_API_KEY: z.string().optional(),
+  // Anthropic Claude (opcional - para parsing de PDF e recategorização)
+  ANTHROPIC_API_KEY: z.string().optional(),
 
   // Node
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
@@ -171,7 +171,7 @@ export async function uploadInvoice(formData: FormData): Promise<TApiResponse<..
 
 **Impacto:**
 - 🔒 Proteção contra abuse
-- 💰 Redução de custos OpenAI
+- 💰 Redução de custos de API (Anthropic Claude)
 - ⚡ Melhor controle de recursos
 
 **Tempo:** 2-3 horas
@@ -833,7 +833,7 @@ export async function parsePdfFile(
 ```
 
 **Impacto:**
-- 💰 Economia OpenAI
+- 💰 Economia Anthropic Claude
 - ⚡ Upload instantâneo (cache hit)
 - 🌍 Melhor UX
 
@@ -1129,33 +1129,33 @@ trackEvent('invoice_uploaded', { accountId, fileSize, parseMethod: 'AI' })
 trackEvent('transaction_edited', { category, amount })
 ```
 
-**Cost Tracking OpenAI:**
+**Cost Tracking Anthropic Claude:**
 
 ```typescript
 // src/lib/analytics/cost-tracking.ts
-export async function trackOpenAICost(usage: {
-  promptTokens: number
-  completionTokens: number
+export async function trackAnthropicCost(usage: {
+  inputTokens: number
+  outputTokens: number
   model: string
 }) {
   const costs = {
-    'gpt-4o-mini': { input: 0.15, output: 0.60 }, // per 1M tokens
+    'claude-haiku-4-5-20251001': { input: 0.80, output: 4.00 }, // per 1M tokens
   }
 
   const cost = costs[usage.model]
-  const inputCost = (usage.promptTokens / 1_000_000) * cost.input
-  const outputCost = (usage.completionTokens / 1_000_000) * cost.output
+  const inputCost = (usage.inputTokens / 1_000_000) * cost.input
+  const outputCost = (usage.outputTokens / 1_000_000) * cost.output
   const totalCost = inputCost + outputCost
 
   // Save to database
   await supabase.from('ai_usage_logs').insert({
     model: usage.model,
-    prompt_tokens: usage.promptTokens,
-    completion_tokens: usage.completionTokens,
+    input_tokens: usage.inputTokens,
+    output_tokens: usage.outputTokens,
     cost_usd: totalCost,
   })
 
-  logger.info('OpenAI usage tracked', { usage, totalCost })
+  logger.info('Anthropic Claude usage tracked', { usage, totalCost })
 }
 ```
 
@@ -1277,7 +1277,7 @@ export async function notifyInvoiceProcessed(invoice: TInvoice) {
 | Queries por request | 10+ | 2-3 | +70% |
 | Cobertura de testes | 0% | 70% | +70% |
 | Bugs em produção | 5/mês | <1/mês | +80% |
-| Custo OpenAI | $100/mês | $60/mês | +40% |
+| Custo Anthropic | $100/mês | $60/mês | +40% |
 
 ---
 

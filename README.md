@@ -251,7 +251,7 @@ npm run test:coverage # Testes com coverage
 - [INSTALLATION.md](docs/setup/INSTALLATION.md) - Instalação detalhada
 - [SETUP_GUIDE.md](docs/setup/SETUP_GUIDE.md) - Guia detalhado de setup
 - [GOOGLE_OAUTH_SETUP.md](docs/setup/GOOGLE_OAUTH_SETUP.md) - Setup OAuth
-- [OPENAI_SETUP.md](docs/setup/OPENAI_SETUP.md) - Setup OpenAI (AI parsing)
+- [ANTHROPIC_SETUP.md](docs/setup/ANTHROPIC_SETUP.md) - Setup Anthropic Claude (AI parsing)
 
 ### 🚀 Deploy e Melhorias
 - [DEPLOYMENT.md](docs/guides/DEPLOYMENT.md) - Guia de deploy
@@ -268,7 +268,7 @@ npm run test:coverage # Testes com coverage
 - [ ] Gráficos com Recharts
 - [ ] Export para CSV/Excel
 - [ ] Notificações por email
-- [ ] OCR com IA (OpenAI Vision)
+- [x] Parsing de PDF com IA (Claude)
 - [ ] App mobile (React Native)
 - [ ] Integração com Open Banking
 - [ ] Alertas de gastos

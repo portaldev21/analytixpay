@@ -55,9 +55,9 @@ Bem-vindo à documentação completa do AnalytiXPay - Sistema de Gestão de Fatu
   - Credenciais e callbacks
   - Integração com Supabase Auth
 
-- **[OPENAI_SETUP.md](setup/OPENAI_SETUP.md)**
-  - Configuração da API OpenAI
-  - AI-powered PDF parsing
+- **[ANTHROPIC_SETUP.md](setup/ANTHROPIC_SETUP.md)**
+  - Configuracao da API Anthropic Claude
+  - AI-powered PDF parsing com suporte nativo a PDF
   - Custos e limites
 
 - **[CREATE_STORAGE_BUCKET.md](setup/CREATE_STORAGE_BUCKET.md)**
@@ -147,7 +147,7 @@ Bem-vindo à documentação completa do AnalytiXPay - Sistema de Gestão de Fatu
 
 - **[PLANEJAMENTO_AI_PARSER.md](planning/PLANEJAMENTO_AI_PARSER.md)**
   - Planejamento do parser com AI
-  - Integração OpenAI GPT-4o-mini
+  - Integracao Anthropic Claude (migrado de OpenAI)
   - Hybrid approach (AI + regex)
 
 - **[EDIT_TRANSACTION_PLAN.md](planning/EDIT_TRANSACTION_PLAN.md)**
@@ -238,7 +238,7 @@ docs/
 │   ├── INSTALLATION.md
 │   ├── SETUP_GUIDE.md
 │   ├── GOOGLE_OAUTH_SETUP.md
-│   ├── OPENAI_SETUP.md
+│   ├── ANTHROPIC_SETUP.md
 │   ├── CREATE_STORAGE_BUCKET.md
 │   └── PENDING_SETUP.md
 ├── guides/                      # Guias técnicos
@@ -276,7 +276,7 @@ docs/
 ### Preciso entender a arquitetura?
 → Leia [PROJECT_DOCUMENTATION.md](guides/PROJECT_DOCUMENTATION.md)
 
-### Preciso configurar OAuth ou OpenAI?
+### Preciso configurar OAuth ou Anthropic Claude?
 → Veja [setup/](setup/)
 
 ### Preciso fazer deploy?
