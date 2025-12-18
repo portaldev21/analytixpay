@@ -1,11 +1,11 @@
 "use client";
 
-import { Card } from "@/components/ui/card";
+import { CardGlass } from "@/components/ui/card-glass";
 import { formatCurrency } from "@/lib/utils";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import {
-  LineChart,
-  Line,
+  AreaChart,
+  Area,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -36,50 +36,74 @@ export function SpendingTrendsChart({ data }: SpendingTrendsChartProps) {
   }));
 
   return (
-    <Card className="p-6">
-      <div className="mb-4">
-        <h3 className="text-lg font-semibold">Tendência de Gastos</h3>
-        <p className="text-sm text-muted-foreground">
-          Evolução dos gastos ao longo do tempo
+    <CardGlass variant="dark-1" size="lg">
+      <div className="mb-6">
+        <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
+          Tendencia de Gastos
+        </h3>
+        <p className="text-sm text-[var(--color-text-muted)]">
+          Evolucao dos gastos ao longo do tempo
         </p>
       </div>
 
       <ResponsiveContainer width="100%" height={isMobile ? 250 : 300}>
-        <LineChart data={chartData}>
-          <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+        <AreaChart data={chartData}>
+          <defs>
+            <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
+              <stop
+                offset="5%"
+                stopColor="var(--color-primary-start)"
+                stopOpacity={0.3}
+              />
+              <stop
+                offset="95%"
+                stopColor="var(--color-primary-start)"
+                stopOpacity={0}
+              />
+            </linearGradient>
+          </defs>
+          <CartesianGrid
+            strokeDasharray="3 3"
+            stroke="var(--glass-border)"
+            vertical={false}
+          />
           <XAxis
             dataKey="monthLabel"
             angle={isMobile ? -45 : 0}
             textAnchor={isMobile ? "end" : "middle"}
             height={isMobile ? 60 : 30}
             tick={{
-              fill: "hsl(var(--muted-foreground))",
+              fill: "var(--color-text-muted)",
               fontSize: isMobile ? 10 : 12,
             }}
+            axisLine={{ stroke: "var(--glass-border)" }}
+            tickLine={false}
           />
           <YAxis
             tick={{
-              fill: "hsl(var(--muted-foreground))",
+              fill: "var(--color-text-muted)",
               fontSize: isMobile ? 10 : 12,
             }}
             tickFormatter={(value) =>
               isMobile ? `${(value / 1000).toFixed(0)}k` : formatCurrency(value)
             }
+            axisLine={false}
+            tickLine={false}
           />
           <Tooltip
             content={({ active, payload }) => {
               if (active && payload && payload.length) {
                 return (
-                  <div className="rounded-lg border bg-background p-3 shadow-lg">
-                    <div className="font-medium">
+                  <div className="glass-card p-3">
+                    <div className="font-medium text-[var(--color-text-primary)]">
                       {payload[0].payload.monthLabel}
                     </div>
-                    <div className="mt-1 text-sm">
-                      <div className="text-primary font-semibold">
+                    <div className="mt-1 space-y-1">
+                      <div className="text-lg font-bold text-[var(--color-primary-start)]">
                         {formatCurrency(Number(payload[0].value))}
                       </div>
-                      <div className="text-muted-foreground">
-                        {payload[0].payload.count} transações
+                      <div className="text-xs text-[var(--color-text-muted)]">
+                        {payload[0].payload.count} transacoes
                       </div>
                     </div>
                   </div>
@@ -88,16 +112,27 @@ export function SpendingTrendsChart({ data }: SpendingTrendsChartProps) {
               return null;
             }}
           />
-          <Line
+          <Area
             type="monotone"
             dataKey="total"
-            stroke="hsl(var(--primary))"
+            stroke="var(--color-primary-start)"
             strokeWidth={2}
-            dot={{ fill: "hsl(var(--primary))", r: 4 }}
-            activeDot={{ r: 6 }}
+            fill="url(#colorTotal)"
+            dot={{
+              fill: "var(--color-card-dark-1)",
+              stroke: "var(--color-primary-start)",
+              strokeWidth: 2,
+              r: 4,
+            }}
+            activeDot={{
+              fill: "var(--color-primary-start)",
+              stroke: "var(--color-card-dark-1)",
+              strokeWidth: 2,
+              r: 6,
+            }}
           />
-        </LineChart>
+        </AreaChart>
       </ResponsiveContainer>
-    </Card>
+    </CardGlass>
   );
 }

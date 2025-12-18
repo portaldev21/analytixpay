@@ -65,10 +65,12 @@ export function PeriodSelector() {
       )}
 
       {/* Date type toggle */}
-      <div className={cn(
-        "flex rounded-lg border bg-muted p-1 gap-1 transition-opacity",
-        isPending && "opacity-70 pointer-events-none"
-      )}>
+      <div
+        className={cn(
+          "flex rounded-lg border bg-muted p-1 gap-1 transition-opacity",
+          isPending && "opacity-70 pointer-events-none",
+        )}
+      >
         {DATE_TYPES.map((type) => (
           <button
             key={type.value}
@@ -79,7 +81,7 @@ export function PeriodSelector() {
               "flex items-center gap-1.5 h-8 px-3 text-xs font-medium rounded-md transition-all",
               dateType === type.value
                 ? "bg-background text-foreground shadow-sm border"
-                : "text-muted-foreground hover:text-foreground"
+                : "text-muted-foreground hover:text-foreground",
             )}
           >
             <type.icon className="h-3.5 w-3.5" />
@@ -89,11 +91,17 @@ export function PeriodSelector() {
       </div>
 
       {/* Period selector */}
-      <Select value={period} onValueChange={handlePeriodChange} disabled={isPending}>
-        <SelectTrigger className={cn(
-          "w-[160px] transition-opacity",
-          isPending && "opacity-70"
-        )}>
+      <Select
+        value={period}
+        onValueChange={handlePeriodChange}
+        disabled={isPending}
+      >
+        <SelectTrigger
+          className={cn(
+            "w-[160px] transition-opacity",
+            isPending && "opacity-70",
+          )}
+        >
           <SelectValue placeholder="Selecionar período" />
         </SelectTrigger>
         <SelectContent>

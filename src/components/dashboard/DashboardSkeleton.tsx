@@ -1,4 +1,6 @@
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+"use client";
+
+import { CardGlass } from "@/components/ui/card-glass";
 import { Skeleton } from "@/components/ui/skeleton";
 
 /**
@@ -8,16 +10,18 @@ export function StatsCardSkeleton() {
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       {[1, 2, 3, 4].map((i) => (
-        <Card key={i}>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <Skeleton className="h-4 w-24" />
-            <Skeleton className="h-4 w-4 rounded-full" />
-          </CardHeader>
-          <CardContent>
-            <Skeleton className="h-8 w-32 mb-2" />
-            <Skeleton className="h-3 w-full" />
-          </CardContent>
-        </Card>
+        <CardGlass key={i} variant="dark-1" size="lg">
+          <div className="flex items-start justify-between">
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-7 w-32" />
+            </div>
+            <Skeleton className="h-10 w-10 rounded-xl" />
+          </div>
+          <div className="mt-3 pt-3 border-t border-[var(--glass-border)]">
+            <Skeleton className="h-4 w-full" />
+          </div>
+        </CardGlass>
       ))}
     </div>
   );
@@ -28,13 +32,13 @@ export function StatsCardSkeleton() {
  */
 export function ChartSkeleton() {
   return (
-    <Card className="p-6">
-      <div className="mb-4">
+    <CardGlass variant="dark-1" size="lg">
+      <div className="mb-6">
         <Skeleton className="h-6 w-48 mb-2" />
         <Skeleton className="h-4 w-64" />
       </div>
-      <Skeleton className="h-[300px] w-full rounded-md" />
-    </Card>
+      <Skeleton className="h-[300px] w-full rounded-xl" />
+    </CardGlass>
   );
 }
 
@@ -43,7 +47,7 @@ export function ChartSkeleton() {
  */
 export function ListSkeleton({ items = 5 }: { items?: number }) {
   return (
-    <Card className="p-6">
+    <CardGlass variant="dark-1" size="lg">
       <div className="mb-4">
         <Skeleton className="h-6 w-48 mb-2" />
         <Skeleton className="h-4 w-64" />
@@ -52,7 +56,7 @@ export function ListSkeleton({ items = 5 }: { items?: number }) {
         {Array.from({ length: items }).map((_, i) => (
           <div
             key={i}
-            className="flex items-center justify-between p-3 rounded-lg border"
+            className="flex items-center justify-between p-3 rounded-xl bg-[var(--color-card-dark-2)]/50"
           >
             <div className="flex items-center gap-3 flex-1">
               <Skeleton className="h-10 w-10 rounded-full" />
@@ -65,7 +69,7 @@ export function ListSkeleton({ items = 5 }: { items?: number }) {
           </div>
         ))}
       </div>
-    </Card>
+    </CardGlass>
   );
 }
 
@@ -81,7 +85,7 @@ export function DashboardSkeleton() {
           <Skeleton className="h-9 w-48 mb-2" />
           <Skeleton className="h-4 w-64" />
         </div>
-        <Skeleton className="h-10 w-40" />
+        <Skeleton className="h-10 w-40 rounded-xl" />
       </div>
 
       {/* Stats cards */}

@@ -1,7 +1,7 @@
 "use client";
 
-import { Card } from "@/components/ui/card";
-import { formatCurrency } from "@/lib/utils";
+import { CardGlass } from "@/components/ui/card-glass";
+import { formatCurrency, getCategoryColor } from "@/lib/utils";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { PieChart as PieChartIcon } from "lucide-react";
 
@@ -14,45 +14,44 @@ interface CategoryBreakdownChartProps {
   }[];
 }
 
-const COLORS = [
-  "hsl(210, 100%, 56%)", // blue
-  "hsl(280, 100%, 65%)", // purple
-  "hsl(340, 100%, 60%)", // pink
-  "hsl(30, 100%, 55%)", // orange
-  "hsl(150, 60%, 50%)", // green
-  "hsl(200, 100%, 45%)", // cyan
-  "hsl(50, 100%, 50%)", // yellow
-  "hsl(0, 100%, 60%)", // red
-];
-
 export function CategoryBreakdownChart({ data }: CategoryBreakdownChartProps) {
-  const chartData = data.sort((a, b) => b.total - a.total).slice(0, 8); // Top 8 categories
+  const chartData = data.sort((a, b) => b.total - a.total).slice(0, 8);
 
   // Empty state
   if (!data || data.length === 0) {
     return (
-      <Card className="p-6">
+      <CardGlass variant="dark-1" size="lg">
         <div className="mb-4">
-          <h3 className="text-lg font-semibold">Gastos por Categoria</h3>
-          <p className="text-sm text-muted-foreground">
-            Distribuição percentual dos gastos
+          <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
+            Gastos por Categoria
+          </h3>
+          <p className="text-sm text-[var(--color-text-muted)]">
+            Distribuicao percentual dos gastos
           </p>
         </div>
-        <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
-          <PieChartIcon className="h-12 w-12 mb-3 opacity-50" />
-          <p className="text-sm">Nenhuma transação encontrada</p>
-          <p className="text-xs mt-1">Faça upload de uma fatura para começar</p>
+        <div className="flex flex-col items-center justify-center py-12">
+          <div className="p-4 rounded-full bg-[var(--color-card-dark-2)]">
+            <PieChartIcon className="size-8 text-[var(--color-text-muted)]" />
+          </div>
+          <p className="text-sm text-[var(--color-text-muted)] mt-4">
+            Nenhuma transacao encontrada
+          </p>
+          <p className="text-xs text-[var(--color-text-muted)]/60 mt-1">
+            Faca upload de uma fatura para comecar
+          </p>
         </div>
-      </Card>
+      </CardGlass>
     );
   }
 
   return (
-    <Card className="p-6">
+    <CardGlass variant="dark-1" size="lg">
       <div className="mb-4">
-        <h3 className="text-lg font-semibold">Gastos por Categoria</h3>
-        <p className="text-sm text-muted-foreground">
-          Distribuição percentual dos gastos
+        <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
+          Gastos por Categoria
+        </h3>
+        <p className="text-sm text-[var(--color-text-muted)]">
+          Distribuicao percentual dos gastos
         </p>
       </div>
 
@@ -66,36 +65,51 @@ export function CategoryBreakdownChart({ data }: CategoryBreakdownChartProps) {
                 cy="50%"
                 innerRadius={60}
                 outerRadius={100}
-                fill="#8884d8"
                 paddingAngle={2}
                 dataKey="total"
                 label={({ payload }: { payload?: { percentage: number } }) =>
                   payload ? `${payload.percentage.toFixed(0)}%` : ""
                 }
+                labelLine={{
+                  stroke: "var(--color-text-muted)",
+                  strokeWidth: 1,
+                }}
               >
-                {chartData.map((entry, index) => (
+                {chartData.map((entry) => (
                   <Cell
                     key={`cell-${entry.category}`}
-                    fill={COLORS[index % COLORS.length]}
+                    fill={getCategoryColor(entry.category)}
+                    stroke="var(--color-card-dark-1)"
+                    strokeWidth={2}
                   />
                 ))}
               </Pie>
               <Tooltip
                 content={({ active, payload }) => {
                   if (active && payload && payload.length) {
-                    const data = payload[0].payload;
+                    const item = payload[0].payload;
                     return (
-                      <div className="rounded-lg border bg-background p-3 shadow-lg">
-                        <div className="font-medium">{data.category}</div>
-                        <div className="mt-1 text-sm">
-                          <div className="text-primary font-semibold">
-                            {formatCurrency(data.total)}
+                      <div className="glass-card p-3">
+                        <div className="flex items-center gap-2">
+                          <div
+                            className="size-3 rounded-full"
+                            style={{
+                              backgroundColor: getCategoryColor(item.category),
+                            }}
+                          />
+                          <span className="font-medium text-[var(--color-text-primary)]">
+                            {item.category}
+                          </span>
+                        </div>
+                        <div className="mt-2 space-y-1">
+                          <div className="text-lg font-bold text-[var(--color-primary-start)]">
+                            {formatCurrency(item.total)}
                           </div>
-                          <div className="text-muted-foreground">
-                            {data.count} transações
+                          <div className="text-xs text-[var(--color-text-muted)]">
+                            {item.count} transacoes
                           </div>
-                          <div className="text-muted-foreground">
-                            {data.percentage.toFixed(1)}% do total
+                          <div className="text-xs text-[var(--color-text-muted)]">
+                            {item.percentage.toFixed(1)}% do total
                           </div>
                         </div>
                       </div>
@@ -109,23 +123,25 @@ export function CategoryBreakdownChart({ data }: CategoryBreakdownChartProps) {
         </div>
 
         <div className="space-y-2">
-          {chartData.map((item, index) => (
+          {chartData.map((item) => (
             <div
               key={item.category}
-              className="flex items-center justify-between gap-2 text-sm"
+              className="flex items-center justify-between gap-2 p-2 rounded-lg hover:bg-[var(--color-card-dark-2)]/50 transition-colors"
             >
-              <div className="flex items-center gap-2 min-w-0">
+              <div className="flex items-center gap-3 min-w-0">
                 <div
-                  className="w-3 h-3 rounded-full flex-shrink-0"
-                  style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                  className="size-3 rounded-full flex-shrink-0"
+                  style={{ backgroundColor: getCategoryColor(item.category) }}
                 />
-                <span className="truncate">{item.category}</span>
+                <span className="text-sm text-[var(--color-text-secondary)] truncate">
+                  {item.category}
+                </span>
               </div>
-              <div className="flex items-center gap-2 flex-shrink-0">
-                <span className="text-muted-foreground text-xs">
+              <div className="flex items-center gap-3 flex-shrink-0">
+                <span className="text-xs text-[var(--color-text-muted)] tabular-nums">
                   {item.percentage.toFixed(0)}%
                 </span>
-                <span className="font-medium">
+                <span className="text-sm font-medium text-[var(--color-text-primary)] tabular-nums">
                   {formatCurrency(item.total)}
                 </span>
               </div>
@@ -133,6 +149,6 @@ export function CategoryBreakdownChart({ data }: CategoryBreakdownChartProps) {
           ))}
         </div>
       </div>
-    </Card>
+    </CardGlass>
   );
 }

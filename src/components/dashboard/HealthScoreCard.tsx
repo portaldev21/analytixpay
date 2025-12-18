@@ -1,7 +1,8 @@
 "use client";
 
 import { Lightbulb, Heart } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { motion } from "framer-motion";
+import { CardGlass } from "@/components/ui/card-glass";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import {
@@ -14,98 +15,164 @@ interface HealthScoreCardProps {
   data: HealthScore | null;
 }
 
-/**
- * Factor name translations
- */
 const FACTOR_NAMES: Record<string, string> = {
-  budgetAdherence: "Controle do Orçamento",
+  budgetAdherence: "Controle do Orcamento",
   savingsRate: "Taxa de Economia",
-  spendingTrend: "Tendência de Gastos",
-  diversification: "Diversificação",
+  spendingTrend: "Tendencia de Gastos",
+  diversification: "Diversificacao",
 };
 
-/**
- * Financial health score card component
- */
+// Map grade colors to design system
+function getGradeStyles(grade: string) {
+  switch (grade) {
+    case "A":
+      return {
+        color: "text-[var(--color-positive)]",
+        bg: "bg-[var(--color-positive)]/10",
+        glow: "shadow-[0_0_20px_rgba(50,230,138,0.3)]",
+      };
+    case "B":
+      return {
+        color: "text-[var(--color-primary-start)]",
+        bg: "bg-[var(--color-primary-start)]/10",
+        glow: "shadow-[0_0_20px_rgba(66,167,164,0.3)]",
+      };
+    case "C":
+      return {
+        color: "text-[var(--color-purple-light)]",
+        bg: "bg-[var(--color-purple-light)]/10",
+        glow: "shadow-[0_0_20px_rgba(170,136,245,0.3)]",
+      };
+    case "D":
+    case "F":
+      return {
+        color: "text-[var(--color-negative)]",
+        bg: "bg-[var(--color-negative)]/10",
+        glow: "shadow-[0_0_20px_rgba(255,79,102,0.3)]",
+      };
+    default:
+      return {
+        color: "text-[var(--color-text-muted)]",
+        bg: "bg-[var(--color-card-dark-2)]",
+        glow: "",
+      };
+  }
+}
+
 export function HealthScoreCard({ data }: HealthScoreCardProps) {
   // Empty state
   if (!data) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Saúde Financeira</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
-            <Heart className="h-12 w-12 mb-3 opacity-50" />
-            <p className="text-sm">Sem dados suficientes</p>
-            <p className="text-xs mt-1">Faça upload de faturas para calcular</p>
+      <CardGlass variant="dark-1" size="lg">
+        <div className="flex items-center gap-2 mb-4">
+          <Heart className="size-5 text-[var(--color-negative)]" />
+          <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
+            Saude Financeira
+          </h3>
+        </div>
+        <div className="flex flex-col items-center justify-center py-8">
+          <div className="p-4 rounded-full bg-[var(--color-card-dark-2)]">
+            <Heart className="size-8 text-[var(--color-text-muted)]" />
           </div>
-        </CardContent>
-      </Card>
+          <p className="text-sm text-[var(--color-text-muted)] mt-4">
+            Sem dados suficientes
+          </p>
+          <p className="text-xs text-[var(--color-text-muted)]/60 mt-1">
+            Faca upload de faturas para calcular
+          </p>
+        </div>
+      </CardGlass>
     );
   }
 
-  const gradeColor = getHealthScoreColor(data.grade);
+  const gradeStyles = getGradeStyles(data.grade);
   const description = getHealthScoreDescription(data.grade);
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Saúde Financeira</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        {/* Score display */}
-        <div className="flex items-center gap-6">
-          <div className="text-center">
-            <div className={cn("text-6xl font-bold", gradeColor)}>
-              {data.grade}
-            </div>
-            <div className="text-sm text-muted-foreground mt-1">
-              {description}
-            </div>
-          </div>
+    <CardGlass variant="dark-1" size="lg">
+      <div className="flex items-center gap-2 mb-6">
+        <Heart className="size-5 text-[var(--color-negative)]" />
+        <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
+          Saude Financeira
+        </h3>
+      </div>
 
-          <div className="flex-1">
-            <div className="text-3xl font-bold mb-2">{data.score}/100</div>
-            <Progress value={data.score} className="h-3" />
+      {/* Score display */}
+      <div className="flex items-center gap-6 mb-6">
+        <motion.div
+          className={cn(
+            "flex items-center justify-center size-20 rounded-2xl",
+            gradeStyles.bg,
+            gradeStyles.glow,
+          )}
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.3 }}
+        >
+          <span className={cn("text-4xl font-bold", gradeStyles.color)}>
+            {data.grade}
+          </span>
+        </motion.div>
+
+        <div className="flex-1">
+          <div className="flex items-baseline gap-1 mb-2">
+            <span className="text-3xl font-bold text-[var(--color-text-primary)] tabular-nums">
+              {data.score}
+            </span>
+            <span className="text-sm text-[var(--color-text-muted)]">/100</span>
           </div>
+          <Progress
+            value={data.score}
+            className="h-2 bg-[var(--color-card-dark-2)]"
+          />
+          <p className="text-sm text-[var(--color-text-muted)] mt-2">
+            {description}
+          </p>
         </div>
+      </div>
 
-        {/* Score breakdown */}
-        <div className="space-y-3">
-          <h4 className="font-medium text-sm">Detalhes da Pontuação</h4>
-          {Object.entries(data.factors).map(([key, value]) => (
-            <div
-              key={key}
-              className="flex justify-between items-center text-sm"
-            >
-              <span className="text-muted-foreground">
-                {FACTOR_NAMES[key] || key}
+      {/* Score breakdown */}
+      <div className="space-y-3 mb-6">
+        <h4 className="text-sm font-medium text-[var(--color-text-secondary)]">
+          Detalhes da Pontuacao
+        </h4>
+        {Object.entries(data.factors).map(([key, value]) => (
+          <div key={key} className="flex justify-between items-center text-sm">
+            <span className="text-[var(--color-text-muted)]">
+              {FACTOR_NAMES[key] || key}
+            </span>
+            <div className="flex items-center gap-3">
+              <Progress
+                value={(value / 25) * 100}
+                className="h-1.5 w-20 bg-[var(--color-card-dark-2)]"
+              />
+              <span className="font-medium text-[var(--color-text-primary)] tabular-nums w-10 text-right">
+                {value}/25
               </span>
-              <div className="flex items-center gap-2">
-                <Progress value={(value / 25) * 100} className="h-2 w-24" />
-                <span className="font-medium w-12 text-right">{value}/25</span>
-              </div>
             </div>
-          ))}
-        </div>
-
-        {/* Recommendations */}
-        {data.recommendations.length > 0 && (
-          <div className="space-y-2">
-            <h4 className="font-medium text-sm">Recomendações</h4>
-            <ul className="space-y-2">
-              {data.recommendations.map((rec, idx) => (
-                <li key={idx} className="flex gap-2 text-sm">
-                  <Lightbulb className="h-4 w-4 text-yellow-600 flex-shrink-0 mt-0.5" />
-                  <span className="text-muted-foreground">{rec}</span>
-                </li>
-              ))}
-            </ul>
           </div>
-        )}
-      </CardContent>
-    </Card>
+        ))}
+      </div>
+
+      {/* Recommendations */}
+      {data.recommendations.length > 0 && (
+        <div className="pt-4 border-t border-[var(--glass-border)]">
+          <h4 className="text-sm font-medium text-[var(--color-text-secondary)] mb-3">
+            Recomendacoes
+          </h4>
+          <ul className="space-y-2">
+            {data.recommendations.map((rec, idx) => (
+              <li
+                key={idx}
+                className="flex gap-2 text-sm p-2 rounded-lg bg-[var(--color-purple-light)]/5"
+              >
+                <Lightbulb className="size-4 text-[var(--color-purple-light)] flex-shrink-0 mt-0.5" />
+                <span className="text-[var(--color-text-muted)]">{rec}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </CardGlass>
   );
 }

@@ -1,6 +1,5 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
-import { DollarSign, TrendingUp, ShoppingCart, CreditCard } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import {
   getTransactionStatsWithComparison,
@@ -50,11 +49,7 @@ interface SearchParams {
 /**
  * Dashboard stats cards - receives pre-fetched data
  */
-function DashboardStatsCards({
-  stats,
-}: {
-  stats: StatsWithComparison;
-}) {
+function DashboardStatsCards({ stats }: { stats: StatsWithComparison }) {
   const { current, comparison } = stats;
 
   return (
@@ -62,7 +57,7 @@ function DashboardStatsCards({
       <StatsCard
         title="Gasto Total"
         value={formatCurrency(current.totalSpent)}
-        icon={DollarSign}
+        icon="DollarSign"
         description="Total gasto no período"
         trend={
           comparison.totalSpentChange !== null
@@ -76,7 +71,7 @@ function DashboardStatsCards({
       <StatsCard
         title="Média por Transação"
         value={formatCurrency(current.averageTransaction)}
-        icon={TrendingUp}
+        icon="TrendingUp"
         description="Valor médio das compras"
         trend={
           comparison.averageChange !== null
@@ -90,7 +85,7 @@ function DashboardStatsCards({
       <StatsCard
         title="Total de Transações"
         value={current.transactionCount}
-        icon={ShoppingCart}
+        icon="ShoppingCart"
         description="Compras realizadas"
         trend={
           comparison.transactionCountChange !== null
@@ -104,7 +99,7 @@ function DashboardStatsCards({
       <StatsCard
         title="Categorias"
         value={current.categoryBreakdown.length}
-        icon={CreditCard}
+        icon="CreditCard"
         description="Categorias diferentes"
       />
     </div>
@@ -170,7 +165,12 @@ export default async function DashboardPage({
     getInvoicesSummary(accountId),
     getRecurringTransactions(accountId),
     getSmartInsights(accountId, dateFilter, previousDateFilter),
-    getFinancialHealthScore(accountId, undefined, dateFilter, previousDateFilter),
+    getFinancialHealthScore(
+      accountId,
+      undefined,
+      dateFilter,
+      previousDateFilter,
+    ),
   ]);
 
   // Extract data with defaults
