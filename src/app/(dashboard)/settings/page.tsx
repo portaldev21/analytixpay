@@ -3,13 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { CreateAccountForm } from "@/components/settings/CreateAccountForm";
 import { RecategorizeButton } from "@/components/settings/RecategorizeButton";
 import { MigrateInvoices } from "@/components/settings/MigrateInvoices";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { CardGlass } from "@/components/ui/card-glass";
 import { Loading } from "@/components/shared/Loading";
 import { Badge } from "@/components/ui/badge";
 
@@ -37,35 +31,39 @@ async function AccountInfo({ userId }: { userId: string }) {
 
   return (
     <>
-      <Card>
-        <CardHeader>
-          <CardTitle>Suas Contas</CardTitle>
-          <CardDescription>Contas às quais você tem acesso</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {accounts.map((item: any) => (
-              <div
-                key={item.account.id}
-                className="flex items-center justify-between p-3 border rounded-lg"
-              >
-                <div>
-                  <p className="font-medium">{item.account.name}</p>
-                  <p className="text-sm text-muted-foreground">
-                    Criada em{" "}
-                    {new Date(item.account.created_at).toLocaleDateString(
-                      "pt-BR",
-                    )}
-                  </p>
-                </div>
-                <Badge variant={item.role === "owner" ? "default" : "secondary"}>
-                  {item.role === "owner" ? "Proprietário" : "Membro"}
-                </Badge>
+      <CardGlass variant="dark-1" size="lg">
+        <div className="mb-4">
+          <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
+            Suas Contas
+          </h3>
+          <p className="text-sm text-[var(--color-text-muted)]">
+            Contas as quais voce tem acesso
+          </p>
+        </div>
+        <div className="space-y-3">
+          {accounts.map((item: any) => (
+            <div
+              key={item.account.id}
+              className="flex items-center justify-between p-4 rounded-xl bg-[var(--color-card-dark-2)] border border-[var(--glass-border)]"
+            >
+              <div>
+                <p className="font-medium text-[var(--color-text-primary)]">
+                  {item.account.name}
+                </p>
+                <p className="text-sm text-[var(--color-text-muted)]">
+                  Criada em{" "}
+                  {new Date(item.account.created_at).toLocaleDateString(
+                    "pt-BR",
+                  )}
+                </p>
               </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+              <Badge variant={item.role === "owner" ? "default" : "glass"}>
+                {item.role === "owner" ? "Proprietario" : "Membro"}
+              </Badge>
+            </div>
+          ))}
+        </div>
+      </CardGlass>
 
       {primaryAccountId && <RecategorizeButton accountId={primaryAccountId} />}
 
@@ -88,9 +86,11 @@ export default async function SettingsPage() {
   return (
     <div className="space-y-6 max-w-4xl">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Configurações</h1>
-        <p className="text-muted-foreground mt-1">
-          Gerenciar contas e preferências
+        <h1 className="text-3xl font-bold tracking-tight text-[var(--color-text-primary)]">
+          Configuracoes
+        </h1>
+        <p className="text-[var(--color-text-muted)] mt-1">
+          Gerenciar contas e preferencias
         </p>
       </div>
 
@@ -101,28 +101,36 @@ export default async function SettingsPage() {
           <AccountInfo userId={user.id} />
         </Suspense>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Informações do Perfil</CardTitle>
-            <CardDescription>Seus dados de usuário</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
+        <CardGlass variant="dark-1" size="lg">
+          <div className="mb-4">
+            <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
+              Informacoes do Perfil
+            </h3>
+            <p className="text-sm text-[var(--color-text-muted)]">
+              Seus dados de usuario
+            </p>
+          </div>
+          <div className="space-y-4">
             <div>
-              <Label className="text-sm font-medium text-muted-foreground">
+              <div className="text-sm font-medium text-[var(--color-text-muted)]">
                 Email
-              </Label>
-              <p className="mt-1">{user.email}</p>
+              </div>
+              <p className="mt-1 text-[var(--color-text-primary)]">
+                {user.email}
+              </p>
             </div>
             {user.user_metadata?.name && (
               <div>
-                <Label className="text-sm font-medium text-muted-foreground">
+                <div className="text-sm font-medium text-[var(--color-text-muted)]">
                   Nome
-                </Label>
-                <p className="mt-1">{user.user_metadata.name}</p>
+                </div>
+                <p className="mt-1 text-[var(--color-text-primary)]">
+                  {user.user_metadata.name}
+                </p>
               </div>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </CardGlass>
       </div>
     </div>
   );

@@ -2,17 +2,16 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Calendar, CheckCircle, Loader2, AlertCircle, FileText } from "lucide-react";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+  Calendar,
+  CheckCircle,
+  Loader2,
+  AlertCircle,
+  FileText,
+} from "lucide-react";
+import { CardGlass } from "@/components/ui/card-glass";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
 import {
   getInvoicesWithoutBillingDate,
   updateInvoiceBillingDate,
@@ -65,11 +64,15 @@ export function MigrateInvoices({ accountId }: MigrateInvoicesProps) {
     setError(null);
     setSuccessMessage(null);
 
-    const result = await updateInvoiceBillingDate(accountId, invoiceId, billingDate);
+    const result = await updateInvoiceBillingDate(
+      accountId,
+      invoiceId,
+      billingDate,
+    );
 
     if (result.success && result.data) {
       setSuccessMessage(
-        `Data de vencimento atualizada! ${result.data.updatedTransactions} transações atualizadas.`
+        `Data de vencimento atualizada! ${result.data.updatedTransactions} transações atualizadas.`,
       );
       // Remove from list
       setInvoices((prev) => prev.filter((i) => i.id !== invoiceId));
@@ -89,64 +92,62 @@ export function MigrateInvoices({ accountId }: MigrateInvoicesProps) {
 
   if (loading) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Calendar className="h-5 w-5" />
+      <CardGlass variant="dark-1" size="lg">
+        <div className="mb-4">
+          <h3 className="flex items-center gap-2 text-lg font-semibold text-[var(--color-text-primary)]">
+            <Calendar className="h-5 w-5 text-[var(--color-primary-start)]" />
             Atualizar Datas de Vencimento
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="flex justify-center py-8">
-          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-        </CardContent>
-      </Card>
+          </h3>
+        </div>
+        <div className="flex justify-center py-8">
+          <Loader2 className="h-6 w-6 animate-spin text-[var(--color-text-muted)]" />
+        </div>
+      </CardGlass>
     );
   }
 
   if (invoices.length === 0) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Calendar className="h-5 w-5" />
+      <CardGlass variant="dark-1" size="lg">
+        <div className="mb-4">
+          <h3 className="flex items-center gap-2 text-lg font-semibold text-[var(--color-text-primary)]">
+            <Calendar className="h-5 w-5 text-[var(--color-primary-start)]" />
             Atualizar Datas de Vencimento
-          </CardTitle>
-          <CardDescription>
-            Adicione datas de vencimento às faturas existentes
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <CheckCircle className="h-5 w-5 text-green-500" />
-            <span>Todas as faturas possuem data de vencimento!</span>
-          </div>
-        </CardContent>
-      </Card>
+          </h3>
+          <p className="text-sm text-[var(--color-text-muted)] mt-1">
+            Adicione datas de vencimento as faturas existentes
+          </p>
+        </div>
+        <div className="flex items-center gap-2 text-[var(--color-text-muted)]">
+          <CheckCircle className="h-5 w-5 text-[var(--color-positive)]" />
+          <span>Todas as faturas possuem data de vencimento!</span>
+        </div>
+      </CardGlass>
     );
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Calendar className="h-5 w-5" />
+    <CardGlass variant="dark-1" size="lg">
+      <div className="mb-4">
+        <h3 className="flex items-center gap-2 text-lg font-semibold text-[var(--color-text-primary)]">
+          <Calendar className="h-5 w-5 text-[var(--color-primary-start)]" />
           Atualizar Datas de Vencimento
-        </CardTitle>
-        <CardDescription>
+        </h3>
+        <p className="text-sm text-[var(--color-text-muted)] mt-1">
           {invoices.length} fatura(s) sem data de vencimento encontrada(s).
-          Adicione a data para cada fatura para melhor organização.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
+          Adicione a data para cada fatura para melhor organizacao.
+        </p>
+      </div>
+      <div className="space-y-4">
         {error && (
-          <div className="flex items-center gap-2 p-3 rounded-lg bg-red-500/10 text-red-600 dark:text-red-400">
+          <div className="flex items-center gap-2 p-3 rounded-xl bg-[var(--color-negative)]/10 border border-[var(--color-negative)]/20 text-[var(--color-negative)]">
             <AlertCircle className="h-4 w-4 flex-shrink-0" />
             <span className="text-sm">{error}</span>
           </div>
         )}
 
         {successMessage && (
-          <div className="flex items-center gap-2 p-3 rounded-lg bg-green-500/10 text-green-600 dark:text-green-400">
+          <div className="flex items-center gap-2 p-3 rounded-xl bg-[var(--color-positive)]/10 border border-[var(--color-positive)]/20 text-[var(--color-positive)]">
             <CheckCircle className="h-4 w-4 flex-shrink-0" />
             <span className="text-sm">{successMessage}</span>
           </div>
@@ -156,15 +157,15 @@ export function MigrateInvoices({ accountId }: MigrateInvoicesProps) {
           {invoices.map((invoice) => (
             <div
               key={invoice.id}
-              className="flex flex-col sm:flex-row sm:items-center gap-3 p-3 border rounded-lg"
+              className="flex flex-col sm:flex-row sm:items-center gap-3 p-4 rounded-xl bg-[var(--color-card-dark-2)] border border-[var(--glass-border)]"
             >
               <div className="flex items-center gap-2 flex-1 min-w-0">
-                <FileText className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                <FileText className="h-4 w-4 text-[var(--color-text-muted)] flex-shrink-0" />
                 <div className="min-w-0">
-                  <p className="font-medium truncate">
+                  <p className="font-medium truncate text-[var(--color-text-primary)]">
                     {invoice.period || invoice.file_name || "Fatura sem nome"}
                   </p>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs text-[var(--color-text-muted)]">
                     Importada em{" "}
                     {new Date(invoice.created_at).toLocaleDateString("pt-BR")}
                   </p>
@@ -188,6 +189,7 @@ export function MigrateInvoices({ accountId }: MigrateInvoicesProps) {
                   size="sm"
                   onClick={() => handleUpdate(invoice.id)}
                   disabled={!dates[invoice.id] || updatingId === invoice.id}
+                  className="bg-gradient-to-r from-[var(--color-primary-start)] to-[var(--color-primary-end)]"
                 >
                   {updatingId === invoice.id ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -199,7 +201,7 @@ export function MigrateInvoices({ accountId }: MigrateInvoicesProps) {
             </div>
           ))}
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </CardGlass>
   );
 }

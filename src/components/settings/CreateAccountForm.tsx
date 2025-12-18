@@ -11,13 +11,7 @@ import { createAccount } from "@/actions/account.actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { CardGlass } from "@/components/ui/card-glass";
 
 const createAccountSchema = z.object({
   name: z.string().min(3, "Nome deve ter no mínimo 3 caracteres"),
@@ -59,24 +53,26 @@ export function CreateAccountForm() {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Criar Nova Conta</CardTitle>
-        <CardDescription>
-          Contas permitem que você compartilhe faturas com família ou amigos
-        </CardDescription>
-      </CardHeader>
+    <CardGlass variant="dark-1" size="lg">
+      <div className="mb-4">
+        <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
+          Criar Nova Conta
+        </h3>
+        <p className="text-sm text-[var(--color-text-muted)]">
+          Contas permitem que voce compartilhe faturas com familia ou amigos
+        </p>
+      </div>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <CardContent className="space-y-4">
+        <div className="space-y-4">
           {error && (
-            <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+            <div className="rounded-xl bg-[var(--color-negative)]/10 border border-[var(--color-negative)]/20 p-3 text-sm text-[var(--color-negative)]">
               {error}
             </div>
           )}
 
           {success && (
-            <div className="rounded-md bg-green-500/10 border border-green-500/20 p-3 text-sm text-green-700 dark:text-green-400 font-medium">
-              ✓ Conta criada com sucesso!
+            <div className="rounded-xl bg-[var(--color-positive)]/10 border border-[var(--color-positive)]/20 p-3 text-sm text-[var(--color-positive)] font-medium">
+              Conta criada com sucesso!
             </div>
           )}
 
@@ -84,16 +80,22 @@ export function CreateAccountForm() {
             <Label htmlFor="name">Nome da Conta</Label>
             <Input
               id="name"
-              placeholder="Ex: Família Silva"
+              placeholder="Ex: Familia Silva"
               {...register("name")}
               disabled={isLoading}
             />
             {errors.name && (
-              <p className="text-sm text-destructive">{errors.name.message}</p>
+              <p className="text-sm text-[var(--color-negative)]">
+                {errors.name.message}
+              </p>
             )}
           </div>
 
-          <Button type="submit" disabled={isLoading}>
+          <Button
+            type="submit"
+            disabled={isLoading}
+            className="bg-gradient-to-r from-[var(--color-primary-start)] to-[var(--color-primary-end)] hover:shadow-[var(--shadow-glow-green)] transition-shadow"
+          >
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -103,8 +105,8 @@ export function CreateAccountForm() {
               "Criar Conta"
             )}
           </Button>
-        </CardContent>
+        </div>
       </form>
-    </Card>
+    </CardGlass>
   );
 }
