@@ -12,14 +12,7 @@ import { login } from "@/actions/auth.actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { CardGlass } from "@/components/ui/card-glass";
 
 type LoginFormData = {
   email: string;
@@ -55,17 +48,19 @@ export function LoginForm() {
   };
 
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader>
-        <CardTitle>Entrar</CardTitle>
-        <CardDescription>
+    <CardGlass variant="dark-1" size="lg" className="w-full max-w-md">
+      <div className="mb-6">
+        <h2 className="text-xl font-semibold text-[var(--color-text-primary)]">
+          Entrar
+        </h2>
+        <p className="text-sm text-[var(--color-text-muted)] mt-1">
           Entre com seu email e senha para acessar sua conta
-        </CardDescription>
-      </CardHeader>
+        </p>
+      </div>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <CardContent className="space-y-4">
+        <div className="space-y-4">
           {error && (
-            <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+            <div className="rounded-xl bg-[var(--color-negative)]/10 border border-[var(--color-negative)]/20 p-3 text-sm text-[var(--color-negative)]">
               {error}
             </div>
           )}
@@ -80,7 +75,9 @@ export function LoginForm() {
               disabled={isLoading}
             />
             {errors.email && (
-              <p className="text-sm text-destructive">{errors.email.message}</p>
+              <p className="text-sm text-[var(--color-negative)]">
+                {errors.email.message}
+              </p>
             )}
           </div>
 
@@ -94,15 +91,19 @@ export function LoginForm() {
               disabled={isLoading}
             />
             {errors.password && (
-              <p className="text-sm text-destructive">
+              <p className="text-sm text-[var(--color-negative)]">
                 {errors.password.message}
               </p>
             )}
           </div>
-        </CardContent>
+        </div>
 
-        <CardFooter className="flex flex-col space-y-4">
-          <Button type="submit" className="w-full" disabled={isLoading}>
+        <div className="flex flex-col space-y-4 mt-6">
+          <Button
+            type="submit"
+            className="w-full h-12 rounded-xl bg-gradient-to-r from-[var(--color-primary-start)] to-[var(--color-primary-end)] hover:shadow-[var(--shadow-glow-green)] transition-shadow"
+            disabled={isLoading}
+          >
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -113,14 +114,17 @@ export function LoginForm() {
             )}
           </Button>
 
-          <p className="text-sm text-muted-foreground text-center">
-            Não tem uma conta?{" "}
-            <Link href="/signup" className="text-primary hover:underline">
+          <p className="text-sm text-[var(--color-text-muted)] text-center">
+            Nao tem uma conta?{" "}
+            <Link
+              href="/signup"
+              className="text-[var(--color-primary-start)] hover:underline"
+            >
               Cadastre-se
             </Link>
           </p>
-        </CardFooter>
+        </div>
       </form>
-    </Card>
+    </CardGlass>
   );
 }

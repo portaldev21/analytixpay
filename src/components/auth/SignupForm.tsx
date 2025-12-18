@@ -12,14 +12,7 @@ import { signup } from "@/actions/auth.actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { CardGlass } from "@/components/ui/card-glass";
 
 type SignupFormData = {
   fullName?: string;
@@ -62,17 +55,19 @@ export function SignupForm() {
   };
 
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader>
-        <CardTitle>Criar Conta</CardTitle>
-        <CardDescription>
+    <CardGlass variant="dark-1" size="lg" className="w-full max-w-md">
+      <div className="mb-6">
+        <h2 className="text-xl font-semibold text-[var(--color-text-primary)]">
+          Criar Conta
+        </h2>
+        <p className="text-sm text-[var(--color-text-muted)] mt-1">
           Preencha os dados abaixo para criar sua conta
-        </CardDescription>
-      </CardHeader>
+        </p>
+      </div>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <CardContent className="space-y-4">
+        <div className="space-y-4">
           {error && (
-            <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+            <div className="rounded-xl bg-[var(--color-negative)]/10 border border-[var(--color-negative)]/20 p-3 text-sm text-[var(--color-negative)]">
               {error}
             </div>
           )}
@@ -87,7 +82,7 @@ export function SignupForm() {
               disabled={isLoading}
             />
             {errors.fullName && (
-              <p className="text-sm text-destructive">
+              <p className="text-sm text-[var(--color-negative)]">
                 {errors.fullName.message}
               </p>
             )}
@@ -103,7 +98,9 @@ export function SignupForm() {
               disabled={isLoading}
             />
             {errors.email && (
-              <p className="text-sm text-destructive">{errors.email.message}</p>
+              <p className="text-sm text-[var(--color-negative)]">
+                {errors.email.message}
+              </p>
             )}
           </div>
 
@@ -117,7 +114,7 @@ export function SignupForm() {
               disabled={isLoading}
             />
             {errors.password && (
-              <p className="text-sm text-destructive">
+              <p className="text-sm text-[var(--color-negative)]">
                 {errors.password.message}
               </p>
             )}
@@ -133,15 +130,19 @@ export function SignupForm() {
               disabled={isLoading}
             />
             {errors.confirmPassword && (
-              <p className="text-sm text-destructive">
+              <p className="text-sm text-[var(--color-negative)]">
                 {errors.confirmPassword.message}
               </p>
             )}
           </div>
-        </CardContent>
+        </div>
 
-        <CardFooter className="flex flex-col space-y-4">
-          <Button type="submit" className="w-full" disabled={isLoading}>
+        <div className="flex flex-col space-y-4 mt-6">
+          <Button
+            type="submit"
+            className="w-full h-12 rounded-xl bg-gradient-to-r from-[var(--color-primary-start)] to-[var(--color-primary-end)] hover:shadow-[var(--shadow-glow-green)] transition-shadow"
+            disabled={isLoading}
+          >
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -152,14 +153,17 @@ export function SignupForm() {
             )}
           </Button>
 
-          <p className="text-sm text-muted-foreground text-center">
-            Já tem uma conta?{" "}
-            <Link href="/login" className="text-primary hover:underline">
+          <p className="text-sm text-[var(--color-text-muted)] text-center">
+            Ja tem uma conta?{" "}
+            <Link
+              href="/login"
+              className="text-[var(--color-primary-start)] hover:underline"
+            >
               Entrar
             </Link>
           </p>
-        </CardFooter>
+        </div>
       </form>
-    </Card>
+    </CardGlass>
   );
 }
