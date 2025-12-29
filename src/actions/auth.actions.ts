@@ -13,18 +13,24 @@ export async function login(
   email: string,
   password: string,
 ): Promise<TApiResponse<{ redirectTo: string }>> {
+  console.log("[Login Action] Starting login for:", email);
+
   try {
     // Validate input
+    console.log("[Login Action] Validating input...");
     const validated = loginSchema.parse({ email, password });
 
+    console.log("[Login Action] Creating Supabase client...");
     const supabase = await createClient();
 
+    console.log("[Login Action] Calling signInWithPassword...");
     const { error } = await supabase.auth.signInWithPassword({
       email: validated.email,
       password: validated.password,
     });
 
     if (error) {
+      console.log("[Login Action] Login error:", error.message);
       return {
         data: null,
         error:
@@ -35,14 +41,17 @@ export async function login(
       };
     }
 
+    console.log("[Login Action] Login successful, revalidating path...");
     revalidatePath("/", "layout");
 
+    console.log("[Login Action] Returning success");
     return {
       data: { redirectTo: "/dashboard" },
       error: null,
       success: true,
     };
   } catch (error) {
+    console.log("[Login Action] Caught error:", error);
     return {
       data: null,
       error: error instanceof Error ? error.message : "Erro ao fazer login",
@@ -156,8 +165,14 @@ export async function logout(): Promise<void> {
 export async function loginWithGoogle(): Promise<
   TApiResponse<{ url: string }>
 > {
+  console.log("[Google Login] Starting...");
+
   try {
+    console.log("[Google Login] Creating Supabase client...");
     const supabase = await createClient();
+
+    console.log("[Google Login] Calling signInWithOAuth...");
+    console.log("[Google Login] Redirect URL:", `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`);
 
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
@@ -166,7 +181,10 @@ export async function loginWithGoogle(): Promise<
       },
     });
 
+    console.log("[Google Login] Response:", { data, error });
+
     if (error) {
+      console.log("[Google Login] Error:", error.message);
       return {
         data: null,
         error: error.message,
@@ -174,12 +192,14 @@ export async function loginWithGoogle(): Promise<
       };
     }
 
+    console.log("[Google Login] Success, URL:", data.url);
     return {
       data: { url: data.url },
       error: null,
       success: true,
     };
   } catch (error) {
+    console.log("[Google Login] Caught error:", error);
     return {
       data: null,
       error:

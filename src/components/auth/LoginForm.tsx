@@ -33,15 +33,20 @@ export function LoginForm() {
   });
 
   const onSubmit = async (data: LoginFormData) => {
+    console.log("[LoginForm] Submit started");
     setIsLoading(true);
     setError(null);
 
+    console.log("[LoginForm] Calling login action...");
     const result = await login(data.email, data.password);
+    console.log("[LoginForm] Login result:", result);
 
     if (result.success) {
+      console.log("[LoginForm] Success, redirecting to dashboard...");
       router.push("/dashboard");
       router.refresh();
     } else {
+      console.log("[LoginForm] Error:", result.error);
       setError(result.error || "Erro ao fazer login");
       setIsLoading(false);
     }

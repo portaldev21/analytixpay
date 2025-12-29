@@ -56,6 +56,26 @@ export interface Database {
         Insert: TChatMessageInsert;
         Update: TChatMessageUpdate;
       };
+      budget_configs: {
+        Row: TBudgetConfig;
+        Insert: TBudgetConfigInsert;
+        Update: TBudgetConfigUpdate;
+      };
+      week_cycles: {
+        Row: TWeekCycle;
+        Insert: TWeekCycleInsert;
+        Update: TWeekCycleUpdate;
+      };
+      daily_records: {
+        Row: TDailyRecord;
+        Insert: TDailyRecordInsert;
+        Update: TDailyRecordUpdate;
+      };
+      budget_expenses: {
+        Row: TBudgetExpense;
+        Insert: TBudgetExpenseInsert;
+        Update: TBudgetExpenseUpdate;
+      };
     };
   };
 }
@@ -518,4 +538,261 @@ export type TFinancialContext = {
     grade: string;
     recommendations: string[];
   };
+};
+
+// =====================================================
+// BUDGET TYPES (Rolling Budget / Orcamento Fluido)
+// =====================================================
+
+export type TCarryOverMode = "reset" | "carry_all" | "carry_deficit" | "carry_credit";
+export type TCycleStatus = "active" | "closed";
+export type TReconciliationStatus = "pending" | "matched" | "unmatched" | "manual";
+export type TBudgetStatus = "above_base" | "at_base" | "below_base" | "critical";
+
+// Budget Configuration
+export type TBudgetConfig = {
+  id: string;
+  account_id: string;
+  daily_base: number;
+  week_start_day: number;
+  carry_over_mode: TCarryOverMode;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+export type TBudgetConfigInsert = {
+  id?: string;
+  account_id: string;
+  daily_base: number;
+  week_start_day?: number;
+  carry_over_mode?: TCarryOverMode;
+  is_active?: boolean;
+  created_at?: string;
+  updated_at?: string;
+};
+
+export type TBudgetConfigUpdate = Partial<TBudgetConfigInsert>;
+
+// Week Cycles
+export type TWeekCycle = {
+  id: string;
+  account_id: string;
+  config_id: string | null;
+  start_date: string;
+  end_date: string;
+  initial_budget: number;
+  carried_balance: number;
+  accumulated_balance: number;
+  status: TCycleStatus;
+  created_at: string;
+  updated_at: string;
+};
+
+export type TWeekCycleInsert = {
+  id?: string;
+  account_id: string;
+  config_id?: string | null;
+  start_date: string;
+  end_date: string;
+  initial_budget: number;
+  carried_balance?: number;
+  accumulated_balance?: number;
+  status?: TCycleStatus;
+  created_at?: string;
+  updated_at?: string;
+};
+
+export type TWeekCycleUpdate = Partial<TWeekCycleInsert>;
+
+// Daily Records
+export type TDailyRecord = {
+  id: string;
+  account_id: string;
+  cycle_id: string;
+  record_date: string;
+  base_budget: number;
+  available_budget: number;
+  total_spent: number;
+  daily_balance: number;
+  remaining_days: number;
+  created_at: string;
+  updated_at: string;
+};
+
+export type TDailyRecordInsert = {
+  id?: string;
+  account_id: string;
+  cycle_id: string;
+  record_date: string;
+  base_budget: number;
+  available_budget: number;
+  total_spent?: number;
+  daily_balance?: number;
+  remaining_days: number;
+  created_at?: string;
+  updated_at?: string;
+};
+
+export type TDailyRecordUpdate = Partial<TDailyRecordInsert>;
+
+// Budget Expenses (Manual entries)
+export type TBudgetExpense = {
+  id: string;
+  account_id: string;
+  daily_record_id: string;
+  user_id: string | null;
+  amount: number;
+  category: string;
+  description: string | null;
+  expense_date: string;
+  expense_time: string | null;
+  reconciled_transaction_id: string | null;
+  reconciliation_status: TReconciliationStatus;
+  created_at: string;
+  updated_at: string;
+};
+
+export type TBudgetExpenseInsert = {
+  id?: string;
+  account_id: string;
+  daily_record_id: string;
+  user_id?: string | null;
+  amount: number;
+  category?: string;
+  description?: string | null;
+  expense_date: string;
+  expense_time?: string | null;
+  reconciled_transaction_id?: string | null;
+  reconciliation_status?: TReconciliationStatus;
+  created_at?: string;
+  updated_at?: string;
+};
+
+export type TBudgetExpenseUpdate = Partial<TBudgetExpenseInsert>;
+
+// =====================================================
+// BUDGET RESPONSE DTOs
+// =====================================================
+
+export type TTodayBudgetResponse = {
+  date: string;
+  available_budget: number;
+  base_budget: number;
+  adjustment: number;
+  total_spent_today: number;
+  remaining_today: number;
+  actual_from_invoices: number;
+  manual_expenses: number;
+  cycle_info: {
+    id: string;
+    days_remaining: number;
+    accumulated_balance: number;
+    week_start: string;
+    week_end: string;
+  };
+  status: TBudgetStatus;
+};
+
+export type TWeekSummary = {
+  cycle: TWeekCycle;
+  daily_records: TDailyRecord[];
+  total_budget: number;
+  total_spent: number;
+  total_saved: number;
+  average_daily_spent: number;
+  days_over_budget: number;
+  days_under_budget: number;
+  comparison_with_actual: {
+    manual_total: number;
+    invoice_total: number;
+    difference: number;
+  };
+};
+
+export type TBudgetVsActual = {
+  budget_spent: number;
+  actual_from_invoices: number;
+  difference: number;
+  by_category: {
+    category: string;
+    budget: number;
+    actual: number;
+    diff: number;
+  }[];
+};
+
+export type TReconciliationSuggestion = {
+  expense: TBudgetExpense;
+  suggestions: {
+    transaction: TTransaction;
+    confidence: number;
+    reasons: string[];
+  }[];
+};
+
+// Extended types with relations
+export type TWeekCycleWithRecords = TWeekCycle & {
+  daily_records: TDailyRecord[];
+  config: TBudgetConfig | null;
+};
+
+export type TDailyRecordWithExpenses = TDailyRecord & {
+  expenses: TBudgetExpense[];
+};
+
+// =====================================================
+// BUDGET FORECAST TYPES
+// =====================================================
+
+export type TMonthlyProjection = {
+  month: string; // "2025-01", "2025-02", etc.
+  total_installments: number; // soma das parcelas do mes
+  installment_count: number; // quantidade de parcelas
+  details: {
+    description: string;
+    amount: number;
+    installment: string; // "3/12"
+  }[];
+};
+
+export type TBudgetImpact = {
+  // Media mensal de parcelas comprometidas
+  avg_monthly_installments: number;
+
+  // Quanto sobra apos parcelas
+  daily_available: number; // daily_base - (avg_monthly / 30)
+  weekly_available: number; // daily_available * 7
+  monthly_available: number; // daily_base * 30 - avg_monthly
+
+  // Percentual comprometido
+  commitment_percentage: number; // (avg_monthly / monthly_budget) * 100
+};
+
+export type TCalendarEvent = {
+  date: string; // "2025-01-15"
+  description: string;
+  amount: number;
+  installment: string;
+};
+
+export type TBudgetForecast = {
+  // Config do budget
+  budget_config: {
+    daily_base: number;
+    weekly_budget: number; // daily_base * 7
+    monthly_budget: number; // daily_base * 30
+  } | null;
+
+  // Parcelas ativas agrupadas
+  active_installments: TInstallmentProjection[];
+
+  // Projecao por mes
+  monthly_projections: TMonthlyProjection[];
+
+  // Impacto no orcamento
+  budget_impact: TBudgetImpact;
+
+  // Eventos do calendario (proximo 6 meses)
+  calendar_events: TCalendarEvent[];
 };

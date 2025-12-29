@@ -8,9 +8,12 @@ import { env } from "@/lib/env";
  * Use this in Server Components and Server Actions
  */
 export async function createClient() {
+  console.log("[Supabase Server] Creating client...");
+  console.log("[Supabase Server] URL:", env.NEXT_PUBLIC_SUPABASE_URL?.substring(0, 30) + "...");
+
   const cookieStore = await cookies();
 
-  return createServerClient<Database>(
+  const client = createServerClient<Database>(
     env.NEXT_PUBLIC_SUPABASE_URL,
     env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     {
@@ -32,6 +35,9 @@ export async function createClient() {
       },
     },
   );
+
+  console.log("[Supabase Server] Client created successfully");
+  return client;
 }
 
 /**

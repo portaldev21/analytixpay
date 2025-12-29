@@ -10,19 +10,25 @@ export function GoogleButton() {
   const [error, setError] = useState<string | null>(null);
 
   const handleGoogleLogin = async () => {
+    console.log("[GoogleButton] Click started");
     try {
       setIsLoading(true);
       setError(null);
+      console.log("[GoogleButton] Calling loginWithGoogle...");
       const result = await loginWithGoogle();
+      console.log("[GoogleButton] Result:", result);
 
       if (result.success && result.data?.url) {
+        console.log("[GoogleButton] Redirecting to:", result.data.url);
         // Redirecionar para a URL de autenticação do Google
         window.location.href = result.data.url;
       } else {
+        console.log("[GoogleButton] Error:", result.error);
         setError(result.error || "Erro ao conectar com Google");
         setIsLoading(false);
       }
     } catch (error) {
+      console.log("[GoogleButton] Caught error:", error);
       setError("Erro ao fazer login com Google");
       setIsLoading(false);
     }

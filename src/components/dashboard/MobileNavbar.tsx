@@ -9,14 +9,15 @@ import {
   CreditCard,
   Settings,
   BarChart3,
+  Wallet,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navigation = [
   { name: "Home", href: "/dashboard", icon: LayoutDashboard },
+  { name: "Orcamento", href: "/budget", icon: Wallet },
   { name: "Analytics", href: "/analytics", icon: BarChart3 },
   { name: "Faturas", href: "/invoices", icon: FileText },
-  { name: "Transacoes", href: "/transactions", icon: CreditCard },
   { name: "Config", href: "/settings", icon: Settings },
 ];
 
