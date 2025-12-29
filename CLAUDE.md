@@ -57,7 +57,11 @@ The project uses Next.js 15 App Router with route groups:
 - **Rate Limiting** (`src/lib/rate-limit.ts`) - LRU cache-based rate limiting
 - **Pagination** (`src/lib/pagination.ts`) - Reusable pagination helpers
 - **Sanitization** (`src/lib/sanitize.ts`) - Input sanitization utilities
-- **Analytics** (`src/lib/analytics/stats.ts`) - Centralized stats calculations
+- **Analytics** (`src/lib/analytics/`) - Financial analysis modules:
+  - `stats.ts` - Centralized stats calculations
+  - `recurring.ts` - Recurring transaction detection
+  - `insights.ts` - Financial insights generation
+  - `health-score.ts` - Financial health scoring
 - **PDF Cache** (`src/lib/pdf/cache.ts`) - Hash-based PDF result caching
 - **AI Agent** (`src/lib/ai/`) - Financial agent prompts and context builder
 
@@ -202,6 +206,7 @@ All types in `src/db/types.ts`:
 - **Imports:** Use alias `@/*` → `src/*`
 - **Commit messages:** English, conventional commits format
 - **Git:** Never execute git commands without explicit permission
+- **Tests:** Co-located in `__tests__/` folders (e.g., `src/lib/analytics/__tests__/stats.test.ts`)
 
 ### Validation Workflow
 

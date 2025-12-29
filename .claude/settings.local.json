@@ -10,7 +10,21 @@
       "Bash(grep:*)",
       "Bash(head:*)",
       "Bash(sort:*)",
-      "Bash(claude mcp list:*)"
+      "Bash(claude mcp list:*)",
+      "Bash(find:*)",
+      "WebSearch",
+      "Bash(npm uninstall:*)",
+      "Bash(npm run lint:*)",
+      "Bash(ls:*)",
+      "Skill(frontend-design)",
+      "Bash(git rm:*)",
+      "Bash(for port in {3000..3010})",
+      "Bash(do lsof -ti:$port)",
+      "Bash(xargs:*)",
+      "Bash(done)",
+      "Bash(kill:*)",
+      "Bash(lsof:*)",
+      "Bash(tail:*)"
     ],
     "deny": [],
     "ask": []
