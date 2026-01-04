@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Link2, TrendingUp } from "lucide-react";
+import { EmptyDashboard } from "@/components/dashboard/EmptyDashboard";
 import { createClient } from "@/lib/supabase/server";
 import {
   getActiveBudgetConfig,
@@ -44,7 +45,7 @@ export default async function BudgetPage() {
     ?.account_id;
 
   if (!accountId) {
-    redirect("/onboarding");
+    return <EmptyDashboard />;
   }
   const today = getToday();
   const todayStr = formatDateToString(today);

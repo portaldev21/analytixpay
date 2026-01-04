@@ -29,6 +29,9 @@ npx vitest --watch                # Run tests in watch mode
 # Setup
 npm install                        # Install dependencies
 node scripts/setup-supabase.js     # Interactive Supabase setup
+
+# Database
+npm run db:types                   # Generate TypeScript types from Supabase schema (requires `npx supabase login`)
 ```
 
 **IMPORTANT:** Never start the server automatically. Always ask the user to start it and test.
@@ -211,11 +214,17 @@ All tables have RLS enabled. Server-side access checks complement database polic
 
 ### Type System
 
-All types in `src/db/types.ts`:
+**Manual types** (`src/db/types.ts`):
 
 - Database types match Supabase schema (Row/Insert/Update variants)
 - Extended types for joins (e.g., `TInvoiceWithTransactions`)
 - API response wrapper: `TApiResponse<T>`
+
+**Generated types** (`src/db/database.types.ts`):
+
+- Auto-generated via `npm run db:types`
+- Requires Supabase CLI login (`npx supabase login`)
+- Use for strict DB schema compliance; manual types for app-level abstractions
 
 ### Component Architecture
 

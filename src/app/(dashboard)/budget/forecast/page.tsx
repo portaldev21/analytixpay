@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { EmptyDashboard } from "@/components/dashboard/EmptyDashboard";
 import { getBudgetForecast } from "@/actions/budget.actions";
 import {
   BudgetImpactCard,
@@ -37,7 +38,7 @@ export default async function BudgetForecastPage() {
     ?.account_id;
 
   if (!accountId) {
-    redirect("/onboarding");
+    return <EmptyDashboard />;
   }
 
   // Fetch forecast data (6 months ahead)
