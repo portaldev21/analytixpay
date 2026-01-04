@@ -9,7 +9,8 @@
     "lint": "biome check",
     "format": "biome format --write",
     "test": "vitest",
-    "test:coverage": "vitest --coverage"
+    "test:coverage": "vitest --coverage",
+    "db:types": "supabase gen types typescript --project-id qzczyicspbizosjogmlq > src/db/database.types.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.71.2",
@@ -61,6 +62,7 @@
     "@vitejs/plugin-react": "^4.3.4",
     "@vitest/coverage-v8": "^3.0.4",
     "jsdom": "^25.0.0",
+    "supabase": "^2.70.5",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^3.0.4"

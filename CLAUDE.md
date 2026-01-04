@@ -64,6 +64,10 @@ The project uses Next.js 15 App Router with route groups:
   - `health-score.ts` - Financial health scoring
 - **PDF Cache** (`src/lib/pdf/cache.ts`) - Hash-based PDF result caching
 - **AI Agent** (`src/lib/ai/`) - Financial agent prompts and context builder
+- **Budget** (`src/lib/budget/`) - Rolling budget modules:
+  - `calculations.ts` - Pure budget calculation functions
+  - `cycle.ts` - Weekly cycle management
+  - `reconciliation.ts` - Expense-transaction matching
 
 ### Analytics Page with AI Agent
 
@@ -86,6 +90,32 @@ The `/analytics` page provides comprehensive financial analysis with an AI-power
 - `chat_conversations` - Stores conversation metadata
 - `chat_messages` - Stores messages with role (user/assistant)
 
+### Rolling Budget System (Orcamento Fluido)
+
+The `/budget` page implements a dynamic daily budget system with weekly cycles.
+
+**Core Formula:** `Available = Daily_Base + (Accumulated_Balance / Remaining_Days)`
+
+**Features:**
+
+- Daily budget tracking with carry-over modes (deficit only, full carry, reset)
+- Manual expense entry with invoice transaction reconciliation
+- Weekly cycle summaries with progress visualization
+- Forecast page (`/budget/forecast`) showing future installment impact
+
+**Components:**
+
+- `src/components/budget/` - Budget UI (TodayBudgetCard, WeekSummaryCard, ExpenseForm, ExpenseList)
+- `src/components/budget/reconciliation/` - Match suggestions and stats
+- `src/components/budget/forecast/` - Impact cards, projection charts, calendar
+
+**Database (requires migration 006):**
+
+- `budget_configs` - Configuration per account (daily_base, week_start_day, carry_over_mode)
+- `week_cycles` - Weekly tracking (start_date, end_date, accumulated_balance)
+- `daily_records` - Daily budget records
+- `budget_expenses` - Manual expenses with reconciliation support
+
 ### Supabase Client Pattern
 
 **Critical:** The codebase uses **two separate Supabase clients**:
@@ -107,6 +137,7 @@ All data mutations use Server Actions in `src/actions/*.actions.ts`:
 - `transaction.actions.ts` - Transaction queries, filtering, updates
 - `analytics.actions.ts` - Dashboard stats, category breakdown
 - `chat.actions.ts` - AI chat conversations and messages
+- `budget.actions.ts` - Rolling budget config, expenses, cycles, reconciliation, forecast
 
 **Patterns:**
 
@@ -174,7 +205,7 @@ Access check helpers in `src/lib/supabase/server.ts`:
 - `migrations/` - Applied migrations
 - `README.md` - Complete database documentation
 
-Main tables: `accounts`, `account_members`, `invoices`, `transactions`, `categories`, `profiles`, `chat_conversations`, `chat_messages`
+Main tables: `accounts`, `account_members`, `invoices`, `transactions`, `categories`, `profiles`, `chat_conversations`, `chat_messages`, `budget_configs`, `week_cycles`, `daily_records`, `budget_expenses`
 
 All tables have RLS enabled. Server-side access checks complement database policies.
 
