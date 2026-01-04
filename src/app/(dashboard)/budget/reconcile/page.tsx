@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, RefreshCw } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { EmptyDashboard } from "@/components/dashboard/EmptyDashboard";
 import {
   getReconciliationSuggestions,
   getReconciliationStats,
@@ -38,7 +39,7 @@ export default async function ReconcilePage() {
     ?.account_id;
 
   if (!accountId) {
-    redirect("/onboarding");
+    return <EmptyDashboard />;
   }
 
   // Fetch data in parallel

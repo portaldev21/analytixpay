@@ -37,6 +37,55 @@ export async function GET(request: Request) {
     }
 
     console.log("[Auth Callback] Session created successfully");
+
+    // Get the authenticated user
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (user) {
+      // Check if user already has an account
+      const { data: existingMember } = await supabase
+        .from("account_members")
+        .select("account_id")
+        .eq("user_id", user.id)
+        .single();
+
+      // If no account exists, create one (first-time OAuth login)
+      if (!existingMember) {
+        console.log("[Auth Callback] Creating default account for new OAuth user");
+
+        const { data: account, error: accountError } = await supabase
+          .from("accounts")
+          .insert({
+            name: "Minha Conta",
+            owner_id: user.id,
+          })
+          .select()
+          .single();
+
+        if (accountError) {
+          console.error("[Auth Callback] Error creating account:", accountError.message);
+        } else if (account) {
+          // Add user as owner member
+          const { error: memberError } = await supabase
+            .from("account_members")
+            .insert({
+              account_id: account.id,
+              user_id: user.id,
+              role: "owner",
+            });
+
+          if (memberError) {
+            console.error("[Auth Callback] Error adding member:", memberError.message);
+          } else {
+            console.log("[Auth Callback] Account and membership created successfully");
+          }
+        }
+      } else {
+        console.log("[Auth Callback] User already has an account");
+      }
+    }
   }
 
   // URL to redirect to after sign in process completes
