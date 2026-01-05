@@ -60,9 +60,9 @@ export function EmptyBudgetState({ accountId, className }: EmptyBudgetStateProps
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <CardGlass variant="dark-1" size="xl" className="text-center">
-          <div className="p-3 rounded-full bg-gradient-to-br from-[var(--color-primary-start)]/20 to-[var(--color-primary-end)]/20 w-fit mx-auto mb-6">
-            <Wallet className="size-10 text-[var(--color-primary-start)]" />
+        <CardGlass variant="default" size="xl" className="text-center">
+          <div className="p-3 rounded-full bg-gradient-to-br from-[var(--color-primary)]/20 to-[var(--color-secondary)]/20 w-fit mx-auto mb-6">
+            <Wallet className="size-10 text-[var(--color-primary)]" />
           </div>
 
           <h2 className="text-2xl font-bold text-[var(--color-text-primary)] mb-2">
@@ -91,9 +91,9 @@ export function EmptyBudgetState({ accountId, className }: EmptyBudgetStateProps
                   placeholder="100,00"
                   className={cn(
                     "w-full h-14 pl-12 pr-4 rounded-xl text-2xl font-bold tabular-nums",
-                    "bg-[var(--color-card-dark-3)] border border-[var(--glass-border)]",
+                    "bg-[var(--color-surface-muted)] border border-[var(--color-border-light)]",
                     "text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)]",
-                    "focus:outline-none focus:border-[var(--color-primary-start)]",
+                    "focus:outline-none focus:border-[var(--color-primary)]",
                     "transition-colors text-center",
                   )}
                 />
@@ -105,7 +105,7 @@ export function EmptyBudgetState({ accountId, className }: EmptyBudgetStateProps
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
-                className="space-y-3 p-4 rounded-xl bg-[var(--color-card-dark-3)]"
+                className="space-y-3 p-4 rounded-xl bg-[var(--color-surface-muted)]"
               >
                 <div className="flex justify-between text-sm">
                   <span className="text-[var(--color-text-muted)]">Semanal</span>
@@ -133,7 +133,7 @@ export function EmptyBudgetState({ accountId, className }: EmptyBudgetStateProps
               disabled={isPending || !dailyBase}
               className={cn(
                 "w-full h-12 rounded-xl font-semibold text-white",
-                "bg-gradient-to-r from-[var(--color-primary-start)] to-[var(--color-primary-end)]",
+                "bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)]",
                 "hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed",
                 "flex items-center justify-center gap-2",
                 "transition-opacity",

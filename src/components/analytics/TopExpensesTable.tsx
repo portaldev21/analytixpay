@@ -16,7 +16,7 @@ export function TopExpensesTable({ data, limit = 10 }: TopExpensesTableProps) {
 
   if (expenses.length === 0) {
     return (
-      <CardGlass variant="dark-1" size="lg">
+      <CardGlass variant="default" size="lg">
         <div className="mb-4">
           <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
             Maiores Gastos
@@ -34,7 +34,7 @@ export function TopExpensesTable({ data, limit = 10 }: TopExpensesTableProps) {
   }
 
   return (
-    <CardGlass variant="dark-1" size="lg">
+    <CardGlass variant="default" size="lg">
       <div className="mb-4">
         <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
           Maiores Gastos
@@ -51,15 +51,15 @@ export function TopExpensesTable({ data, limit = 10 }: TopExpensesTableProps) {
           return (
             <div
               key={transaction.id}
-              className="flex items-center gap-3 p-3 rounded-xl border border-[var(--glass-border)] bg-[var(--color-card-dark-2)] hover:bg-[var(--color-card-dark-3)] transition-colors"
+              className="flex items-center gap-3 p-3 rounded-xl border border-[var(--color-border-light)] bg-[var(--color-surface-muted)] hover:bg-[var(--color-surface-muted)] transition-colors"
             >
               {/* Rank */}
               <div
                 className={cn(
                   "flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold",
                   index < 3
-                    ? "bg-gradient-to-br from-[var(--color-primary-start)] to-[var(--color-primary-end)] text-white"
-                    : "bg-[var(--color-card-dark-3)] text-[var(--color-text-muted)]",
+                    ? "bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-secondary)] text-white"
+                    : "bg-[var(--color-surface-muted)] text-[var(--color-text-muted)]",
                 )}
               >
                 {index + 1}
@@ -85,7 +85,7 @@ export function TopExpensesTable({ data, limit = 10 }: TopExpensesTableProps) {
                     {formatDate(transaction.date)}
                   </span>
                   {transaction.installment && (
-                    <Badge variant="purple" className="text-xs">
+                    <Badge variant="info" className="text-xs">
                       {transaction.installment}
                     </Badge>
                   )}

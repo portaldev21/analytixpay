@@ -17,7 +17,7 @@ export function ActiveInstallmentsList({
 }: ActiveInstallmentsListProps) {
   if (installments.length === 0) {
     return (
-      <CardGlass variant="dark-1" size="lg" className={className}>
+      <CardGlass variant="default" size="lg" className={className}>
         <div className="mb-4">
           <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
             Parcelas Ativas
@@ -48,7 +48,7 @@ export function ActiveInstallmentsList({
   );
 
   return (
-    <CardGlass variant="dark-1" size="lg" className={className}>
+    <CardGlass variant="default" size="lg" className={className}>
       <div className="mb-4">
         <div className="flex items-start justify-between">
           <div>
@@ -82,7 +82,7 @@ export function ActiveInstallmentsList({
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
-              className="p-4 rounded-xl bg-[var(--color-card-dark-2)] border border-[var(--glass-border)]"
+              className="p-4 rounded-xl bg-[var(--color-surface-muted)] border border-[var(--color-border-light)]"
             >
               {/* Description and Amount */}
               <div className="flex items-start justify-between mb-3">
@@ -98,7 +98,7 @@ export function ActiveInstallmentsList({
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-bold text-[var(--color-primary-start)] tabular-nums">
+                  <p className="text-sm font-bold text-[var(--color-primary)] tabular-nums">
                     {formatCurrency(inst.amount)}
                   </p>
                   <p className="text-xs text-[var(--color-text-muted)]">
@@ -117,9 +117,9 @@ export function ActiveInstallmentsList({
                     Faltam {inst.remaining_installments}
                   </span>
                 </div>
-                <div className="h-2 bg-[var(--color-card-dark-3)] rounded-full overflow-hidden">
+                <div className="h-2 bg-[var(--color-surface-muted)] rounded-full overflow-hidden">
                   <motion.div
-                    className="h-full rounded-full bg-gradient-to-r from-[var(--color-primary-start)] to-[var(--color-positive)]"
+                    className="h-full rounded-full bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-positive)]"
                     initial={{ width: 0 }}
                     animate={{ width: `${progress}%` }}
                     transition={{ duration: 0.5, delay: index * 0.05 }}
@@ -128,7 +128,7 @@ export function ActiveInstallmentsList({
               </div>
 
               {/* Remaining amount */}
-              <div className="flex items-center justify-between mt-3 pt-3 border-t border-[var(--glass-border)]">
+              <div className="flex items-center justify-between mt-3 pt-3 border-t border-[var(--color-border-light)]">
                 <span className="text-xs text-[var(--color-text-muted)]">
                   Total restante
                 </span>
@@ -142,7 +142,7 @@ export function ActiveInstallmentsList({
       </div>
 
       {/* Summary footer */}
-      <div className="mt-4 pt-4 border-t border-[var(--glass-border)]">
+      <div className="mt-4 pt-4 border-t border-[var(--color-border-light)]">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <CreditCard className="size-4 text-[var(--color-text-muted)]" />

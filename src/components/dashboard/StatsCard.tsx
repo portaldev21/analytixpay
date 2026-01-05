@@ -33,7 +33,7 @@ interface StatsCardProps {
     value: number | null;
     isPositive: boolean;
   };
-  variant?: "default" | "primary" | "purple";
+  variant?: "default" | "primary" | "secondary";
   className?: string;
 }
 
@@ -49,31 +49,22 @@ export function StatsCard({
   // Support both string icon names and direct icon components
   const Icon = typeof icon === "string" ? iconMap[icon] || DollarSign : icon;
   const iconBgColor = {
-    default: "bg-[var(--color-card-dark-2)]",
-    primary:
-      "bg-gradient-to-br from-[var(--color-primary-start)]/20 to-[var(--color-primary-end)]/20",
-    purple:
-      "bg-gradient-to-br from-[var(--color-purple-light)]/20 to-[var(--color-purple-mid)]/20",
+    default: "bg-[var(--color-surface-muted)]",
+    primary: "bg-[var(--color-primary)]/10",
+    secondary: "bg-[var(--color-secondary)]/10",
   };
 
   const iconColor = {
     default: "text-[var(--color-text-muted)]",
-    primary: "text-[var(--color-primary-start)]",
-    purple: "text-[var(--color-purple-light)]",
+    primary: "text-[var(--color-primary)]",
+    secondary: "text-[var(--color-secondary)]",
   };
 
   return (
     <CardGlass
-      variant="dark-1"
+      variant="default"
       size="lg"
       interactive
-      hoverGlow={
-        variant === "primary"
-          ? "green"
-          : variant === "purple"
-            ? "purple"
-            : "none"
-      }
       className={className}
     >
       <div className="flex items-start justify-between">
@@ -82,7 +73,7 @@ export function StatsCard({
             {title}
           </p>
           <motion.p
-            className="text-2xl font-bold text-[var(--color-text-primary)] tabular-nums"
+            className="text-2xl font-bold text-[var(--color-text-primary)] tabular-nums font-mono"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
@@ -91,7 +82,7 @@ export function StatsCard({
           </motion.p>
         </div>
 
-        <div className={cn("p-2.5 rounded-xl", iconBgColor[variant])}>
+        <div className={cn("p-2.5 rounded-[var(--radius-md)]", iconBgColor[variant])}>
           <Icon className={cn("size-5", iconColor[variant])} />
         </div>
       </div>
@@ -103,7 +94,7 @@ export function StatsCard({
       )}
 
       {trend && trend.value !== null && (
-        <div className="flex items-center gap-2 mt-3 pt-3 border-t border-[var(--glass-border)]">
+        <div className="flex items-center gap-2 mt-3 pt-3 border-t border-[var(--color-border-light)]">
           <span
             className={cn(
               "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium",

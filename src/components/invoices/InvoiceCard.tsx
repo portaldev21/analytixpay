@@ -40,10 +40,10 @@ export function InvoiceCard({
       transition={{ duration: 0.2 }}
     >
       <CardGlass
-        variant="dark-2"
+        variant="muted"
         size="lg"
         interactive
-        hoverGlow={invoice.status === "completed" ? "green" : "none"}
+        
         className={
           isDeleting
             ? "!bg-[var(--color-negative)]/10 !border-[var(--color-negative)]/50"
@@ -56,14 +56,14 @@ export function InvoiceCard({
               className={`rounded-xl p-2.5 flex-shrink-0 transition-colors ${
                 isDeleting
                   ? "bg-[var(--color-negative)]/20"
-                  : "bg-gradient-to-br from-[var(--color-primary-start)]/20 to-[var(--color-primary-end)]/20"
+                  : "bg-gradient-to-br from-[var(--color-primary)]/20 to-[var(--color-secondary)]/20"
               }`}
             >
               <FileText
                 className={`h-5 w-5 transition-colors ${
                   isDeleting
                     ? "text-[var(--color-negative)]"
-                    : "text-[var(--color-primary-start)]"
+                    : "text-[var(--color-primary)]"
                 }`}
               />
             </div>
@@ -101,10 +101,10 @@ export function InvoiceCard({
             <Badge
               variant={
                 invoice.status === "completed"
-                  ? "positive"
+                  ? "success"
                   : invoice.status === "error"
                     ? "destructive"
-                    : "purple"
+                    : "info"
               }
             >
               {invoice.status === "completed"
@@ -156,7 +156,7 @@ export function InvoiceCard({
         {!isDeleting && invoice.status === "completed" && (
           <Link
             href={`/invoices/${invoice.id}?accountId=${accountId}`}
-            className="mt-4 pt-4 border-t border-[var(--glass-border)] flex items-center justify-between text-sm text-[var(--color-primary-start)] hover:text-[var(--color-positive)] transition-colors group"
+            className="mt-4 pt-4 border-t border-[var(--color-border-light)] flex items-center justify-between text-sm text-[var(--color-primary)] hover:text-[var(--color-positive)] transition-colors group"
           >
             <span>Ver detalhes da fatura</span>
             <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />

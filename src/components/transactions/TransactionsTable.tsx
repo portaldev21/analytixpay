@@ -25,7 +25,7 @@ export function TransactionsTable({
 
   if (transactions.length === 0) {
     return (
-      <CardGlass variant="dark-1" size="lg" className="text-center">
+      <CardGlass variant="default" size="lg" className="text-center">
         <p className="text-[var(--color-text-muted)]">
           Nenhuma transação encontrada
         </p>
@@ -66,7 +66,7 @@ export function TransactionsTable({
               transition={{ duration: 0.2 }}
             >
               <CardGlass
-                variant="dark-2"
+                variant="muted"
                 size="md"
                 interactive
                 className={
@@ -87,7 +87,7 @@ export function TransactionsTable({
                         <Badge
                           variant={
                             installmentInfo.isFirst
-                              ? "positive"
+                              ? "success"
                               : installmentInfo.isLast
                                 ? "destructive"
                                 : "secondary"
@@ -123,7 +123,7 @@ export function TransactionsTable({
                       {showInvoiceLink && transaction.invoice_id && (
                         <Link
                           href={`/invoices/${transaction.invoice_id}`}
-                          className="flex items-center gap-1 text-[var(--color-primary-start)] hover:text-[var(--color-positive)] transition-colors hover:underline"
+                          className="flex items-center gap-1 text-[var(--color-primary)] hover:text-[var(--color-positive)] transition-colors hover:underline"
                         >
                           <ExternalLink className="h-3.5 w-3.5" />
                           <span>Ver fatura</span>

@@ -1,8 +1,8 @@
-# AnalytiXPay 💳
+# ControleFatura
 
-PORTAL DEV SUPABASE
+Controle suas faturas com inteligência.
 
-Sistema moderno de gestão de faturas de cartão de crédito com extração automática de transações via PDF parsing.
+Sistema moderno de gestão de faturas de cartão de crédito com extração automática de transações via PDF parsing e análise financeira com IA.
 
 ![Next.js](https://img.shields.io/badge/Next.js-15-black)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)
@@ -25,8 +25,8 @@ Sistema moderno de gestão de faturas de cartão de crédito com extração auto
 ### 1. Clonar e Instalar
 
 ```bash
-git clone https://github.com/seu-usuario/analytixpay.git
-cd analytixpay
+git clone https://github.com/seu-usuario/controlefatura.git
+cd controlefatura
 npm install
 ```
 
@@ -172,9 +172,10 @@ analytixpay/
 
 ## 🎨 Design
 
-- **Tema**: Dark mode por padrão
-- **Paleta**: Azul (#3b82f6) + Cinza escuro
-- **Typography**: Geist Font (Vercel)
+- **Design System**: ControleFatura v3.0
+- **Paleta**: Verde Esmeralda (#2C8A4B) + Azul Médio (#1D5A8F)
+- **Tipografia**: Merriweather (títulos) + Inter (corpo) + Roboto Mono (números)
+- **Tema**: Suporte a modo claro e escuro
 - **Responsivo**: Mobile-first design
 - **Animações**: Transições suaves com Framer Motion
 
@@ -221,8 +222,8 @@ git push origin main
 ### Docker
 
 ```bash
-docker build -t analytixpay .
-docker run -p 3000:3000 analytixpay
+docker build -t controlefatura .
+docker run -p 3000:3000 controlefatura
 ```
 
 📖 **Guia completo**: [DEPLOYMENT.md](./DEPLOYMENT.md)
@@ -303,8 +304,8 @@ Este projeto está sob a licença MIT. Veja [LICENSE](./LICENSE) para mais infor
 
 ---
 
-**Desenvolvido com ❤️ usando Next.js e Supabase**
+**Desenvolvido com Next.js e Supabase**
 
-**Status**: ✅ Produção Ready
-**Versão**: 1.0.0
-**Última atualização**: 2025-10-12
+**Status**: Producao Ready
+**Versao**: 3.0.0
+**Design System**: ControleFatura v3.0

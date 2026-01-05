@@ -43,10 +43,10 @@ const DialogContent = React.forwardRef<
         "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg",
         "translate-x-[-50%] translate-y-[-50%]",
         "gap-4 p-6",
-        "border border-[var(--glass-border)]",
-        "bg-[var(--color-card-dark-1)]",
+        "border border-[var(--color-border-light)]",
+        "bg-[var(--color-surface)]",
         "rounded-[var(--radius-lg)]",
-        "shadow-[var(--shadow-card)]",
+        "shadow-[var(--shadow-lg)]",
         "text-[var(--color-text-primary)]",
         "duration-200",
         "data-[state=open]:animate-in data-[state=closed]:animate-out",
@@ -59,7 +59,7 @@ const DialogContent = React.forwardRef<
       {...props}
     >
       {children}
-      <DialogPrimitive.Close className="absolute right-4 top-4 rounded-lg p-1 text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-card-dark-2)] transition-all focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-start)] disabled:pointer-events-none">
+      <DialogPrimitive.Close className="absolute right-4 top-4 rounded-lg p-1 text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-muted)] transition-all focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] disabled:pointer-events-none">
         <X className="h-4 w-4" />
         <span className="sr-only">Close</span>
       </DialogPrimitive.Close>

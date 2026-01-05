@@ -99,7 +99,7 @@ export function InstallmentsCalendar({
 
   if (events.length === 0) {
     return (
-      <CardGlass variant="dark-1" size="lg" className={className}>
+      <CardGlass variant="default" size="lg" className={className}>
         <div className="mb-4">
           <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
             Calendario de Parcelas
@@ -117,7 +117,7 @@ export function InstallmentsCalendar({
   }
 
   return (
-    <CardGlass variant="dark-1" size="lg" className={className}>
+    <CardGlass variant="default" size="lg" className={className}>
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div>
@@ -192,21 +192,21 @@ export function InstallmentsCalendar({
               }}
               className={cn(
                 "relative h-10 rounded-lg text-sm font-medium transition-colors",
-                "focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-start)]/50",
+                "focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50",
                 isToday(date) &&
-                  "ring-2 ring-[var(--color-primary-start)] ring-offset-1 ring-offset-[var(--color-card-dark-1)]",
+                  "ring-2 ring-[var(--color-primary)] ring-offset-1 ring-offset-[var(--color-surface)]",
                 hasEvents
                   ? cn(
-                      "bg-[var(--color-primary-start)]/20 text-[var(--color-primary-start)]",
-                      "hover:bg-[var(--color-primary-start)]/30 cursor-pointer",
-                      isSelected && "bg-[var(--color-primary-start)]/40",
+                      "bg-[var(--color-primary)]/20 text-[var(--color-primary)]",
+                      "hover:bg-[var(--color-primary)]/30 cursor-pointer",
+                      isSelected && "bg-[var(--color-primary)]/40",
                     )
-                  : "text-[var(--color-text-muted)] hover:bg-[var(--color-card-dark-2)]",
+                  : "text-[var(--color-text-muted)] hover:bg-[var(--color-surface-muted)]",
               )}
             >
               {date.getDate()}
               {hasEvents && (
-                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[var(--color-primary-start)] text-[10px] font-bold text-white">
+                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[var(--color-primary)] text-[10px] font-bold text-white">
                   {dayEvents.length}
                 </span>
               )}
@@ -217,8 +217,8 @@ export function InstallmentsCalendar({
 
       {/* Selected event details */}
       {selectedEvent && (
-        <div className="mt-4 pt-4 border-t border-[var(--glass-border)]">
-          <div className="p-3 rounded-xl bg-[var(--color-card-dark-2)] border border-[var(--glass-border)]">
+        <div className="mt-4 pt-4 border-t border-[var(--color-border-light)]">
+          <div className="p-3 rounded-xl bg-[var(--color-surface-muted)] border border-[var(--color-border-light)]">
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-sm font-medium text-[var(--color-text-primary)]">
@@ -228,7 +228,7 @@ export function InstallmentsCalendar({
                   Parcela {selectedEvent.installment}
                 </p>
               </div>
-              <span className="text-lg font-bold text-[var(--color-primary-start)] tabular-nums">
+              <span className="text-lg font-bold text-[var(--color-primary)] tabular-nums">
                 {formatCurrency(selectedEvent.amount)}
               </span>
             </div>
@@ -250,7 +250,7 @@ export function InstallmentsCalendar({
                         key={idx}
                         type="button"
                         onClick={() => setSelectedEvent(event)}
-                        className="w-full p-2 rounded-lg bg-[var(--color-card-dark-3)] border border-[var(--glass-border)] text-left hover:bg-[var(--color-card-dark-2)] transition-colors"
+                        className="w-full p-2 rounded-lg bg-[var(--color-surface-muted)] border border-[var(--color-border-light)] text-left hover:bg-[var(--color-surface-muted)] transition-colors"
                       >
                         <div className="flex items-center justify-between">
                           <span className="text-xs text-[var(--color-text-muted)] truncate">
@@ -272,7 +272,7 @@ export function InstallmentsCalendar({
       )}
 
       {/* Summary */}
-      <div className="mt-4 pt-4 border-t border-[var(--glass-border)]">
+      <div className="mt-4 pt-4 border-t border-[var(--color-border-light)]">
         <div className="flex items-center justify-between text-sm">
           <span className="text-[var(--color-text-muted)]">
             Total em {MONTH_NAMES[currentMonth]}

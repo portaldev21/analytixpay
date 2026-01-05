@@ -20,7 +20,7 @@ export function CategoryBreakdownChart({ data }: CategoryBreakdownChartProps) {
   // Empty state
   if (!data || data.length === 0) {
     return (
-      <CardGlass variant="dark-1" size="lg">
+      <CardGlass variant="default" size="lg">
         <div className="mb-4">
           <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
             Gastos por Categoria
@@ -30,7 +30,7 @@ export function CategoryBreakdownChart({ data }: CategoryBreakdownChartProps) {
           </p>
         </div>
         <div className="flex flex-col items-center justify-center py-12">
-          <div className="p-4 rounded-full bg-[var(--color-card-dark-2)]">
+          <div className="p-4 rounded-full bg-[var(--color-surface-muted)]">
             <PieChartIcon className="size-8 text-[var(--color-text-muted)]" />
           </div>
           <p className="text-sm text-[var(--color-text-muted)] mt-4">
@@ -45,7 +45,7 @@ export function CategoryBreakdownChart({ data }: CategoryBreakdownChartProps) {
   }
 
   return (
-    <CardGlass variant="dark-1" size="lg">
+    <CardGlass variant="default" size="lg">
       <div className="mb-4">
         <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
           Gastos por Categoria
@@ -79,7 +79,7 @@ export function CategoryBreakdownChart({ data }: CategoryBreakdownChartProps) {
                   <Cell
                     key={`cell-${entry.category}`}
                     fill={getCategoryColor(entry.category)}
-                    stroke="var(--color-card-dark-1)"
+                    stroke="var(--color-surface)"
                     strokeWidth={2}
                   />
                 ))}
@@ -102,7 +102,7 @@ export function CategoryBreakdownChart({ data }: CategoryBreakdownChartProps) {
                           </span>
                         </div>
                         <div className="mt-2 space-y-1">
-                          <div className="text-lg font-bold text-[var(--color-primary-start)]">
+                          <div className="text-lg font-bold text-[var(--color-primary)]">
                             {formatCurrency(item.total)}
                           </div>
                           <div className="text-xs text-[var(--color-text-muted)]">
@@ -126,7 +126,7 @@ export function CategoryBreakdownChart({ data }: CategoryBreakdownChartProps) {
           {chartData.map((item) => (
             <div
               key={item.category}
-              className="flex items-center justify-between gap-2 p-2 rounded-lg hover:bg-[var(--color-card-dark-2)]/50 transition-colors"
+              className="flex items-center justify-between gap-2 p-2 rounded-lg hover:bg-[var(--color-surface-muted)]/50 transition-colors"
             >
               <div className="flex items-center gap-3 min-w-0">
                 <div

@@ -33,7 +33,7 @@ export function SpendingByCardChart({ data }: SpendingByCardChartProps) {
 
   if (data.length === 0) {
     return (
-      <CardGlass variant="dark-1" size="lg">
+      <CardGlass variant="default" size="lg">
         <div className="mb-4">
           <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
             Gastos por Cartao
@@ -60,7 +60,7 @@ export function SpendingByCardChart({ data }: SpendingByCardChartProps) {
   }));
 
   return (
-    <CardGlass variant="dark-1" size="lg">
+    <CardGlass variant="default" size="lg">
       <div className="mb-4">
         <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
           Gastos por Cartao
@@ -98,12 +98,12 @@ export function SpendingByCardChart({ data }: SpendingByCardChartProps) {
                   label: string;
                 };
                 return (
-                  <div className="rounded-xl border border-[var(--glass-border)] bg-[var(--color-card-dark-1)] p-3 shadow-[var(--shadow-card)]">
+                  <div className="rounded-xl border border-[var(--color-border-light)] bg-[var(--color-surface)] p-3 shadow-[var(--shadow-lg)]">
                     <div className="font-medium text-[var(--color-text-primary)]">
                       {data.label}
                     </div>
                     <div className="mt-1 text-sm">
-                      <div className="text-[var(--color-primary-start)] font-semibold tabular-nums">
+                      <div className="text-[var(--color-primary)] font-semibold tabular-nums">
                         {formatCurrency(data.total)}
                       </div>
                       <div className="text-[var(--color-text-muted)]">

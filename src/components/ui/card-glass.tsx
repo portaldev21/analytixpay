@@ -10,46 +10,35 @@ const cardGlassVariants = cva(
   {
     variants: {
       variant: {
+        // Default - Clean white/surface card
         default: [
-          "bg-[var(--glass-bg)]",
-          "backdrop-blur-[var(--glass-blur)]",
-          "border border-[var(--glass-border)]",
-          "shadow-[var(--shadow-card)]",
+          "bg-[var(--color-surface)]",
+          "border border-[var(--color-border-light)]",
+          "shadow-[var(--shadow-lg)]",
         ],
-        "dark-1": [
-          "bg-[var(--color-card-dark-1)]",
-          "border border-[var(--glass-border)]",
-          "shadow-[var(--shadow-card)]",
+        // Muted - Subtle gray background
+        muted: [
+          "bg-[var(--color-surface-muted)]",
+          "border border-[var(--color-border-light)]",
         ],
-        "dark-2": [
-          "bg-[var(--color-card-dark-2)]",
-          "border border-[var(--glass-border)]",
-          "shadow-[var(--shadow-card)]",
-        ],
-        "dark-3": [
-          "bg-[var(--color-card-dark-3)]",
-          "border border-[var(--glass-border)]",
-          "shadow-[var(--shadow-card)]",
-        ],
-        blue: [
-          "bg-gradient-to-br from-[var(--color-card-blue-start)] to-[var(--color-card-blue-end)]",
-          "border border-[var(--glass-border)]",
-          "shadow-[var(--shadow-card)]",
-        ],
+        // Primary - Verde Esmeralda
         primary: [
-          "bg-gradient-to-br from-[var(--color-primary-start)] to-[var(--color-primary-end)]",
-          "border border-[var(--glass-border)]",
-          "shadow-[var(--shadow-card)]",
+          "bg-[var(--color-primary)]",
+          "border border-[var(--color-primary-hover)]",
+          "shadow-[var(--shadow-md)]",
+          "text-white",
         ],
-        purple: [
-          "bg-gradient-to-br from-[var(--color-purple-light)] to-[var(--color-purple-mid)]",
-          "border border-[var(--glass-border)]",
-          "shadow-[var(--shadow-card)]",
+        // Secondary - Azul Médio
+        secondary: [
+          "bg-[var(--color-secondary)]",
+          "border border-[var(--color-secondary-hover)]",
+          "shadow-[var(--shadow-md)]",
+          "text-white",
         ],
-        subtle: [
-          "bg-[rgba(9,24,58,0.5)]",
-          "backdrop-blur-[12px]",
-          "border border-[rgba(255,255,255,0.05)]",
+        // Outline - Transparent with border
+        outline: [
+          "bg-transparent",
+          "border border-[var(--color-border)]",
         ],
       },
       size: {
@@ -58,20 +47,14 @@ const cardGlassVariants = cva(
         lg: "rounded-[var(--radius-lg)] p-5",
         xl: "rounded-[var(--radius-xl)] p-6",
       },
-      glow: {
-        none: "",
-        green: "shadow-[var(--shadow-glow-green)]",
-        purple: "shadow-[var(--shadow-glow-purple)]",
-      },
       interactive: {
-        true: "cursor-pointer hover:scale-[1.02] active:scale-[0.98]",
+        true: "cursor-pointer hover:shadow-[var(--shadow-lg)] hover:translate-y-[-2px]",
         false: "",
       },
     },
     defaultVariants: {
       variant: "default",
       size: "lg",
-      glow: "none",
       interactive: false,
     },
   },
@@ -81,7 +64,6 @@ export interface CardGlassProps
   extends Omit<HTMLMotionProps<"div">, "children">,
     VariantProps<typeof cardGlassVariants> {
   children: React.ReactNode;
-  hoverGlow?: "green" | "purple" | "none";
 }
 
 const CardGlass = React.forwardRef<HTMLDivElement, CardGlassProps>(
@@ -90,9 +72,7 @@ const CardGlass = React.forwardRef<HTMLDivElement, CardGlassProps>(
       className,
       variant,
       size,
-      glow,
       interactive,
-      hoverGlow = "none",
       children,
       ...props
     },
@@ -102,23 +82,18 @@ const CardGlass = React.forwardRef<HTMLDivElement, CardGlassProps>(
       <motion.div
         ref={ref}
         className={cn(
-          cardGlassVariants({ variant, size, glow, interactive }),
+          cardGlassVariants({ variant, size, interactive }),
           className,
         )}
         whileHover={
           interactive
             ? {
-                scale: 1.02,
-                boxShadow:
-                  hoverGlow === "green"
-                    ? "0 0 30px rgba(66, 167, 164, 0.3)"
-                    : hoverGlow === "purple"
-                      ? "0 0 30px rgba(170, 136, 245, 0.3)"
-                      : undefined,
+                scale: 1.01,
+                y: -2,
               }
             : undefined
         }
-        whileTap={interactive ? { scale: 0.98 } : undefined}
+        whileTap={interactive ? { scale: 0.99 } : undefined}
         transition={{ duration: 0.2 }}
         {...props}
       >
@@ -149,7 +124,7 @@ const CardGlassTitle = React.forwardRef<
   <h3
     ref={ref}
     className={cn(
-      "text-lg font-semibold text-[var(--color-text-primary)] leading-none tracking-tight",
+      "text-lg font-semibold text-[var(--color-text-primary)] leading-none tracking-tight font-title",
       className,
     )}
     {...props}
@@ -205,7 +180,7 @@ const CardGlassValue = React.forwardRef<HTMLDivElement, CardGlassValueProps>(
       {label && (
         <p className="text-sm text-[var(--color-text-muted)]">{label}</p>
       )}
-      <p className="text-3xl font-bold text-[var(--color-text-primary)] tabular-nums">
+      <p className="text-3xl font-bold text-[var(--color-text-primary)] tabular-nums font-mono">
         {value}
       </p>
       {trend && (

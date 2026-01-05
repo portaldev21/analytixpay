@@ -4,26 +4,31 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const badgeVariants = cva(
-  "inline-flex items-center rounded-lg border px-2.5 py-0.5 text-xs font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-start)] focus:ring-offset-2 focus:ring-offset-[var(--color-card-dark-1)]",
+  "inline-flex items-center rounded-[var(--radius-md)] border px-2.5 py-0.5 text-xs font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2 focus:ring-offset-[var(--color-background)]",
   {
     variants: {
       variant: {
+        // Default - Verde Esmeralda
         default:
-          "border-transparent bg-gradient-to-r from-[var(--color-primary-start)] to-[var(--color-primary-end)] text-white shadow-sm hover:shadow-[var(--shadow-glow-green)]",
+          "border-transparent bg-[var(--color-primary)] text-white shadow-sm hover:bg-[var(--color-primary-hover)]",
+        // Secondary - Azul Médio
         secondary:
-          "border-[var(--glass-border)] bg-[var(--color-card-dark-2)] text-[var(--color-text-secondary)] hover:bg-[var(--color-card-dark-3)] hover:text-[var(--color-text-primary)]",
+          "border-[var(--color-border)] bg-[var(--color-surface-muted)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)] hover:text-[var(--color-text-primary)]",
+        // Destructive - Vermelho
         destructive:
-          "border-transparent bg-[var(--color-negative)]/20 text-[var(--color-negative)] hover:bg-[var(--color-negative)]/30",
+          "border-transparent bg-[var(--color-destructive)]/10 text-[var(--color-destructive)] hover:bg-[var(--color-destructive)]/20",
+        // Outline - Border only
         outline:
-          "border-[var(--glass-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]",
-        positive:
-          "border-transparent bg-[var(--color-positive)]/20 text-[var(--color-positive)] hover:bg-[var(--color-positive)]/30",
-        purple:
-          "border-transparent bg-[var(--color-purple-light)]/20 text-[var(--color-purple-light)] hover:bg-[var(--color-purple-light)]/30",
+          "border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]",
+        // Success - Verde Esmeralda light
+        success:
+          "border-transparent bg-[var(--color-positive)]/10 text-[var(--color-positive)] hover:bg-[var(--color-positive)]/20",
+        // Info - Azul Médio light
         info:
-          "border-transparent bg-[var(--color-primary-start)]/20 text-[var(--color-primary-start)] hover:bg-[var(--color-primary-start)]/30",
-        glass:
-          "border-[var(--glass-border)] bg-[var(--glass-bg)] backdrop-blur-sm text-[var(--color-text-primary)]",
+          "border-transparent bg-[var(--color-info)]/10 text-[var(--color-info)] hover:bg-[var(--color-info)]/20",
+        // Warning - Âmbar
+        warning:
+          "border-transparent bg-[var(--color-warning)]/10 text-[var(--color-warning)] hover:bg-[var(--color-warning)]/20",
       },
     },
     defaultVariants: {

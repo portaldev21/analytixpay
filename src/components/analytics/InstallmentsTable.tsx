@@ -13,7 +13,7 @@ interface InstallmentsTableProps {
 export function InstallmentsTable({ data }: InstallmentsTableProps) {
   if (data.length === 0) {
     return (
-      <CardGlass variant="dark-1" size="lg">
+      <CardGlass variant="default" size="lg">
         <div className="mb-4">
           <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
             Parcelas Futuras
@@ -35,7 +35,7 @@ export function InstallmentsTable({ data }: InstallmentsTableProps) {
   const totalMonthly = data.reduce((sum, i) => sum + i.amount, 0);
 
   return (
-    <CardGlass variant="dark-1" size="lg">
+    <CardGlass variant="default" size="lg">
       <div className="mb-4">
         <div className="flex items-center justify-between">
           <div>
@@ -50,7 +50,7 @@ export function InstallmentsTable({ data }: InstallmentsTableProps) {
             <div className="text-sm text-[var(--color-text-muted)]">
               Total restante
             </div>
-            <div className="text-lg font-bold text-[var(--color-primary-start)] tabular-nums">
+            <div className="text-lg font-bold text-[var(--color-primary)] tabular-nums">
               {formatCurrency(totalRemaining)}
             </div>
           </div>
@@ -77,14 +77,14 @@ export function InstallmentsTable({ data }: InstallmentsTableProps) {
         {data.map((item, index) => (
           <div
             key={index}
-            className="flex items-center justify-between p-3 rounded-xl border border-[var(--glass-border)] bg-[var(--color-card-dark-2)] hover:bg-[var(--color-card-dark-3)] transition-colors"
+            className="flex items-center justify-between p-3 rounded-xl border border-[var(--color-border-light)] bg-[var(--color-surface-muted)] hover:bg-[var(--color-surface-muted)] transition-colors"
           >
             <div className="flex-1 min-w-0">
               <div className="font-medium text-[var(--color-text-primary)] truncate">
                 {item.description}
               </div>
               <div className="flex items-center gap-2 mt-1">
-                <Badge variant="purple" className="text-xs">
+                <Badge variant="info" className="text-xs">
                   {item.current_installment}/{item.total_installments}
                 </Badge>
                 <span className="text-xs text-[var(--color-text-muted)]">

@@ -21,13 +21,13 @@ const SelectTrigger = React.forwardRef<
     className={cn(
       "flex h-10 w-full items-center justify-between",
       "rounded-[var(--radius-sm)]",
-      "border border-[var(--glass-border)]",
-      "bg-[var(--color-card-dark-2)]",
+      "border border-[var(--color-border-light)]",
+      "bg-[var(--color-surface-muted)]",
       "px-3 py-2 text-sm",
       "text-[var(--color-text-primary)]",
       "placeholder:text-[var(--color-text-muted)]",
       "transition-all duration-200",
-      "focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-start)] focus:border-[var(--color-primary-start)]",
+      "focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)]",
       "hover:border-[var(--color-text-muted)]",
       "disabled:cursor-not-allowed disabled:opacity-50",
       "[&>span]:line-clamp-1",
@@ -88,10 +88,10 @@ const SelectContent = React.forwardRef<
       className={cn(
         "relative z-50 max-h-96 min-w-[8rem] overflow-hidden",
         "rounded-[var(--radius-sm)]",
-        "border border-[var(--glass-border)]",
-        "bg-[var(--color-card-dark-1)]",
+        "border border-[var(--color-border-light)]",
+        "bg-[var(--color-surface)]",
         "text-[var(--color-text-primary)]",
-        "shadow-[var(--shadow-card)]",
+        "shadow-[var(--shadow-lg)]",
         "backdrop-blur-md",
         "data-[state=open]:animate-in data-[state=closed]:animate-out",
         "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
@@ -144,8 +144,8 @@ const SelectItem = React.forwardRef<
       "rounded-lg py-2 pl-8 pr-2 text-sm",
       "text-[var(--color-text-secondary)]",
       "outline-none transition-colors",
-      "focus:bg-[var(--color-card-dark-2)] focus:text-[var(--color-text-primary)]",
-      "hover:bg-[var(--color-card-dark-2)] hover:text-[var(--color-text-primary)]",
+      "focus:bg-[var(--color-surface-muted)] focus:text-[var(--color-text-primary)]",
+      "hover:bg-[var(--color-surface-muted)] hover:text-[var(--color-text-primary)]",
       "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
       className,
     )}
@@ -153,7 +153,7 @@ const SelectItem = React.forwardRef<
   >
     <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
       <SelectPrimitive.ItemIndicator>
-        <Check className="h-4 w-4 text-[var(--color-primary-start)]" />
+        <Check className="h-4 w-4 text-[var(--color-primary)]" />
       </SelectPrimitive.ItemIndicator>
     </span>
 

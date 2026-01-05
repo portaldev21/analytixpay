@@ -17,11 +17,11 @@ export function ChatSuggestions({
       {SUGGESTED_QUESTIONS.map((question, index) => (
         <Button
           key={index}
-          variant="glass"
+          variant="outline"
           size="sm"
           onClick={() => onSelect(question)}
           disabled={disabled}
-          className="text-xs h-auto py-2 px-3 hover:border-[var(--color-primary-start)] hover:text-[var(--color-primary-start)]"
+          className="text-xs h-auto py-2 px-3 hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]"
         >
           {question}
         </Button>

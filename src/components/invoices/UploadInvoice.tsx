@@ -107,20 +107,20 @@ export function UploadInvoice({ accountId }: UploadInvoiceProps) {
         {...getRootProps()}
         className={cn(
           "border-2 border-dashed rounded-[var(--radius-lg)] cursor-pointer transition-all",
-          "bg-[var(--color-card-dark-2)] border-[var(--glass-border)]",
+          "bg-[var(--color-surface-muted)] border-[var(--color-border-light)]",
           isDragActive &&
-            "border-[var(--color-primary-start)] bg-[var(--color-primary-start)]/10",
+            "border-[var(--color-primary)] bg-[var(--color-primary)]/10",
           uploading && "opacity-50 cursor-not-allowed",
           selectedFile &&
-            "border-[var(--color-primary-start)]/50 bg-[var(--color-primary-start)]/5",
+            "border-[var(--color-primary)]/50 bg-[var(--color-primary)]/5",
         )}
       >
         <input {...getInputProps()} />
         <div className="p-8 text-center">
           {uploading ? (
             <>
-              <div className="mx-auto size-16 rounded-2xl bg-gradient-to-br from-[var(--color-primary-start)]/20 to-[var(--color-primary-end)]/20 flex items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-[var(--color-primary-start)]" />
+              <div className="mx-auto size-16 rounded-2xl bg-gradient-to-br from-[var(--color-primary)]/20 to-[var(--color-secondary)]/20 flex items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin text-[var(--color-primary)]" />
               </div>
               <h3 className="mt-4 font-semibold text-[var(--color-text-primary)]">
                 Processando fatura...
@@ -131,8 +131,8 @@ export function UploadInvoice({ accountId }: UploadInvoiceProps) {
             </>
           ) : selectedFile ? (
             <>
-              <div className="mx-auto size-16 rounded-2xl bg-gradient-to-br from-[var(--color-primary-start)]/20 to-[var(--color-primary-end)]/20 flex items-center justify-center">
-                <FileText className="h-8 w-8 text-[var(--color-primary-start)]" />
+              <div className="mx-auto size-16 rounded-2xl bg-gradient-to-br from-[var(--color-primary)]/20 to-[var(--color-secondary)]/20 flex items-center justify-center">
+                <FileText className="h-8 w-8 text-[var(--color-primary)]" />
               </div>
               <h3 className="mt-4 font-semibold text-[var(--color-text-primary)]">
                 {selectedFile.name}
@@ -143,7 +143,7 @@ export function UploadInvoice({ accountId }: UploadInvoiceProps) {
             </>
           ) : (
             <>
-              <div className="mx-auto size-16 rounded-2xl bg-[var(--color-card-dark-3)] flex items-center justify-center">
+              <div className="mx-auto size-16 rounded-2xl bg-[var(--color-surface-muted)] flex items-center justify-center">
                 <Upload className="h-8 w-8 text-[var(--color-text-muted)]" />
               </div>
               <h3 className="mt-4 font-semibold text-[var(--color-text-primary)]">
@@ -185,7 +185,7 @@ export function UploadInvoice({ accountId }: UploadInvoiceProps) {
       {/* Step 3: Ask for date if not detected */}
       {status === "need_date" && (
         <CardGlass
-          variant="dark-2"
+          variant="muted"
           size="md"
           className="border-[var(--color-purple-light)]/30"
         >
@@ -253,7 +253,7 @@ export function UploadInvoice({ accountId }: UploadInvoiceProps) {
       {/* Success message */}
       {status === "success" && (
         <CardGlass
-          variant="dark-2"
+          variant="muted"
           size="md"
           className="border-[var(--color-positive)]/30"
         >
@@ -276,7 +276,7 @@ export function UploadInvoice({ accountId }: UploadInvoiceProps) {
       {/* Error message */}
       {status === "error" && (
         <CardGlass
-          variant="dark-2"
+          variant="muted"
           size="md"
           className="border-[var(--color-negative)]/30"
         >

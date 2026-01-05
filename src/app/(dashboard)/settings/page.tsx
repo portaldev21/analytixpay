@@ -31,7 +31,7 @@ async function AccountInfo({ userId }: { userId: string }) {
 
   return (
     <>
-      <CardGlass variant="dark-1" size="lg">
+      <CardGlass variant="default" size="lg">
         <div className="mb-4">
           <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
             Suas Contas
@@ -44,7 +44,7 @@ async function AccountInfo({ userId }: { userId: string }) {
           {accounts.map((item: any) => (
             <div
               key={item.account.id}
-              className="flex items-center justify-between p-4 rounded-xl bg-[var(--color-card-dark-2)] border border-[var(--glass-border)]"
+              className="flex items-center justify-between p-4 rounded-xl bg-[var(--color-surface-muted)] border border-[var(--color-border-light)]"
             >
               <div>
                 <p className="font-medium text-[var(--color-text-primary)]">
@@ -57,7 +57,7 @@ async function AccountInfo({ userId }: { userId: string }) {
                   )}
                 </p>
               </div>
-              <Badge variant={item.role === "owner" ? "default" : "glass"}>
+              <Badge variant={item.role === "owner" ? "default" : "secondary"}>
                 {item.role === "owner" ? "Proprietario" : "Membro"}
               </Badge>
             </div>
@@ -101,7 +101,7 @@ export default async function SettingsPage() {
           <AccountInfo userId={user.id} />
         </Suspense>
 
-        <CardGlass variant="dark-1" size="lg">
+        <CardGlass variant="default" size="lg">
           <div className="mb-4">
             <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
               Informacoes do Perfil

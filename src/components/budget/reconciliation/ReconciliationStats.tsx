@@ -49,7 +49,7 @@ export function ReconciliationStats({ stats }: ReconciliationStatsProps) {
   ];
 
   return (
-    <CardGlass variant="dark-1" size="lg">
+    <CardGlass variant="default" size="lg">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
           Status de Reconciliacao
@@ -71,7 +71,7 @@ export function ReconciliationStats({ stats }: ReconciliationStatsProps) {
         </div>
         <Progress
           value={stats.match_rate}
-          className="h-2 bg-[var(--color-card-dark-2)]"
+          className="h-2 bg-[var(--color-surface-muted)]"
         />
       </div>
 
@@ -80,7 +80,7 @@ export function ReconciliationStats({ stats }: ReconciliationStatsProps) {
         {statItems.map((item) => (
           <div
             key={item.label}
-            className="flex items-center gap-3 p-3 rounded-xl bg-[var(--color-card-dark-2)]/50"
+            className="flex items-center gap-3 p-3 rounded-xl bg-[var(--color-surface-muted)]/50"
           >
             <div className={cn("p-2 rounded-lg", item.bg)}>
               <item.icon className={cn("size-4", item.color)} />

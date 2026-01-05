@@ -31,9 +31,9 @@ function getInsightStyles(type: InsightType) {
     case "info":
       return {
         icon: Info,
-        color: "text-[var(--color-primary-start)]",
-        bg: "bg-[var(--color-primary-start)]/10",
-        border: "border-[var(--color-primary-start)]/20",
+        color: "text-[var(--color-info)]",
+        bg: "bg-[var(--color-info)]/10",
+        border: "border-[var(--color-info)]/20",
       };
     case "success":
       return {
@@ -45,9 +45,9 @@ function getInsightStyles(type: InsightType) {
     case "tip":
       return {
         icon: Lightbulb,
-        color: "text-[var(--color-purple-light)]",
-        bg: "bg-[var(--color-purple-light)]/10",
-        border: "border-[var(--color-purple-light)]/20",
+        color: "text-[var(--color-secondary)]",
+        bg: "bg-[var(--color-secondary)]/10",
+        border: "border-[var(--color-secondary)]/20",
       };
   }
 }
@@ -55,7 +55,7 @@ function getInsightStyles(type: InsightType) {
 export function InsightsPanel({ insights }: InsightsPanelProps) {
   if (insights.length === 0) {
     return (
-      <CardGlass variant="purple" size="lg">
+      <CardGlass variant="secondary" size="lg">
         <div className="text-center py-6">
           <div className="inline-flex p-3 rounded-full bg-white/10 mb-4">
             <Sparkles className="size-8 text-white" />
@@ -70,12 +70,12 @@ export function InsightsPanel({ insights }: InsightsPanelProps) {
   }
 
   return (
-    <CardGlass variant="dark-1" size="lg">
+    <CardGlass variant="default" size="lg">
       <div className="flex items-center gap-2 mb-4">
-        <div className="p-1.5 rounded-lg bg-[var(--color-purple-light)]/10">
-          <Sparkles className="size-4 text-[var(--color-purple-light)]" />
+        <div className="p-1.5 rounded-[var(--radius-md)] bg-[var(--color-secondary)]/10">
+          <Sparkles className="size-4 text-[var(--color-secondary)]" />
         </div>
-        <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
+        <h3 className="text-lg font-semibold text-[var(--color-text-primary)] font-title">
           Insights Inteligentes
         </h3>
       </div>
@@ -94,15 +94,15 @@ export function InsightsPanel({ insights }: InsightsPanelProps) {
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ delay: idx * 0.1 }}
                 className={cn(
-                  "p-4 rounded-xl border transition-colors",
+                  "p-4 rounded-[var(--radius-md)] border transition-colors",
                   styles.bg,
                   styles.border,
-                  "hover:brightness-110",
+                  "hover:brightness-95",
                 )}
               >
                 <div className="flex gap-3">
                   <div
-                    className={cn("flex-shrink-0 p-1.5 rounded-lg", styles.bg)}
+                    className={cn("flex-shrink-0 p-1.5 rounded-[var(--radius-sm)]", styles.bg)}
                   >
                     <Icon className={cn("size-4", styles.color)} />
                   </div>

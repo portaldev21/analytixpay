@@ -36,15 +36,16 @@ export function Sidebar() {
     <div
       className={cn(
         "hidden lg:flex flex-col h-full w-[280px]",
-        "bg-[var(--color-card-dark-1)]",
-        "border-r border-[var(--glass-border)]",
+        "bg-[var(--color-surface)]",
+        "border-r border-[var(--color-border-light)]",
+        "shadow-[var(--shadow-sm)]",
       )}
     >
       {/* Logo */}
       <div className="p-6 pb-8">
         <Link href="/dashboard" className="block">
-          <h1 className="text-2xl font-bold tracking-tight text-gradient-green">
-            AnalytiXPay
+          <h1 className="text-2xl font-bold tracking-tight text-[var(--color-primary)] font-title">
+            ControleFatura
           </h1>
           <p className="text-xs text-[var(--color-text-muted)] mt-1">
             Gestao de Faturas
@@ -68,9 +69,9 @@ export function Sidebar() {
                   layoutId="sidebar-active-bg"
                   className={cn(
                     "absolute inset-0",
-                    "bg-gradient-to-r from-[var(--color-primary-start)]/20 to-transparent",
-                    "rounded-xl",
-                    "border-l-2 border-[var(--color-primary-start)]",
+                    "bg-[var(--color-primary)]/10",
+                    "rounded-[var(--radius-md)]",
+                    "border-l-2 border-[var(--color-primary)]",
                   )}
                   transition={{
                     type: "spring",
@@ -82,17 +83,17 @@ export function Sidebar() {
 
               <div
                 className={cn(
-                  "relative flex items-center gap-3 px-4 py-3 rounded-xl",
+                  "relative flex items-center gap-3 px-4 py-3 rounded-[var(--radius-md)]",
                   "text-sm font-medium transition-colors",
                   isActive
                     ? "text-[var(--color-text-primary)]"
-                    : "text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] hover:bg-[var(--color-card-dark-2)]/50",
+                    : "text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-muted)]",
                 )}
               >
                 <Icon
                   className={cn(
                     "size-5",
-                    isActive && "text-[var(--color-primary-start)]",
+                    isActive && "text-[var(--color-primary)]",
                   )}
                 />
                 {item.name}
@@ -103,13 +104,13 @@ export function Sidebar() {
       </nav>
 
       {/* Divider */}
-      <div className="mx-4 my-4 h-px bg-[var(--glass-border)]" />
+      <div className="mx-4 my-4 h-px bg-[var(--color-border-light)]" />
 
       {/* Logout */}
       <div className="p-3">
         <Button
           variant="ghost"
-          className="w-full justify-start gap-3 text-[var(--color-text-muted)] hover:text-[var(--color-negative)]"
+          className="w-full justify-start gap-3 text-[var(--color-text-muted)] hover:text-[var(--color-destructive)]"
           onClick={handleLogout}
         >
           <LogOut className="size-5" />
@@ -119,12 +120,12 @@ export function Sidebar() {
 
       {/* Footer */}
       <div className="p-4 pt-0">
-        <div className="p-3 rounded-xl bg-[var(--color-card-dark-2)]/50 border border-[var(--glass-border)]">
+        <div className="p-3 rounded-[var(--radius-md)] bg-[var(--color-surface-muted)] border border-[var(--color-border-light)]">
           <p className="text-xs text-[var(--color-text-muted)]">
-            Dark Premium Fintech
+            ControleFatura
           </p>
           <p className="text-[10px] text-[var(--color-text-muted)]/60 mt-1">
-            v2.0 - Design System
+            v3.0 - Design System
           </p>
         </div>
       </div>

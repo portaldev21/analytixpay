@@ -21,6 +21,7 @@ const pageTitles: Record<string, string> = {
   "/invoices": "Faturas",
   "/transactions": "Transacoes",
   "/settings": "Configuracoes",
+  "/budget": "Orcamento",
 };
 
 function getPageTitle(pathname: string): string {
@@ -48,13 +49,14 @@ export function Header({ user }: HeaderProps) {
       className={cn(
         "sticky top-0 z-10",
         "flex h-16 items-center gap-4 px-4 lg:px-6",
-        "bg-[var(--color-card-dark-1)]/80 backdrop-blur-lg",
-        "border-b border-[var(--glass-border)]",
+        "bg-[var(--color-surface)]/95 backdrop-blur-sm",
+        "border-b border-[var(--color-border-light)]",
+        "shadow-[var(--shadow-sm)]",
       )}
     >
       {/* Page Title - visible on mobile */}
       <div className="flex-1 lg:hidden">
-        <h1 className="text-lg font-semibold text-[var(--color-text-primary)]">
+        <h1 className="text-lg font-semibold text-[var(--color-text-primary)] font-title">
           {pageTitle}
         </h1>
       </div>
@@ -72,7 +74,7 @@ export function Header({ user }: HeaderProps) {
         >
           <Bell className="size-5" />
           {/* Notification indicator */}
-          <span className="absolute top-1.5 right-1.5 size-2 bg-[var(--color-negative)] rounded-full" />
+          <span className="absolute top-1.5 right-1.5 size-2 bg-[var(--color-destructive)] rounded-full" />
         </Button>
 
         {/* User Info - hidden on small mobile */}
@@ -91,7 +93,7 @@ export function Header({ user }: HeaderProps) {
             <div
               className={cn(
                 "absolute -inset-0.5",
-                "bg-gradient-to-r from-[var(--color-primary-start)] to-[var(--color-purple-light)]",
+                "bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)]",
                 "rounded-full opacity-75",
               )}
             />
