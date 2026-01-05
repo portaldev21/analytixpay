@@ -53,7 +53,7 @@ export function CreateAccountForm() {
   };
 
   return (
-    <CardGlass variant="dark-1" size="lg">
+    <CardGlass variant="default" size="lg">
       <div className="mb-4">
         <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
           Criar Nova Conta
@@ -94,7 +94,7 @@ export function CreateAccountForm() {
           <Button
             type="submit"
             disabled={isLoading}
-            className="bg-gradient-to-r from-[var(--color-primary-start)] to-[var(--color-primary-end)] hover:shadow-[var(--shadow-glow-green)] transition-shadow"
+            className="bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)] hover:shadow-[var(--shadow-md)] transition-shadow"
           >
             {isLoading ? (
               <>

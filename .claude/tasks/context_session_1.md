@@ -1,152 +1,78 @@
-# Session Context - Orcamento Fluido Implementation
+# Session Context - Rebranding AnalytiXPay → ControleFatura
 
-## Session ID: 1
-## Date: 2024-12-29 (Updated: 2024-12-29)
-## Status: COMPLETED (Phase 5 Added)
+## Date: 2026-01-04
 
----
+## Summary
+Complete rebranding and design system migration from "AnalytiXPay" (dark glassmorphism theme) to "ControleFatura" (clean professional financial theme).
 
-## Overview
+## Changes Made
 
-Implementation of "Orcamento Fluido" (Rolling Budget) feature for AnalytiXPay. This feature allows users to manage daily budgets that dynamically adjust based on previous spending within weekly cycles.
+### Core Design System (`src/app/globals.css`)
+- New color palette:
+  - Primary: #2C8A4B (Verde Esmeralda)
+  - Secondary: #1D5A8F (Azul Médio)
+  - Background: #F5F7FA (Light mode default)
+  - Surface: #FFFFFF
+  - Error: #C62828
+- Removed glassmorphism effects
+- Added light mode as default with dark mode support
+- Updated all CSS custom properties
 
-### Core Formula
-`Available_Budget = Daily_Base + (Accumulated_Balance / Remaining_Days)`
+### Typography (`src/app/layout.tsx`)
+- Merriweather (serif) - titles
+- Inter (sans-serif) - body text
+- Roboto Mono - numeric values
 
----
+### Branding Updates
+- App name: AnalytiXPay → ControleFatura
+- AI Assistant: AnalytiX → ControleIA
+- Design System version: v2.0 → v3.0
+- Package name: analytixpay → controlefatura
 
-## User Requirements (Answered)
+### Components Updated
+- `src/components/ui/button.tsx` - Simplified to 6 variants, removed glass/purple
+- `src/components/ui/card-glass.tsx` - Simplified variants: default, muted, primary, secondary, outline
+- `src/components/ui/badge.tsx` - Updated variants: default, secondary, destructive, outline, success, info, warning
+- `src/components/ui/input.tsx` - Updated to new color scheme
+- `src/components/ui/chip.tsx` - Updated to new color scheme
+- `src/components/ui/progress.tsx` - Updated to new color scheme
+- All dashboard components updated to use new CSS variables
+- All budget components updated
+- All analytics components updated
 
-1. **Budget Scope**: Account-level (shared between members)
-2. **Data Source**: Hybrid - use existing invoice transactions + manual expenses with reconciliation
-3. **Carry-over Mode**: Carry deficit only (negatives carry, positives reset)
-4. **MVP Scope**: Full Phase 1-4 implementation
+### Files Modified (Key)
+- `src/app/globals.css`
+- `src/app/layout.tsx`
+- `src/app/(auth)/layout.tsx`
+- `src/components/dashboard/Sidebar.tsx`
+- `src/components/dashboard/Header.tsx`
+- `src/lib/ai/prompts.ts`
+- `src/lib/utils.ts` (category colors)
+- `package.json`
+- `CLAUDE.md`
+- `README.md`
 
----
+### Bulk Replacements
+- `--color-primary-start` → `--color-primary`
+- `--color-primary-end` → `--color-secondary`
+- `--color-card-dark-1` → `--color-surface`
+- `--color-card-dark-2` → `--color-surface-muted`
+- `--color-card-dark-3` → `--color-surface-muted`
+- `--glass-border` → `--color-border-light`
+- `--shadow-glow-green` → `--shadow-md`
+- `--shadow-card` → `--shadow-lg`
+- `variant="glass"` → `variant="outline"`
+- `variant="purple"` → `variant="info"`
+- `variant="positive"` → `variant="success"`
+- Removed all `hoverGlow` props
 
-## Files Created/Modified
+## Validation
+- Build: PASSED (`npm run build`)
+- Lint: Minor pre-existing issues (not related to rebranding)
 
-### Database
-- `src/db/migrations/006_add_budget_tables.sql` - Complete schema with tables:
-  - `budget_configs` - Configuration (daily_base, week_start_day, carry_over_mode)
-  - `week_cycles` - Weekly cycles tracking
-  - `daily_records` - Daily budget records
-  - `budget_expenses` - Manual expenses with reconciliation support
+## Next Steps
+- User should test the application visually in the browser
+- Consider adding favicon/logo assets if not already present
 
-- `src/db/types.ts` - Added budget types:
-  - `TCarryOverMode`, `TCycleStatus`, `TReconciliationStatus`, `TBudgetStatus`
-  - `TBudgetConfig`, `TWeekCycle`, `TDailyRecord`, `TBudgetExpense`
-  - `TTodayBudgetResponse`, `TWeekSummary`
-
-### Libraries
-- `src/lib/budget/calculations.ts` - Pure calculation functions
-- `src/lib/budget/cycle.ts` - Cycle management functions
-- `src/lib/budget/reconciliation.ts` - Expense-transaction matching
-- `src/lib/budget/__tests__/calculations.test.ts` - 56 unit tests
-
-### Server Actions
-- `src/actions/budget.actions.ts` - All server actions:
-  - `upsertBudgetConfig`, `getActiveBudgetConfig`
-  - `getTodayBudget`, `addBudgetExpense`, `updateBudgetExpense`, `deleteBudgetExpense`
-  - `getExpensesForDate`, `getCurrentCycle`, `getWeekSummary`, `getBudgetVsActual`
-  - `getReconciliationSuggestions`, `approveReconciliation`, `markExpenseUnmatched`, `getReconciliationStats`
-
-### Components
-- `src/components/budget/TodayBudgetCard.tsx` - Hero card showing today's available budget
-- `src/components/budget/WeekSummaryCard.tsx` - Week progress with stats
-- `src/components/budget/ExpenseForm.tsx` - Quick expense entry form
-- `src/components/budget/ExpenseList.tsx` - List of today's expenses
-- `src/components/budget/EmptyBudgetState.tsx` - Setup screen for first-time config
-- `src/components/budget/index.ts` - Barrel export
-- `src/components/budget/reconciliation/MatchSuggestionCard.tsx` - Match approval UI
-- `src/components/budget/reconciliation/ReconciliationStats.tsx` - Stats dashboard
-- `src/components/budget/reconciliation/index.ts` - Barrel export
-
-### Pages
-- `src/app/(dashboard)/budget/page.tsx` - Main budget dashboard
-- `src/app/(dashboard)/budget/reconcile/page.tsx` - Reconciliation interface
-
-### Navigation Updates
-- `src/components/dashboard/Sidebar.tsx` - Added "Orcamento" link
-- `src/components/dashboard/MobileNavbar.tsx` - Added "Orcamento" link
-
----
-
-## Technical Notes
-
-### TypeScript Type Issues
-The Supabase client doesn't recognize new budget tables because the Database type forward references aren't resolving properly. Fixed with a helper function:
-
-```typescript
-// In budget.actions.ts
-function getUntypedClient(supabase: SupabaseClient): SupabaseClient<any> {
-  return supabase as SupabaseClient<any>;
-}
-```
-
-This is a temporary workaround until types are regenerated from Supabase.
-
-### Test Results
-- 63 tests passing (56 budget calculations + 7 analytics stats)
-- Build successful with all routes compiling
-
----
-
----
-
-## Phase 5: Budget Forecast (COMPLETED)
-
-### Overview
-Added budget forecast feature that detects future installments from invoices and shows their impact on daily, weekly, and monthly budgets.
-
-### New Types (`src/db/types.ts`)
-- `TMonthlyProjection` - Monthly installment projection
-- `TBudgetImpact` - Budget impact calculations
-- `TCalendarEvent` - Calendar events for installments
-- `TBudgetForecast` - Complete forecast response
-
-### New Server Action (`src/actions/budget.actions.ts`)
-- `getBudgetForecast(accountId, months)` - Returns forecast data with:
-  - Active installments projection
-  - Monthly projections (next 6 months)
-  - Budget impact calculations
-  - Calendar events for each payment
-
-### New Components (`src/components/budget/forecast/`)
-- `BudgetImpactCard.tsx` - Hero card showing:
-  - Commitment percentage (with color coding)
-  - Budget base vs available (daily/weekly/monthly)
-  - Average monthly installments
-- `MonthlyProjectionChart.tsx` - Bar chart showing:
-  - Monthly installment totals
-  - Reference line for monthly budget
-  - Color coding for over-budget months
-- `InstallmentsCalendar.tsx` - Interactive calendar:
-  - Navigate between months
-  - Badges for days with payments
-  - Click to see payment details
-- `ActiveInstallmentsList.tsx` - List showing:
-  - Each active installment with progress bar
-  - Remaining amount and installments
-  - Next payment date
-
-### New Page
-- `src/app/(dashboard)/budget/forecast/page.tsx` - Forecast dashboard
-
-### Navigation
-- Added "Previsao" button to `/budget` page header (links to `/budget/forecast`)
-
----
-
-## Next Steps (Not in MVP)
-
-1. Run migration `006_add_budget_tables.sql` in Supabase SQL Editor
-2. Add budget configuration section to Settings page
-3. Add more sophisticated reconciliation algorithms
-4. Create historical reports and charts
-5. Add notification system for budget alerts
-
----
-
-## Plan File
-See: `/Users/vop12/.claude/plans/golden-floating-sunbeam.md`
+## Branch
+`fix/oauth-callback-session`

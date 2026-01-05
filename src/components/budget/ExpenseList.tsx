@@ -77,7 +77,7 @@ export function ExpenseList({
 
   if (expenses.length === 0) {
     return (
-      <CardGlass variant="dark-1" size="lg" className={className}>
+      <CardGlass variant="default" size="lg" className={className}>
         <div className="text-center py-8">
           <ShoppingCart className="size-12 mx-auto text-[var(--color-text-muted)] mb-3" />
           <p className="text-[var(--color-text-muted)]">
@@ -92,7 +92,7 @@ export function ExpenseList({
   }
 
   return (
-    <CardGlass variant="dark-1" size="lg" className={className}>
+    <CardGlass variant="default" size="lg" className={className}>
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
           Gastos de Hoje
@@ -118,8 +118,8 @@ export function ExpenseList({
                 exit={{ opacity: 0, x: 20 }}
                 className={cn(
                   "flex items-center gap-3 p-3 rounded-xl",
-                  "bg-[var(--color-card-dark-3)]",
-                  "border border-[var(--glass-border)]",
+                  "bg-[var(--color-surface-muted)]",
+                  "border border-[var(--color-border-light)]",
                   isDeleting && "opacity-50",
                 )}
               >
@@ -171,7 +171,7 @@ export function ExpenseList({
       </div>
 
       {/* Total */}
-      <div className="mt-4 pt-4 border-t border-[var(--glass-border)]">
+      <div className="mt-4 pt-4 border-t border-[var(--color-border-light)]">
         <div className="flex items-center justify-between">
           <span className="text-sm text-[var(--color-text-muted)]">Total</span>
           <span className="text-lg font-bold text-[var(--color-text-primary)] tabular-nums">

@@ -92,10 +92,10 @@ export function MigrateInvoices({ accountId }: MigrateInvoicesProps) {
 
   if (loading) {
     return (
-      <CardGlass variant="dark-1" size="lg">
+      <CardGlass variant="default" size="lg">
         <div className="mb-4">
           <h3 className="flex items-center gap-2 text-lg font-semibold text-[var(--color-text-primary)]">
-            <Calendar className="h-5 w-5 text-[var(--color-primary-start)]" />
+            <Calendar className="h-5 w-5 text-[var(--color-primary)]" />
             Atualizar Datas de Vencimento
           </h3>
         </div>
@@ -108,10 +108,10 @@ export function MigrateInvoices({ accountId }: MigrateInvoicesProps) {
 
   if (invoices.length === 0) {
     return (
-      <CardGlass variant="dark-1" size="lg">
+      <CardGlass variant="default" size="lg">
         <div className="mb-4">
           <h3 className="flex items-center gap-2 text-lg font-semibold text-[var(--color-text-primary)]">
-            <Calendar className="h-5 w-5 text-[var(--color-primary-start)]" />
+            <Calendar className="h-5 w-5 text-[var(--color-primary)]" />
             Atualizar Datas de Vencimento
           </h3>
           <p className="text-sm text-[var(--color-text-muted)] mt-1">
@@ -127,10 +127,10 @@ export function MigrateInvoices({ accountId }: MigrateInvoicesProps) {
   }
 
   return (
-    <CardGlass variant="dark-1" size="lg">
+    <CardGlass variant="default" size="lg">
       <div className="mb-4">
         <h3 className="flex items-center gap-2 text-lg font-semibold text-[var(--color-text-primary)]">
-          <Calendar className="h-5 w-5 text-[var(--color-primary-start)]" />
+          <Calendar className="h-5 w-5 text-[var(--color-primary)]" />
           Atualizar Datas de Vencimento
         </h3>
         <p className="text-sm text-[var(--color-text-muted)] mt-1">
@@ -157,7 +157,7 @@ export function MigrateInvoices({ accountId }: MigrateInvoicesProps) {
           {invoices.map((invoice) => (
             <div
               key={invoice.id}
-              className="flex flex-col sm:flex-row sm:items-center gap-3 p-4 rounded-xl bg-[var(--color-card-dark-2)] border border-[var(--glass-border)]"
+              className="flex flex-col sm:flex-row sm:items-center gap-3 p-4 rounded-xl bg-[var(--color-surface-muted)] border border-[var(--color-border-light)]"
             >
               <div className="flex items-center gap-2 flex-1 min-w-0">
                 <FileText className="h-4 w-4 text-[var(--color-text-muted)] flex-shrink-0" />
@@ -189,7 +189,7 @@ export function MigrateInvoices({ accountId }: MigrateInvoicesProps) {
                   size="sm"
                   onClick={() => handleUpdate(invoice.id)}
                   disabled={!dates[invoice.id] || updatingId === invoice.id}
-                  className="bg-gradient-to-r from-[var(--color-primary-start)] to-[var(--color-primary-end)]"
+                  className="bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)]"
                 >
                   {updatingId === invoice.id ? (
                     <Loader2 className="h-4 w-4 animate-spin" />

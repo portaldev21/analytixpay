@@ -133,11 +133,11 @@ export function ChatContainer({ accountId }: ChatContainerProps) {
   const hasMessages = messages.length > 0 || streamingContent;
 
   return (
-    <CardGlass variant="dark-1" size="lg" className="flex flex-col h-[600px]">
+    <CardGlass variant="default" size="lg" className="flex flex-col h-[600px]">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--color-primary-start)] to-[var(--color-primary-end)] flex items-center justify-center shadow-[var(--shadow-glow-green)]">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-secondary)] flex items-center justify-center shadow-[var(--shadow-md)]">
             <Bot className="h-5 w-5 text-white" />
           </div>
           <div>
@@ -166,7 +166,7 @@ export function ChatContainer({ accountId }: ChatContainerProps) {
       <div className="flex-1 overflow-y-auto space-y-4 mb-4 scrollbar-thin">
         {!hasMessages ? (
           <div className="flex flex-col items-center justify-center h-full text-center">
-            <div className="p-4 rounded-2xl bg-[var(--color-card-dark-2)] mb-4">
+            <div className="p-4 rounded-2xl bg-[var(--color-surface-muted)] mb-4">
               <MessageSquare className="h-10 w-10 text-[var(--color-text-muted)]" />
             </div>
             <h4 className="font-medium text-[var(--color-text-primary)] mb-2">

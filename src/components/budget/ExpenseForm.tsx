@@ -83,7 +83,7 @@ export function ExpenseForm({ accountId, onSuccess, className }: ExpenseFormProp
   };
 
   return (
-    <CardGlass variant="dark-1" size="lg" className={className}>
+    <CardGlass variant="default" size="lg" className={className}>
       <form onSubmit={handleSubmit}>
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
@@ -92,7 +92,7 @@ export function ExpenseForm({ accountId, onSuccess, className }: ExpenseFormProp
           <button
             type="button"
             onClick={() => setShowDetails(!showDetails)}
-            className="text-sm text-[var(--color-primary-start)] hover:underline"
+            className="text-sm text-[var(--color-primary)] hover:underline"
           >
             {showDetails ? "Ocultar detalhes" : "Mais detalhes"}
           </button>
@@ -111,9 +111,9 @@ export function ExpenseForm({ accountId, onSuccess, className }: ExpenseFormProp
             placeholder="0,00"
             className={cn(
               "w-full h-14 pl-12 pr-4 rounded-xl text-2xl font-bold tabular-nums",
-              "bg-[var(--color-card-dark-3)] border border-[var(--glass-border)]",
+              "bg-[var(--color-surface-muted)] border border-[var(--color-border-light)]",
               "text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)]",
-              "focus:outline-none focus:border-[var(--color-primary-start)]",
+              "focus:outline-none focus:border-[var(--color-primary)]",
               "transition-colors",
             )}
           />
@@ -134,8 +134,8 @@ export function ExpenseForm({ accountId, onSuccess, className }: ExpenseFormProp
                   className={cn(
                     "flex flex-col items-center gap-1 p-2 rounded-lg transition-all",
                     isSelected
-                      ? "bg-[var(--color-card-dark-2)] border-2 border-[var(--color-primary-start)]"
-                      : "bg-[var(--color-card-dark-3)] border-2 border-transparent hover:border-[var(--glass-border)]",
+                      ? "bg-[var(--color-surface-muted)] border-2 border-[var(--color-primary)]"
+                      : "bg-[var(--color-surface-muted)] border-2 border-transparent hover:border-[var(--color-border-light)]",
                   )}
                 >
                   <Icon className={cn("size-5", isSelected ? cat.color : "text-[var(--color-text-muted)]")} />
@@ -174,9 +174,9 @@ export function ExpenseForm({ accountId, onSuccess, className }: ExpenseFormProp
                   maxLength={200}
                   className={cn(
                     "w-full h-10 px-4 rounded-lg text-sm",
-                    "bg-[var(--color-card-dark-3)] border border-[var(--glass-border)]",
+                    "bg-[var(--color-surface-muted)] border border-[var(--color-border-light)]",
                     "text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)]",
-                    "focus:outline-none focus:border-[var(--color-primary-start)]",
+                    "focus:outline-none focus:border-[var(--color-primary)]",
                     "transition-colors",
                   )}
                 />
@@ -219,7 +219,7 @@ export function ExpenseForm({ accountId, onSuccess, className }: ExpenseFormProp
           disabled={isPending || !amount}
           className={cn(
             "w-full h-12 rounded-xl font-semibold text-white",
-            "bg-gradient-to-r from-[var(--color-primary-start)] to-[var(--color-primary-end)]",
+            "bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)]",
             "hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed",
             "flex items-center justify-center gap-2",
             "transition-opacity",

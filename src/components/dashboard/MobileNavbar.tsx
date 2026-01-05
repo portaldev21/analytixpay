@@ -28,8 +28,8 @@ export function MobileNavbar() {
     <nav
       className={cn(
         "fixed bottom-0 left-0 right-0 z-50",
-        "bg-[var(--color-card-dark-1)]/95 backdrop-blur-lg",
-        "border-t border-[var(--glass-border)]",
+        "bg-[var(--color-surface)]/95 backdrop-blur-lg",
+        "border-t border-[var(--color-border-light)]",
         "px-2 pb-safe",
         "lg:hidden", // Hidden on desktop
       )}
@@ -53,9 +53,9 @@ export function MobileNavbar() {
                   layoutId="mobile-nav-indicator"
                   className={cn(
                     "absolute inset-x-1 top-1.5 h-10",
-                    "bg-gradient-to-r from-[var(--color-primary-start)] to-[var(--color-primary-end)]",
+                    "bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)]",
                     "rounded-xl",
-                    "shadow-[var(--shadow-glow-green)]",
+                    "shadow-[var(--shadow-md)]",
                   )}
                   transition={{
                     type: "spring",

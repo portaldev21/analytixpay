@@ -145,7 +145,7 @@ export function TransactionFilters({
       {hasActiveFilters && (
         <div className="flex flex-wrap gap-2">
           {currentInvoice && (
-            <Badge variant="glass" className="gap-1 pr-1">
+            <Badge variant="outline" className="gap-1 pr-1">
               <span className="text-[var(--color-text-muted)]">Fatura:</span>{" "}
               {invoices.find((i) => i.id === currentInvoice)?.period ||
                 "Selecionada"}
@@ -158,7 +158,7 @@ export function TransactionFilters({
             </Badge>
           )}
           {currentInstallment && (
-            <Badge variant="glass" className="gap-1 pr-1">
+            <Badge variant="outline" className="gap-1 pr-1">
               {
                 INSTALLMENT_OPTIONS.find((o) => o.value === currentInstallment)
                   ?.label
@@ -172,7 +172,7 @@ export function TransactionFilters({
             </Badge>
           )}
           {currentCategory && (
-            <Badge variant="glass" className="gap-1 pr-1">
+            <Badge variant="outline" className="gap-1 pr-1">
               {currentCategory}
               <button
                 onClick={() => updateFilter("category", "")}

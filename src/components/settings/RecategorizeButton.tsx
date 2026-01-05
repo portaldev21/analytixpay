@@ -41,7 +41,7 @@ export function RecategorizeButton({ accountId }: RecategorizeButtonProps) {
   };
 
   return (
-    <CardGlass variant="dark-1" size="lg">
+    <CardGlass variant="default" size="lg">
       <div className="mb-4">
         <h3 className="flex items-center gap-2 text-lg font-semibold text-[var(--color-text-primary)]">
           <div className="p-2 rounded-lg bg-[var(--color-purple-light)]/20">

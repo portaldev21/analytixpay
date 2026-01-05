@@ -96,7 +96,7 @@ export function MatchSuggestionCard({
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, height: 0 }}
       >
-        <CardGlass variant="dark-2" size="lg" className="space-y-4">
+        <CardGlass variant="muted" size="lg" className="space-y-4">
           {/* Expense Info */}
           <div className="flex items-start justify-between">
             <div className="space-y-1">
@@ -105,7 +105,7 @@ export function MatchSuggestionCard({
                   {formatCurrency(expense.amount)}
                 </span>
                 {expense.category && (
-                  <span className="px-2 py-0.5 text-xs rounded-full bg-[var(--color-card-dark-1)] text-[var(--color-text-muted)]">
+                  <span className="px-2 py-0.5 text-xs rounded-full bg-[var(--color-surface)] text-[var(--color-text-muted)]">
                     {expense.category}
                   </span>
                 )}
@@ -158,8 +158,8 @@ export function MatchSuggestionCard({
                     className={cn(
                       "p-3 rounded-xl border cursor-pointer transition-all",
                       selectedMatch === match.transaction.id
-                        ? "border-[var(--color-primary-start)] bg-[var(--color-primary-start)]/5"
-                        : "border-[var(--glass-border)] hover:border-[var(--color-text-muted)]/30",
+                        ? "border-[var(--color-primary)] bg-[var(--color-primary)]/5"
+                        : "border-[var(--color-border-light)] hover:border-[var(--color-text-muted)]/30",
                     )}
                   >
                     <div className="flex items-center justify-between">
@@ -181,7 +181,7 @@ export function MatchSuggestionCard({
                       </div>
 
                       {selectedMatch === match.transaction.id && (
-                        <div className="size-5 rounded-full bg-[var(--color-primary-start)] flex items-center justify-center">
+                        <div className="size-5 rounded-full bg-[var(--color-primary)] flex items-center justify-center">
                           <Check className="size-3 text-white" />
                         </div>
                       )}
@@ -199,7 +199,7 @@ export function MatchSuggestionCard({
           )}
 
           {/* Actions */}
-          <div className="flex items-center gap-2 pt-2 border-t border-[var(--glass-border)]">
+          <div className="flex items-center gap-2 pt-2 border-t border-[var(--color-border-light)]">
             {hasMatches && (
               <Button
                 onClick={handleApprove}

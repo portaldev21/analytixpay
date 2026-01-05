@@ -106,7 +106,7 @@ export default async function ReconcilePage() {
             ))}
           </div>
         ) : (
-          <CardGlass variant="dark-1" size="lg" className="text-center py-12">
+          <CardGlass variant="default" size="lg" className="text-center py-12">
             <div className="space-y-3">
               <div className="mx-auto size-12 rounded-full bg-[var(--color-positive)]/10 flex items-center justify-center">
                 <RefreshCw className="size-6 text-[var(--color-positive)]" />
@@ -131,13 +131,13 @@ export default async function ReconcilePage() {
       </div>
 
       {/* Help section */}
-      <CardGlass variant="dark-1" size="lg">
+      <CardGlass variant="default" size="lg">
         <h3 className="text-lg font-semibold text-[var(--color-text-primary)] mb-4">
           Como funciona a reconciliacao
         </h3>
         <div className="grid gap-4 md:grid-cols-3">
           <div className="space-y-2">
-            <div className="size-10 rounded-xl bg-[var(--color-primary-start)]/10 flex items-center justify-center">
+            <div className="size-10 rounded-xl bg-[var(--color-primary)]/10 flex items-center justify-center">
               <span className="text-xl">1</span>
             </div>
             <h4 className="font-medium text-[var(--color-text-primary)]">
@@ -149,7 +149,7 @@ export default async function ReconcilePage() {
             </p>
           </div>
           <div className="space-y-2">
-            <div className="size-10 rounded-xl bg-[var(--color-primary-start)]/10 flex items-center justify-center">
+            <div className="size-10 rounded-xl bg-[var(--color-primary)]/10 flex items-center justify-center">
               <span className="text-xl">2</span>
             </div>
             <h4 className="font-medium text-[var(--color-text-primary)]">
@@ -161,7 +161,7 @@ export default async function ReconcilePage() {
             </p>
           </div>
           <div className="space-y-2">
-            <div className="size-10 rounded-xl bg-[var(--color-primary-start)]/10 flex items-center justify-center">
+            <div className="size-10 rounded-xl bg-[var(--color-primary)]/10 flex items-center justify-center">
               <span className="text-xl">3</span>
             </div>
             <h4 className="font-medium text-[var(--color-text-primary)]">

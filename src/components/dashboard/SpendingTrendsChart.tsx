@@ -36,7 +36,7 @@ export function SpendingTrendsChart({ data }: SpendingTrendsChartProps) {
   }));
 
   return (
-    <CardGlass variant="dark-1" size="lg">
+    <CardGlass variant="default" size="lg">
       <div className="mb-6">
         <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
           Tendencia de Gastos
@@ -52,19 +52,19 @@ export function SpendingTrendsChart({ data }: SpendingTrendsChartProps) {
             <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
               <stop
                 offset="5%"
-                stopColor="var(--color-primary-start)"
+                stopColor="var(--color-primary)"
                 stopOpacity={0.3}
               />
               <stop
                 offset="95%"
-                stopColor="var(--color-primary-start)"
+                stopColor="var(--color-primary)"
                 stopOpacity={0}
               />
             </linearGradient>
           </defs>
           <CartesianGrid
             strokeDasharray="3 3"
-            stroke="var(--glass-border)"
+            stroke="var(--color-border-light)"
             vertical={false}
           />
           <XAxis
@@ -76,7 +76,7 @@ export function SpendingTrendsChart({ data }: SpendingTrendsChartProps) {
               fill: "var(--color-text-muted)",
               fontSize: isMobile ? 10 : 12,
             }}
-            axisLine={{ stroke: "var(--glass-border)" }}
+            axisLine={{ stroke: "var(--color-border-light)" }}
             tickLine={false}
           />
           <YAxis
@@ -99,7 +99,7 @@ export function SpendingTrendsChart({ data }: SpendingTrendsChartProps) {
                       {payload[0].payload.monthLabel}
                     </div>
                     <div className="mt-1 space-y-1">
-                      <div className="text-lg font-bold text-[var(--color-primary-start)]">
+                      <div className="text-lg font-bold text-[var(--color-primary)]">
                         {formatCurrency(Number(payload[0].value))}
                       </div>
                       <div className="text-xs text-[var(--color-text-muted)]">
@@ -115,18 +115,18 @@ export function SpendingTrendsChart({ data }: SpendingTrendsChartProps) {
           <Area
             type="monotone"
             dataKey="total"
-            stroke="var(--color-primary-start)"
+            stroke="var(--color-primary)"
             strokeWidth={2}
             fill="url(#colorTotal)"
             dot={{
-              fill: "var(--color-card-dark-1)",
-              stroke: "var(--color-primary-start)",
+              fill: "var(--color-surface)",
+              stroke: "var(--color-primary)",
               strokeWidth: 2,
               r: 4,
             }}
             activeDot={{
-              fill: "var(--color-primary-start)",
-              stroke: "var(--color-card-dark-1)",
+              fill: "var(--color-primary)",
+              stroke: "var(--color-surface)",
               strokeWidth: 2,
               r: 6,
             }}

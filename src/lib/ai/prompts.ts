@@ -48,7 +48,7 @@ export function buildSystemPrompt(context: TFinancialContext): string {
     context.comparison.percentageChange >= 0 ? "aumento" : "reducao";
 
   return `Voce e um assistente financeiro especializado em analise de gastos de cartao de credito brasileiro.
-Seu nome e AnalytiX, o assistente financeiro inteligente do AnalytiXPay.
+Seu nome e ControleIA, o assistente financeiro inteligente do ControleFatura.
 
 === CONTEXTO FINANCEIRO DO USUARIO ===
 

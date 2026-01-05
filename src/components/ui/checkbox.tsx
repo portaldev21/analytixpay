@@ -15,13 +15,13 @@ const Checkbox = React.forwardRef<
     className={cn(
       "peer h-5 w-5 shrink-0",
       "rounded-md",
-      "border border-[var(--glass-border)]",
-      "bg-[var(--color-card-dark-2)]",
+      "border border-[var(--color-border-light)]",
+      "bg-[var(--color-surface-muted)]",
       "transition-all duration-200",
-      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary-start)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-card-dark-1)]",
+      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface)]",
       "hover:border-[var(--color-text-muted)]",
       "disabled:cursor-not-allowed disabled:opacity-50",
-      "data-[state=checked]:bg-gradient-to-br data-[state=checked]:from-[var(--color-primary-start)] data-[state=checked]:to-[var(--color-primary-end)]",
+      "data-[state=checked]:bg-gradient-to-br data-[state=checked]:from-[var(--color-primary)] data-[state=checked]:to-[var(--color-secondary)]",
       "data-[state=checked]:border-transparent data-[state=checked]:text-white",
       className,
     )}

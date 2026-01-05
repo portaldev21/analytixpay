@@ -204,22 +204,23 @@ export function formatCardNumber(lastDigits: string): string {
 }
 
 /**
- * Color by category - Dark Premium Fintech palette
+ * Color by category - ControleFatura Design System palette
+ * Uses Verde Esmeralda and Azul Médio as primary colors
  */
 export function getCategoryColor(category: string): string {
   const colors: Record<string, string> = {
-    Alimentação: "#32E68A", // positive green
-    Transporte: "#42A7A4", // primary teal
-    Saúde: "#FF4F66", // negative/alert red
-    Lazer: "#AA88F5", // purple light
-    Compras: "#EC4899", // pink
-    Educação: "#F59E0B", // amber
-    Casa: "#6E88BA", // blue card start
-    Vestuário: "#5F57B7", // purple mid
-    Beleza: "#F97316", // orange
-    Tecnologia: "#214E98", // blue card end
-    Serviços: "#91919F", // text muted
-    Outros: "#DCDDE3", // text secondary
+    Alimentação: "#2C8A4B", // Verde Esmeralda (primary)
+    Transporte: "#1D5A8F", // Azul Médio (secondary)
+    Saúde: "#C62828", // Vermelho (alert)
+    Lazer: "#0F3B57", // Azul Escuro
+    Compras: "#4A657D", // Azul acinzentado
+    Educação: "#2C8A4B", // Verde Esmeralda
+    Casa: "#1D5A8F", // Azul Médio
+    Vestuário: "#0F3B57", // Azul Escuro
+    Beleza: "#4A657D", // Azul acinzentado
+    Tecnologia: "#1D5A8F", // Azul Médio
+    Serviços: "#B0BEC5", // Cinza Médio
+    Outros: "#B0BEC5", // Cinza Médio
   };
 
   return colors[category] || colors["Outros"];

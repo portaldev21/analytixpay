@@ -11,57 +11,50 @@ const chipVariants = cva(
   {
     variants: {
       variant: {
-        // Default - subtle dark background
+        // Default - subtle gray background
         default: [
-          "bg-[var(--color-card-dark-2)]",
+          "bg-[var(--color-surface-muted)]",
           "text-[var(--color-text-secondary)]",
-          "border border-[var(--glass-border)]",
+          "border border-[var(--color-border-light)]",
         ],
-        // Active/Selected - Green gradient
+        // Active/Selected - Verde Esmeralda
         active: [
-          "bg-gradient-to-r from-[var(--color-primary-start)] to-[var(--color-primary-end)]",
+          "bg-[var(--color-primary)]",
           "text-white",
-          "shadow-sm shadow-[var(--color-primary-end)]/20",
+          "shadow-sm shadow-[var(--color-primary)]/20",
         ],
-        // Positive - Green outline/fill
+        // Positive - Verde Esmeralda light
         positive: [
           "bg-[var(--color-positive)]/10",
           "text-[var(--color-positive)]",
           "border border-[var(--color-positive)]/30",
         ],
-        // Negative - Red outline/fill
+        // Negative - Vermelho light
         negative: [
           "bg-[var(--color-negative)]/10",
           "text-[var(--color-negative)]",
           "border border-[var(--color-negative)]/30",
         ],
-        // Purple - For insights/AI
-        purple: [
-          "bg-[var(--color-purple-light)]/10",
-          "text-[var(--color-purple-light)]",
-          "border border-[var(--color-purple-light)]/30",
+        // Info - Azul Médio light
+        info: [
+          "bg-[var(--color-info)]/10",
+          "text-[var(--color-info)]",
+          "border border-[var(--color-info)]/30",
         ],
         // Outline - Transparent with border
         outline: [
           "bg-transparent",
           "text-[var(--color-text-muted)]",
-          "border border-[var(--glass-border)]",
-        ],
-        // Glass - Glassmorphism
-        glass: [
-          "bg-[var(--glass-bg)]",
-          "backdrop-blur-sm",
-          "text-[var(--color-text-secondary)]",
-          "border border-[var(--glass-border)]",
+          "border border-[var(--color-border)]",
         ],
       },
       size: {
-        sm: "h-6 px-2 text-xs rounded-md",
-        md: "h-8 px-3 text-sm rounded-lg",
-        lg: "h-10 px-4 text-sm rounded-xl",
+        sm: "h-6 px-2 text-xs rounded-[var(--radius-sm)]",
+        md: "h-8 px-3 text-sm rounded-[var(--radius-md)]",
+        lg: "h-10 px-4 text-sm rounded-[var(--radius-md)]",
       },
       interactive: {
-        true: "cursor-pointer hover:brightness-110 active:scale-95",
+        true: "cursor-pointer hover:brightness-95 active:scale-95",
         false: "",
       },
     },
@@ -109,7 +102,7 @@ const Chip = React.forwardRef<HTMLSpanElement, ChipProps>(
               e.stopPropagation();
               onRemove();
             }}
-            className="ml-0.5 rounded-full p-0.5 hover:bg-white/10 transition-colors"
+            className="ml-0.5 rounded-full p-0.5 hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
           >
             <X className="size-3" />
           </button>

@@ -21,8 +21,8 @@ export function ChatMessage({
       className={cn(
         "flex gap-3 p-4 rounded-xl",
         isAssistant
-          ? "bg-[var(--color-card-dark-2)]"
-          : "bg-[var(--color-primary-start)]/10 border border-[var(--color-primary-start)]/20",
+          ? "bg-[var(--color-surface-muted)]"
+          : "bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/20",
       )}
     >
       {/* Avatar */}
@@ -30,8 +30,8 @@ export function ChatMessage({
         className={cn(
           "flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center",
           isAssistant
-            ? "bg-gradient-to-br from-[var(--color-primary-start)] to-[var(--color-primary-end)] text-white"
-            : "bg-[var(--color-card-dark-3)] text-[var(--color-text-secondary)]",
+            ? "bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-secondary)] text-white"
+            : "bg-[var(--color-surface-muted)] text-[var(--color-text-secondary)]",
         )}
       >
         {isAssistant ? (
@@ -49,7 +49,7 @@ export function ChatMessage({
         <div className="text-sm text-[var(--color-text-primary)] whitespace-pre-wrap break-words">
           {content}
           {isStreaming && (
-            <span className="inline-block w-2 h-4 ml-1 bg-[var(--color-primary-start)] rounded-sm animate-pulse" />
+            <span className="inline-block w-2 h-4 ml-1 bg-[var(--color-primary)] rounded-sm animate-pulse" />
           )}
         </div>
       </div>

@@ -121,7 +121,7 @@ export default async function BudgetPage() {
           </div>
         </div>
       ) : (
-        <CardGlass variant="dark-1" size="lg" className="text-center py-12">
+        <CardGlass variant="default" size="lg" className="text-center py-12">
           <p className="text-[var(--color-text-muted)]">
             Erro ao carregar dados do orcamento. Tente novamente.
           </p>
@@ -129,7 +129,7 @@ export default async function BudgetPage() {
       )}
 
       {/* Budget info */}
-      <CardGlass variant="dark-1" size="lg">
+      <CardGlass variant="default" size="lg">
         <h3 className="text-lg font-semibold text-[var(--color-text-primary)] mb-4">
           Como funciona o Orcamento Fluido
         </h3>
@@ -157,7 +157,7 @@ export default async function BudgetPage() {
             </p>
           </div>
           <div className="space-y-2">
-            <div className="size-10 rounded-xl bg-[var(--color-primary-start)]/10 flex items-center justify-center">
+            <div className="size-10 rounded-xl bg-[var(--color-primary)]/10 flex items-center justify-center">
               <span className="text-xl">🔄</span>
             </div>
             <h4 className="font-medium text-[var(--color-text-primary)]">

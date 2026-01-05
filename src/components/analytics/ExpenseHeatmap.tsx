@@ -39,7 +39,7 @@ export function ExpenseHeatmap({ data }: ExpenseHeatmapProps) {
   }));
 
   return (
-    <CardGlass variant="dark-1" size="lg">
+    <CardGlass variant="default" size="lg">
       <div className="mb-4">
         <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
           Calendario de Gastos
@@ -75,17 +75,17 @@ export function ExpenseHeatmap({ data }: ExpenseHeatmapProps) {
       {/* Color legend */}
       <div className="flex items-center justify-end gap-1.5 mt-4 text-xs text-[var(--color-text-muted)]">
         <span>Menos</span>
-        <div className="w-3 h-3 rounded-sm bg-[var(--color-card-dark-3)]" />
-        <div className="w-3 h-3 rounded-sm bg-[var(--color-primary-start)]/25" />
-        <div className="w-3 h-3 rounded-sm bg-[var(--color-primary-start)]/50" />
-        <div className="w-3 h-3 rounded-sm bg-[var(--color-primary-start)]/75" />
-        <div className="w-3 h-3 rounded-sm bg-[var(--color-primary-start)]" />
+        <div className="w-3 h-3 rounded-sm bg-[var(--color-surface-muted)]" />
+        <div className="w-3 h-3 rounded-sm bg-[var(--color-primary)]/25" />
+        <div className="w-3 h-3 rounded-sm bg-[var(--color-primary)]/50" />
+        <div className="w-3 h-3 rounded-sm bg-[var(--color-primary)]/75" />
+        <div className="w-3 h-3 rounded-sm bg-[var(--color-primary)]" />
         <span>Mais</span>
       </div>
 
       <style jsx global>{`
         .react-calendar-heatmap .color-empty {
-          fill: var(--color-card-dark-3);
+          fill: var(--color-surface-muted);
         }
         .react-calendar-heatmap .color-scale-1 {
           fill: rgba(66, 167, 164, 0.25);

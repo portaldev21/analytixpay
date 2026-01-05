@@ -53,7 +53,7 @@ export function LoginForm() {
   };
 
   return (
-    <CardGlass variant="dark-1" size="lg" className="w-full max-w-md">
+    <CardGlass variant="default" size="lg" className="w-full max-w-md">
       <div className="mb-6">
         <h2 className="text-xl font-semibold text-[var(--color-text-primary)]">
           Entrar
@@ -106,7 +106,7 @@ export function LoginForm() {
         <div className="flex flex-col space-y-4 mt-6">
           <Button
             type="submit"
-            className="w-full h-12 rounded-xl bg-gradient-to-r from-[var(--color-primary-start)] to-[var(--color-primary-end)] hover:shadow-[var(--shadow-glow-green)] transition-shadow"
+            className="w-full h-12 rounded-xl bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)] hover:shadow-[var(--shadow-md)] transition-shadow"
             disabled={isLoading}
           >
             {isLoading ? (
@@ -123,7 +123,7 @@ export function LoginForm() {
             Nao tem uma conta?{" "}
             <Link
               href="/signup"
-              className="text-[var(--color-primary-start)] hover:underline"
+              className="text-[var(--color-primary)] hover:underline"
             >
               Cadastre-se
             </Link>

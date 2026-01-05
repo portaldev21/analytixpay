@@ -33,8 +33,8 @@ function getGradeStyles(grade: string) {
       };
     case "B":
       return {
-        color: "text-[var(--color-primary-start)]",
-        bg: "bg-[var(--color-primary-start)]/10",
+        color: "text-[var(--color-primary)]",
+        bg: "bg-[var(--color-primary)]/10",
         glow: "shadow-[0_0_20px_rgba(66,167,164,0.3)]",
       };
     case "C":
@@ -53,7 +53,7 @@ function getGradeStyles(grade: string) {
     default:
       return {
         color: "text-[var(--color-text-muted)]",
-        bg: "bg-[var(--color-card-dark-2)]",
+        bg: "bg-[var(--color-surface-muted)]",
         glow: "",
       };
   }
@@ -63,7 +63,7 @@ export function HealthScoreCard({ data }: HealthScoreCardProps) {
   // Empty state
   if (!data) {
     return (
-      <CardGlass variant="dark-1" size="lg">
+      <CardGlass variant="default" size="lg">
         <div className="flex items-center gap-2 mb-4">
           <Heart className="size-5 text-[var(--color-negative)]" />
           <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
@@ -71,7 +71,7 @@ export function HealthScoreCard({ data }: HealthScoreCardProps) {
           </h3>
         </div>
         <div className="flex flex-col items-center justify-center py-8">
-          <div className="p-4 rounded-full bg-[var(--color-card-dark-2)]">
+          <div className="p-4 rounded-full bg-[var(--color-surface-muted)]">
             <Heart className="size-8 text-[var(--color-text-muted)]" />
           </div>
           <p className="text-sm text-[var(--color-text-muted)] mt-4">
@@ -89,7 +89,7 @@ export function HealthScoreCard({ data }: HealthScoreCardProps) {
   const description = getHealthScoreDescription(data.grade);
 
   return (
-    <CardGlass variant="dark-1" size="lg">
+    <CardGlass variant="default" size="lg">
       <div className="flex items-center gap-2 mb-6">
         <Heart className="size-5 text-[var(--color-negative)]" />
         <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
@@ -123,7 +123,7 @@ export function HealthScoreCard({ data }: HealthScoreCardProps) {
           </div>
           <Progress
             value={data.score}
-            className="h-2 bg-[var(--color-card-dark-2)]"
+            className="h-2 bg-[var(--color-surface-muted)]"
           />
           <p className="text-sm text-[var(--color-text-muted)] mt-2">
             {description}
@@ -144,7 +144,7 @@ export function HealthScoreCard({ data }: HealthScoreCardProps) {
             <div className="flex items-center gap-3">
               <Progress
                 value={(value / 25) * 100}
-                className="h-1.5 w-20 bg-[var(--color-card-dark-2)]"
+                className="h-1.5 w-20 bg-[var(--color-surface-muted)]"
               />
               <span className="font-medium text-[var(--color-text-primary)] tabular-nums w-10 text-right">
                 {value}/25
@@ -156,7 +156,7 @@ export function HealthScoreCard({ data }: HealthScoreCardProps) {
 
       {/* Recommendations */}
       {data.recommendations.length > 0 && (
-        <div className="pt-4 border-t border-[var(--glass-border)]">
+        <div className="pt-4 border-t border-[var(--color-border-light)]">
           <h4 className="text-sm font-medium text-[var(--color-text-secondary)] mb-3">
             Recomendacoes
           </h4>

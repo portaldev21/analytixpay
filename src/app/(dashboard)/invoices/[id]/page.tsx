@@ -132,12 +132,12 @@ export default async function InvoiceDetailPage({
 
       {/* Invoice Info Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <CardGlass variant="dark-1" size="lg">
+        <CardGlass variant="default" size="lg">
           <div className="flex items-center justify-between mb-3">
             <span className="text-sm font-medium text-[var(--color-text-muted)]">
               Vencimento
             </span>
-            <div className="p-2 rounded-lg bg-[var(--color-card-dark-2)]">
+            <div className="p-2 rounded-lg bg-[var(--color-surface-muted)]">
               <Calendar className="h-4 w-4 text-[var(--color-text-muted)]" />
             </div>
           </div>
@@ -153,13 +153,13 @@ export default async function InvoiceDetailPage({
           )}
         </CardGlass>
 
-        <CardGlass variant="dark-1" size="lg" hoverGlow="green">
+        <CardGlass variant="default" size="lg" >
           <div className="flex items-center justify-between mb-3">
             <span className="text-sm font-medium text-[var(--color-text-muted)]">
               Total
             </span>
-            <div className="p-2 rounded-lg bg-gradient-to-br from-[var(--color-primary-start)]/20 to-[var(--color-primary-end)]/20">
-              <TrendingUp className="h-4 w-4 text-[var(--color-primary-start)]" />
+            <div className="p-2 rounded-lg bg-gradient-to-br from-[var(--color-primary)]/20 to-[var(--color-secondary)]/20">
+              <TrendingUp className="h-4 w-4 text-[var(--color-primary)]" />
             </div>
           </div>
           <div className="text-2xl font-bold text-[var(--color-text-primary)] tabular-nums">
@@ -170,12 +170,12 @@ export default async function InvoiceDetailPage({
           </p>
         </CardGlass>
 
-        <CardGlass variant="dark-1" size="lg">
+        <CardGlass variant="default" size="lg">
           <div className="flex items-center justify-between mb-3">
             <span className="text-sm font-medium text-[var(--color-text-muted)]">
               Cartão
             </span>
-            <div className="p-2 rounded-lg bg-[var(--color-card-dark-2)]">
+            <div className="p-2 rounded-lg bg-[var(--color-surface-muted)]">
               <CreditCard className="h-4 w-4 text-[var(--color-text-muted)]" />
             </div>
           </div>
@@ -189,22 +189,22 @@ export default async function InvoiceDetailPage({
           </p>
         </CardGlass>
 
-        <CardGlass variant="dark-1" size="lg">
+        <CardGlass variant="default" size="lg">
           <div className="flex items-center justify-between mb-3">
             <span className="text-sm font-medium text-[var(--color-text-muted)]">
               Status
             </span>
-            <div className="p-2 rounded-lg bg-[var(--color-card-dark-2)]">
+            <div className="p-2 rounded-lg bg-[var(--color-surface-muted)]">
               <FileText className="h-4 w-4 text-[var(--color-text-muted)]" />
             </div>
           </div>
           <Badge
             variant={
               invoice.status === "completed"
-                ? "positive"
+                ? "success"
                 : invoice.status === "error"
                   ? "destructive"
-                  : "purple"
+                  : "info"
             }
             className="text-base py-1.5 px-4"
           >
@@ -219,7 +219,7 @@ export default async function InvoiceDetailPage({
 
       {/* Category Breakdown */}
       <div className="grid gap-4 lg:grid-cols-2">
-        <CardGlass variant="dark-1" size="lg">
+        <CardGlass variant="default" size="lg">
           <h3 className="text-lg font-semibold text-[var(--color-text-primary)] mb-4">
             Gastos por Categoria
           </h3>
@@ -237,7 +237,7 @@ export default async function InvoiceDetailPage({
                         {percentage}%
                       </span>
                     </div>
-                    <div className="h-2 bg-[var(--color-card-dark-2)] rounded-full overflow-hidden">
+                    <div className="h-2 bg-[var(--color-surface-muted)] rounded-full overflow-hidden">
                       <div
                         className="h-full rounded-full transition-all duration-500"
                         style={{
@@ -256,7 +256,7 @@ export default async function InvoiceDetailPage({
           </div>
         </CardGlass>
 
-        <CardGlass variant="dark-1" size="lg">
+        <CardGlass variant="default" size="lg">
           <h3 className="text-lg font-semibold text-[var(--color-text-primary)] mb-4">
             Parcelas
           </h3>
@@ -265,8 +265,8 @@ export default async function InvoiceDetailPage({
               href={`/invoices/${id}?accountId=${accountId}&installment=current`}
               className={`block p-4 rounded-xl border transition-all ${
                 installment === "current"
-                  ? "bg-[var(--color-primary-start)]/10 border-[var(--color-primary-start)]/50"
-                  : "border-[var(--glass-border)] hover:border-[var(--color-text-muted)] hover:bg-[var(--color-card-dark-2)]"
+                  ? "bg-[var(--color-primary)]/10 border-[var(--color-primary)]/50"
+                  : "border-[var(--color-border-light)] hover:border-[var(--color-text-muted)] hover:bg-[var(--color-surface-muted)]"
               }`}
             >
               <div className="flex justify-between items-center">
@@ -278,7 +278,7 @@ export default async function InvoiceDetailPage({
                     Primeira parcela de compras parceladas
                   </p>
                 </div>
-                <Badge variant="positive">{installmentStats.current}</Badge>
+                <Badge variant="success">{installmentStats.current}</Badge>
               </div>
             </Link>
 
@@ -286,8 +286,8 @@ export default async function InvoiceDetailPage({
               href={`/invoices/${id}?accountId=${accountId}&installment=past`}
               className={`block p-4 rounded-xl border transition-all ${
                 installment === "past"
-                  ? "bg-[var(--color-primary-start)]/10 border-[var(--color-primary-start)]/50"
-                  : "border-[var(--glass-border)] hover:border-[var(--color-text-muted)] hover:bg-[var(--color-card-dark-2)]"
+                  ? "bg-[var(--color-primary)]/10 border-[var(--color-primary)]/50"
+                  : "border-[var(--color-border-light)] hover:border-[var(--color-text-muted)] hover:bg-[var(--color-surface-muted)]"
               }`}
             >
               <div className="flex justify-between items-center">
@@ -299,7 +299,7 @@ export default async function InvoiceDetailPage({
                     Parcelas de compras feitas em faturas anteriores
                   </p>
                 </div>
-                <Badge variant="purple">{installmentStats.past}</Badge>
+                <Badge variant="info">{installmentStats.past}</Badge>
               </div>
             </Link>
 
@@ -307,8 +307,8 @@ export default async function InvoiceDetailPage({
               href={`/invoices/${id}?accountId=${accountId}&installment=none`}
               className={`block p-4 rounded-xl border transition-all ${
                 installment === "none"
-                  ? "bg-[var(--color-primary-start)]/10 border-[var(--color-primary-start)]/50"
-                  : "border-[var(--glass-border)] hover:border-[var(--color-text-muted)] hover:bg-[var(--color-card-dark-2)]"
+                  ? "bg-[var(--color-primary)]/10 border-[var(--color-primary)]/50"
+                  : "border-[var(--color-border-light)] hover:border-[var(--color-text-muted)] hover:bg-[var(--color-surface-muted)]"
               }`}
             >
               <div className="flex justify-between items-center">
@@ -327,7 +327,7 @@ export default async function InvoiceDetailPage({
             {installment && (
               <Link
                 href={`/invoices/${id}?accountId=${accountId}`}
-                className="block text-center text-sm text-[var(--color-primary-start)] hover:text-[var(--color-positive)] transition-colors"
+                className="block text-center text-sm text-[var(--color-primary)] hover:text-[var(--color-positive)] transition-colors"
               >
                 Limpar filtro
               </Link>

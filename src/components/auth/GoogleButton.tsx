@@ -39,7 +39,7 @@ export function GoogleButton() {
       <Button
         type="button"
         variant="outline"
-        className="w-full h-12 rounded-xl bg-[var(--color-card-dark-2)] border-[var(--glass-border)] text-[var(--color-text-primary)] hover:bg-[var(--color-card-dark-3)] hover:border-[var(--color-text-muted)]/30 transition-all"
+        className="w-full h-12 rounded-xl bg-[var(--color-surface-muted)] border-[var(--color-border-light)] text-[var(--color-text-primary)] hover:bg-[var(--color-surface-muted)] hover:border-[var(--color-text-muted)]/30 transition-all"
         onClick={handleGoogleLogin}
         disabled={isLoading}
       >

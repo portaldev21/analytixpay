@@ -49,7 +49,7 @@ export function MonthlyProjectionChart({
 
   if (data.length === 0) {
     return (
-      <CardGlass variant="dark-1" size="lg">
+      <CardGlass variant="default" size="lg">
         <div className="mb-4">
           <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
             Projecao Mensal de Parcelas
@@ -78,7 +78,7 @@ export function MonthlyProjectionChart({
   );
 
   return (
-    <CardGlass variant="dark-1" size="lg">
+    <CardGlass variant="default" size="lg">
       <div className="mb-4">
         <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
           Projecao Mensal de Parcelas
@@ -128,7 +128,7 @@ export function MonthlyProjectionChart({
                   label: string;
                 };
                 return (
-                  <div className="rounded-xl border border-[var(--glass-border)] bg-[var(--color-card-dark-1)] p-3 shadow-[var(--shadow-card)]">
+                  <div className="rounded-xl border border-[var(--color-border-light)] bg-[var(--color-surface)] p-3 shadow-[var(--shadow-lg)]">
                     <div className="font-medium text-[var(--color-text-primary)] mb-2">
                       {item.label}
                     </div>
@@ -137,7 +137,7 @@ export function MonthlyProjectionChart({
                         <span className="text-sm text-[var(--color-text-muted)]">
                           Total
                         </span>
-                        <span className="text-[var(--color-primary-start)] font-semibold tabular-nums">
+                        <span className="text-[var(--color-primary)] font-semibold tabular-nums">
                           {formatCurrency(item.total_installments)}
                         </span>
                       </div>
@@ -150,7 +150,7 @@ export function MonthlyProjectionChart({
                         </span>
                       </div>
                       {item.details.length > 0 && (
-                        <div className="pt-2 mt-2 border-t border-[var(--glass-border)]">
+                        <div className="pt-2 mt-2 border-t border-[var(--color-border-light)]">
                           <p className="text-xs text-[var(--color-text-muted)] mb-1">
                             Detalhes:
                           </p>
@@ -185,7 +185,7 @@ export function MonthlyProjectionChart({
                 monthlyBudget && item.total_installments > monthlyBudget;
               const color = isOverBudget
                 ? "var(--color-negative)"
-                : "var(--color-primary-start)";
+                : "var(--color-primary)";
               return <Cell key={`cell-${index}`} fill={color} />;
             })}
           </Bar>
@@ -193,10 +193,10 @@ export function MonthlyProjectionChart({
       </ResponsiveContainer>
 
       {monthlyBudget && (
-        <div className="mt-4 pt-4 border-t border-[var(--glass-border)]">
+        <div className="mt-4 pt-4 border-t border-[var(--color-border-light)]">
           <div className="flex items-center gap-4 text-sm">
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-sm bg-[var(--color-primary-start)]" />
+              <div className="w-3 h-3 rounded-sm bg-[var(--color-primary)]" />
               <span className="text-[var(--color-text-muted)]">
                 Dentro do orcamento
               </span>

@@ -21,28 +21,24 @@ export function TodayBudgetCard({ data, className }: TodayBudgetCardProps) {
       bgColor: "bg-[var(--color-positive)]/10",
       icon: TrendingUp,
       label: "Acima da base",
-      hoverGlow: "green" as const,
     },
     at_base: {
-      color: "text-[var(--color-primary-start)]",
-      bgColor: "bg-[var(--color-primary-start)]/10",
+      color: "text-[var(--color-primary)]",
+      bgColor: "bg-[var(--color-primary)]/10",
       icon: Minus,
       label: "Na base",
-      hoverGlow: "green" as const,
     },
     below_base: {
-      color: "text-yellow-400",
-      bgColor: "bg-yellow-400/10",
+      color: "text-[var(--color-warning)]",
+      bgColor: "bg-[var(--color-warning)]/10",
       icon: TrendingDown,
       label: "Abaixo da base",
-      hoverGlow: "none" as const,
     },
     critical: {
       color: "text-[var(--color-negative)]",
       bgColor: "bg-[var(--color-negative)]/10",
       icon: TrendingDown,
       label: "Critico",
-      hoverGlow: "none" as const,
     },
   };
 
@@ -51,10 +47,9 @@ export function TodayBudgetCard({ data, className }: TodayBudgetCardProps) {
 
   return (
     <CardGlass
-      variant="dark-1"
+      variant="default"
       size="xl"
       interactive
-      hoverGlow={config.hoverGlow}
       className={className}
     >
       <div className="flex items-start justify-between mb-6">
@@ -89,10 +84,10 @@ export function TodayBudgetCard({ data, className }: TodayBudgetCardProps) {
         <div
           className={cn(
             "p-3 rounded-xl",
-            "bg-gradient-to-br from-[var(--color-primary-start)]/20 to-[var(--color-primary-end)]/20",
+            "bg-[var(--color-primary)]/10",
           )}
         >
-          <Wallet className="size-6 text-[var(--color-primary-start)]" />
+          <Wallet className="size-6 text-[var(--color-primary)]" />
         </div>
       </div>
 
@@ -104,7 +99,7 @@ export function TodayBudgetCard({ data, className }: TodayBudgetCardProps) {
             {formatCurrency(data.total_spent_today)} / {formatCurrency(data.available_budget)}
           </span>
         </div>
-        <div className="h-3 bg-[var(--color-card-dark-3)] rounded-full overflow-hidden">
+        <div className="h-3 bg-[var(--color-surface-muted)] rounded-full overflow-hidden">
           <motion.div
             className={cn(
               "h-full rounded-full",
@@ -112,7 +107,7 @@ export function TodayBudgetCard({ data, className }: TodayBudgetCardProps) {
                 ? "bg-gradient-to-r from-[var(--color-negative)] to-red-400"
                 : percentUsed > 80
                   ? "bg-gradient-to-r from-yellow-500 to-yellow-400"
-                  : "bg-gradient-to-r from-[var(--color-primary-start)] to-[var(--color-positive)]",
+                  : "bg-[var(--color-primary)]",
             )}
             initial={{ width: 0 }}
             animate={{ width: `${Math.min(percentUsed, 100)}%` }}
@@ -122,7 +117,7 @@ export function TodayBudgetCard({ data, className }: TodayBudgetCardProps) {
       </div>
 
       {/* Remaining */}
-      <div className="mt-4 pt-4 border-t border-[var(--glass-border)]">
+      <div className="mt-4 pt-4 border-t border-[var(--color-border-light)]">
         <div className="flex items-center justify-between">
           <span className="text-sm text-[var(--color-text-muted)]">
             Restante para hoje

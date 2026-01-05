@@ -4,9 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-AnalytiXPay is a Brazilian credit card invoice management system built with Next.js 15 and Supabase. It features automatic PDF parsing (AI + regex hybrid), transaction extraction, categorization, and a financial AI chat agent with multi-user account support.
+ControleFatura is a Brazilian credit card invoice management system built with Next.js 15 and Supabase. It features automatic PDF parsing (AI + regex hybrid), transaction extraction, categorization, and a financial AI chat agent (ControleIA) with multi-user account support.
 
 **Stack:** Next.js 15 (App Router) + TypeScript 5 + Supabase + Tailwind CSS 4 + Biome + React Hook Form/Zod + Anthropic Claude
+
+**Design System:** ControleFatura v3.0 - Verde Esmeralda (#2C8A4B) + Azul Médio (#1D5A8F) + Merriweather/Inter/Roboto Mono fonts
 
 ## Common Commands
 

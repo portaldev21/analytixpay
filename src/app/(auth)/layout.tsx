@@ -4,16 +4,16 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-main-gradient p-4">
+    <div className="min-h-screen flex items-center justify-center bg-[var(--color-background)] p-4">
       {/* Decorative elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 -left-20 w-96 h-96 bg-[var(--color-primary-start)]/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-[var(--color-purple-light)]/10 rounded-full blur-3xl" />
+        <div className="absolute top-1/4 -left-20 w-96 h-96 bg-[var(--color-primary)]/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-[var(--color-secondary)]/5 rounded-full blur-3xl" />
       </div>
 
       <div className="w-full max-w-md relative z-10">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-[var(--color-primary-start)] to-[var(--color-primary-end)] shadow-[var(--shadow-glow-green)] mb-4">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-[var(--radius-lg)] bg-[var(--color-primary)] shadow-[var(--shadow-lg)] mb-4">
             <svg
               className="w-8 h-8 text-white"
               fill="none"
@@ -28,8 +28,8 @@ export default function AuthLayout({
               />
             </svg>
           </div>
-          <h1 className="text-3xl font-bold tracking-tight text-gradient-green">
-            AnalytiXPay
+          <h1 className="text-3xl font-bold tracking-tight text-[var(--color-primary)] font-title">
+            ControleFatura
           </h1>
           <p className="text-[var(--color-text-muted)] mt-2">
             Gestao inteligente de faturas de cartao
