@@ -249,6 +249,71 @@ export type TProfileInsert = {
 export type TProfileUpdate = Partial<TProfileInsert>;
 
 // =====================================================
+// PLANNING TYPES
+// =====================================================
+
+export type TFinancialPlan = {
+  id: string;
+  account_id: string;
+  name: string;
+  start_month: string;
+  months: number;
+  initial_balance: number;
+  created_at: string;
+  updated_at: string;
+};
+
+export type TPlanIncomeSource = {
+  id: string;
+  plan_id: string;
+  name: string;
+  amount: number;
+  frequency: "monthly" | "once";
+  month_index: number | null;
+  created_at: string;
+};
+
+export type TPlanScenario = {
+  id: string;
+  plan_id: string;
+  type: "current" | "optimistic" | "pessimistic";
+  name: string;
+  created_at: string;
+};
+
+export type TPlanScenarioItem = {
+  id: string;
+  scenario_id: string;
+  category: string;
+  expense_type: "fixed" | "variable";
+  name: string;
+  amount: number;
+  end_month: number | null;
+  auto_detected: boolean;
+  created_at: string;
+};
+
+export type TPlanScenarioWithItems = TPlanScenario & {
+  items: TPlanScenarioItem[];
+};
+
+export type TFinancialPlanWithDetails = TFinancialPlan & {
+  incomes: TPlanIncomeSource[];
+  scenarios: TPlanScenarioWithItems[];
+};
+
+export type TPlanSummary = {
+  id: string;
+  name: string;
+  start_month: string;
+  months: number;
+  initial_balance: number;
+  monthly_result: number;
+  final_balance: number;
+  created_at: string;
+};
+
+// =====================================================
 // EXTENDED TYPES (WITH JOINS)
 // =====================================================
 
@@ -544,10 +609,22 @@ export type TFinancialContext = {
 // BUDGET TYPES (Rolling Budget / Orcamento Fluido)
 // =====================================================
 
-export type TCarryOverMode = "reset" | "carry_all" | "carry_deficit" | "carry_credit";
+export type TCarryOverMode =
+  | "reset"
+  | "carry_all"
+  | "carry_deficit"
+  | "carry_credit";
 export type TCycleStatus = "active" | "closed";
-export type TReconciliationStatus = "pending" | "matched" | "unmatched" | "manual";
-export type TBudgetStatus = "above_base" | "at_base" | "below_base" | "critical";
+export type TReconciliationStatus =
+  | "pending"
+  | "matched"
+  | "unmatched"
+  | "manual";
+export type TBudgetStatus =
+  | "above_base"
+  | "at_base"
+  | "below_base"
+  | "critical";
 
 // Budget Configuration
 export type TBudgetConfig = {

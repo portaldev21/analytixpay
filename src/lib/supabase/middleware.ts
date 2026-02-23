@@ -5,7 +5,6 @@ import { type NextRequest, NextResponse } from "next/server";
  * Supabase Client for Middleware
  */
 export async function updateSession(request: NextRequest) {
-
   let supabaseResponse = NextResponse.next({
     request,
   });
@@ -50,7 +49,8 @@ export async function updateSession(request: NextRequest) {
     request.nextUrl.pathname.startsWith("/transactions") ||
     request.nextUrl.pathname.startsWith("/settings") ||
     request.nextUrl.pathname.startsWith("/budget") ||
-    request.nextUrl.pathname.startsWith("/analytics");
+    request.nextUrl.pathname.startsWith("/analytics") ||
+    request.nextUrl.pathname.startsWith("/planning");
 
   // Redirect to login if not authenticated and trying to access dashboard
   if (!user && isDashboardPage) {
