@@ -76,3 +76,77 @@ Complete rebranding and design system migration from "AnalytiXPay" (dark glassmo
 
 ## Branch
 `fix/oauth-callback-session`
+
+---
+
+## Session Update: 2026-02-23 - Skill Files Adaptation
+
+### Summary
+Adapted all four `.claude/skills/` SKILL.md files from the original MGM-Web project patterns to ControleFatura project conventions.
+
+### Files Modified
+
+#### `.claude/skills/stripe/SKILL.md`
+- Replaced `getOrgContextFromCookies()` with `requireAuth()` from `@/lib/supabase/server`
+- Replaced `createAdminClient()` with `createClient()` from `@/lib/supabase/server`
+- Changed `org.userId` to `user.id` (from requireAuth)
+- Changed `NEXT_PUBLIC_SITE_URL` to `NEXT_PUBLIC_APP_URL`
+- Changed port 3003 to 3000 everywhere
+- Changed `src/lib/types.ts` reference to `src/db/types.ts`
+- Replaced `users` table queries with `profiles` table queries (ControleFatura pattern)
+- Removed entire MGM database schema section (users/subscriptions tables)
+- Added ControleFatura-specific schema with RLS policies and `accounts` table integration
+- Updated idempotency key example to use `user.id`
+- Updated common issues table (port 3003 -> 3000)
+
+#### `.claude/skills/abacatepay/SKILL.md`
+- Replaced `bun add` with `npm install`
+- Added ControleFatura integration note at top
+- Changed `NEXT_PUBLIC_APP_URL` to `http://localhost:3000`
+- Added full Server Action example using `requireAuth()`, `TApiResponse`, `logger`
+- Added webhook API route example using ControleFatura auth patterns
+- Updated product names to "ControleFatura Pro"
+
+#### `.claude/skills/posthog/SKILL.md`
+- Changed title from "PostHog no MGM" to "PostHog no ControleFatura"
+- Updated architecture table paths:
+  - `src/providers/posthog-provider.tsx` -> `src/components/shared/posthog-provider.tsx`
+  - `src/lib/posthog-server.ts` -> `src/lib/analytics/posthog.ts`
+- Removed `useTrackSection` hook references entirely
+- Removed `src/lib/posthog-api.ts` reference (HogQL section made generic)
+- Replaced all MGM event names with ControleFatura equivalents:
+  - `group:add_start` -> `invoice:upload_start`
+  - `billing:checkout_complete` -> `invoice:parse_complete`
+  - `group:add_success` -> `transaction:categorize_success`
+- Added complete ControleFatura event taxonomy: auth:, invoice:, transaction:, budget:, analytics:, chat:
+- Updated user identification example to use ControleFatura profile fields
+- Added PostHog provider setup example for ControleFatura
+
+#### `.claude/skills/cloudflare/SKILL.md`
+- Removed ALL Clerk references and Clerk DNS sections (Step 3)
+- Removed Clerk from description and workflow
+- Replaced with Supabase Auth context note
+- Added Step 4 for optional Supabase custom domain setup
+- Replaced `bun add -g` with `npm install -g`
+- Updated interactive prompts (removed Clerk DNS paste, added Supabase custom domain question)
+- Updated troubleshooting table (Clerk -> Supabase)
+- Updated R2 examples to use ControleFatura bucket names and domains
+- Kept Vercel, email routing, and R2 sections intact (valid for ControleFatura)
+
+#### `.claude/skills/idor-testing/SKILL.md`
+- Replaced all "MGM-Web" references with "ControleFatura"
+- Changed `group_owner` isolation to `account_id` isolation via `requireAccountAccess()`
+- Replaced API route endpoints with ControleFatura Server Actions (`src/actions/*.actions.ts`)
+- Noted single API route: `POST /api/chat` for AI streaming
+- Replaced `getOrgContextFromCookies()` with `requireAccountAccess(accountId)` pattern
+- Updated RBAC from 3 levels (Owner/Admin/Member) to 2 levels (owner/member)
+- Replaced `org.canManageUsers`/`org.canCreateGroups` with `requireAccountOwnership()`
+- Removed user ID enumeration section (ControleFatura uses UUIDs, not auto-incrementing IDs)
+- Added chat conversation access as a medium-risk area
+- Added Supabase Storage path traversal to testing checklist
+- Updated all code examples to use `TApiResponse<T>`, `requireAuth()`, `requireAccountAccess()`, `requireAccountOwnership()`
+- Updated tables from groups/alerts to invoices/transactions/budgets/accounts
+- Renamed "Remediation (MGM-Web Patterns)" to "Remediation (ControleFatura Patterns)"
+- Emphasized Server Actions as primary attack surface
+- Added RLS defense-in-depth remediation section
+- Added Supabase Storage protection guidance
