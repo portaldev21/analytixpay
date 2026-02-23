@@ -24,7 +24,9 @@
       "Bash(done)",
       "Bash(kill:*)",
       "Bash(lsof:*)",
-      "Bash(tail:*)"
+      "Bash(tail:*)",
+      "Skill(superpowers:brainstorming)",
+      "Bash(xxd:*)"
     ],
     "deny": [],
     "ask": []

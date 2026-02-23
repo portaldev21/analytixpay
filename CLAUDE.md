@@ -19,13 +19,13 @@ npm run build        # Build for production with Turbopack
 npm run start        # Run production build
 
 # Code Quality
-npm run lint         # Run Biome linter
-npm run format       # Format code with Biome
+npm run lint         # Run Biome check (linting + formatting + import organization)
+npm run format       # Auto-format code with Biome
 
 # Testing
 npm run test                      # Run all unit tests with Vitest
 npm run test:coverage             # Run tests with coverage report
-npx vitest src/lib/env.test.ts    # Run a single test file
+npx vitest src/lib/analytics/__tests__/stats.test.ts  # Run a single test file
 npx vitest --watch                # Run tests in watch mode
 
 # Setup
@@ -47,6 +47,17 @@ The project uses Next.js 15 App Router with route groups:
 - `(auth)/` - Public authentication routes (login, signup)
 - `(dashboard)/` - Protected routes requiring authentication
 - Middleware (`src/middleware.ts`) handles session management and route protection
+
+**Pages:**
+- `/dashboard` - Main dashboard with stats
+- `/invoices` - Invoice list and upload
+- `/invoices/[id]` - Invoice detail
+- `/transactions` - Transaction list
+- `/analytics` - Financial analysis with AI chat
+- `/budget` - Rolling budget tracker
+- `/budget/forecast` - Future installment projections
+- `/budget/reconcile` - Expense-transaction matching
+- `/settings` - Account settings
 
 ### Data Flow Pattern
 
@@ -123,10 +134,11 @@ The `/budget` page implements a dynamic daily budget system with weekly cycles.
 
 ### Supabase Client Pattern
 
-**Critical:** The codebase uses **two separate Supabase clients**:
+**Critical:** The codebase uses **three separate Supabase clients**:
 
 - `src/lib/supabase/client.ts` - Browser client for Client Components (`'use client'`)
 - `src/lib/supabase/server.ts` - Server client for Server Components and Server Actions
+- `src/lib/supabase/middleware.ts` - Middleware client (uses `process.env` directly, not `env.ts`, because Edge middleware cannot run Zod validation)
 
 Server Actions and Server Components MUST use `createClient()` from `server.ts`.
 
@@ -226,7 +238,7 @@ All tables have RLS enabled. Server-side access checks complement database polic
 
 - Auto-generated via `npm run db:types`
 - Requires Supabase CLI login (`npx supabase login`)
-- Use for strict DB schema compliance; manual types for app-level abstractions
+- **Note:** The codebase currently uses manual types (`src/db/types.ts`) for the `Database` generic in Supabase clients. Generated types are available for strict DB schema reference.
 
 ### Component Architecture
 
@@ -237,18 +249,18 @@ All tables have RLS enabled. Server-side access checks complement database polic
 
 ### Styling
 
-- Tailwind CSS 4, dark mode by default (blue #3b82f6 + dark gray)
+- Tailwind CSS 4 with dark mode support
 - Use `cn()` helper from `src/lib/utils.ts` for class merging
 - Animations via Framer Motion
 
 ## Development Guidelines
 
-- **Linting:** Biome (not ESLint/Prettier), 2-space indentation
+- **Linting:** Biome (not ESLint/Prettier), 2-space indentation, auto import organization enabled
 - **TypeScript:** Strict mode, no `any` types
 - **Imports:** Use alias `@/*` → `src/*`
 - **Commit messages:** English, conventional commits format
 - **Git:** Never execute git commands without explicit permission
-- **Tests:** Co-located in `__tests__/` folders (e.g., `src/lib/analytics/__tests__/stats.test.ts`)
+- **Tests:** Vitest with jsdom environment, co-located in `__tests__/` folders (e.g., `src/lib/analytics/__tests__/stats.test.ts`). Setup file: `vitest.setup.ts`
 
 ### Validation Workflow
 
