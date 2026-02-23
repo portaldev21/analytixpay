@@ -28,6 +28,9 @@ import { cn, formatCurrency } from "@/lib/utils";
 import { ExpenseGroup } from "./ExpenseGroup";
 import { IncomeSection } from "./IncomeSection";
 import { MonthlyResultCard } from "./MonthlyResultCard";
+import { ProjectionChart } from "./ProjectionChart";
+import { ProjectionTable } from "./ProjectionTable";
+import { RunwayCard } from "./RunwayCard";
 import { ScenarioTabs } from "./ScenarioTabs";
 
 interface PlanningEditorProps {
@@ -82,8 +85,8 @@ export function PlanningEditor({
     [activeItems, incomes],
   );
 
-  // Pre-compute projection for Task 10 consumption
-  const _projection = useMemo(
+  // Projection data for table, chart, and runway
+  const projection = useMemo(
     () =>
       calculateProjection(
         plan.initial_balance,
@@ -93,6 +96,18 @@ export function PlanningEditor({
       ),
     [plan.initial_balance, plan.months, incomes, scenarios],
   );
+
+  // Runway: use last month's cash and the current scenario's average monthly expenses
+  const runwayCash = useMemo(() => {
+    if (projection.length === 0) return plan.initial_balance;
+    return projection[projection.length - 1].current.cash;
+  }, [projection, plan.initial_balance]);
+
+  const runwayExpenses = useMemo(() => {
+    if (projection.length === 0) return 0;
+    const total = projection.reduce((sum, p) => sum + p.current.expenses, 0);
+    return total / projection.length;
+  }, [projection]);
 
   // ---- Header handlers ----
   const handleNameBlur = useCallback(async () => {
@@ -416,17 +431,12 @@ export function PlanningEditor({
       {/* Monthly Result Card */}
       <MonthlyResultCard result={monthlyResult} />
 
-      {/* Projection placeholder for Task 10 */}
-      <div
-        className={cn(
-          "rounded-[var(--radius-lg)] border border-dashed border-[var(--color-border-light)] p-8",
-          "flex flex-col items-center justify-center text-center",
-        )}
-      >
-        <p className="text-[var(--color-text-muted)] text-sm">
-          Projecao de cenarios sera exibida aqui (em breve)
-        </p>
-      </div>
+      {/* Projection Section */}
+      <RunwayCard currentCash={runwayCash} monthlyExpenses={runwayExpenses} />
+
+      <ProjectionChart projection={projection} startMonth={plan.start_month} />
+
+      <ProjectionTable projection={projection} startMonth={plan.start_month} />
     </div>
   );
 }
