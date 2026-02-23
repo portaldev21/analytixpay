@@ -28,10 +28,7 @@ export const metadata: Metadata = {
   title: "ControleFatura - Controle suas faturas com inteligência",
   description:
     "Gestão inteligente de faturas de cartão de crédito. Acompanhe gastos, categorize transações e tenha controle total das suas finanças.",
-  icons: {
-    icon: "/favicon.ico",
-    apple: "/apple-touch-icon.png",
-  },
+  manifest: "/manifest.webmanifest",
 };
 
 export const viewport: Viewport = {
