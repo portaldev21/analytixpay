@@ -83,7 +83,9 @@ export async function getUserAccounts() {
  */
 export async function hasAccessToAccount(accountId: string): Promise<boolean> {
   const supabase = await createClient();
-  const user = await getCurrentUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (!user) {
     return false;
@@ -140,10 +142,24 @@ export async function requireAuth() {
  * @throws Error if not authenticated or no access
  */
 export async function requireAccountAccess(accountId: string) {
-  const { user, supabase } = await requireAuth();
+  const supabase = await createClient();
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
 
-  const hasAccess = await hasAccessToAccount(accountId);
-  if (!hasAccess) {
+  if (authError || !user) {
+    throw new Error("Usuário não autenticado");
+  }
+
+  const { data, error } = await supabase
+    .from("account_members")
+    .select("id")
+    .eq("account_id", accountId)
+    .eq("user_id", user.id)
+    .single();
+
+  if (error || !data) {
     throw new Error("Acesso negado a esta conta");
   }
 

@@ -416,23 +416,29 @@ Retorne APENAS um JSON no formato:
       };
     }
 
-    // Update transactions with new categories
-    let updatedCount = 0;
+    // Group transactions by validated category for batch updates
+    const categoryGroups = new Map<string, string[]>();
     for (const [id, category] of Object.entries(result.categories)) {
-      // Validate category
       const validCategory = VALID_CATEGORIES.includes(category)
         ? category
         : "Outros";
+      const ids = categoryGroups.get(validCategory) || [];
+      ids.push(id);
+      categoryGroups.set(validCategory, ids);
+    }
 
-      const { error: updateError } = await (
+    // Batch update by category
+    let updatedCount = 0;
+    for (const [category, ids] of categoryGroups.entries()) {
+      const { error: updateError, count } = await (
         supabase.from("transactions") as any
       )
-        .update({ category: validCategory })
-        .eq("id", id)
+        .update({ category })
+        .in("id", ids)
         .eq("account_id", accountId);
 
       if (!updateError) {
-        updatedCount++;
+        updatedCount += count ?? ids.length;
       }
     }
 

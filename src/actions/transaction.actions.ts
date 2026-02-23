@@ -262,6 +262,7 @@ export async function getTransactionStatsWithComparison(
 
 /**
  * Get dashboard stats (complete)
+ * Scoped to last 2 months for performance
  */
 export async function getDashboardStats(
   accountId: string,
@@ -273,10 +274,16 @@ export async function getDashboardStats(
       return { data: null, error: "Acesso negado", success: false };
     }
 
+    // Limit to last 2 months for performance
+    const twoMonthsAgo = new Date();
+    twoMonthsAgo.setMonth(twoMonthsAgo.getMonth() - 2);
+    const startDate = twoMonthsAgo.toISOString().split("T")[0];
+
     const { data: transactions, error } = await supabase
       .from("transactions")
       .select("*")
-      .eq("account_id", accountId);
+      .eq("account_id", accountId)
+      .gte("date", startDate);
 
     if (error) {
       return { data: null, error: error.message, success: false };

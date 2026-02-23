@@ -170,6 +170,16 @@ export async function uploadInvoice(
       .insert(transactions as any);
 
     if (transError) {
+      // Rollback: delete orphaned invoice and storage file
+      logger.error("Transaction insert failed, rolling back invoice", {
+        invoiceId: createdInvoice.id,
+        transError,
+      });
+      await supabase
+        .from("invoices")
+        .delete()
+        .eq("id", createdInvoice.id);
+      await supabase.storage.from("invoices").remove([filePath]);
       return { data: null, error: transError.message, success: false };
     }
 
@@ -301,7 +311,7 @@ export async function deleteInvoice(
       }
     } catch (storageError) {
       // Log but don't fail - file might already be deleted
-      console.warn("Failed to delete file from storage:", storageError);
+      logger.warn("Failed to delete file from storage", { storageError });
     }
 
     revalidatePath("/invoices");
@@ -348,7 +358,7 @@ export async function getInvoicesSummary(accountId: string): Promise<
 
     const { data: invoices, error: invoicesError } = await supabase
       .from("invoices")
-      .select("*")
+      .select("id, period, card_last_digits, total_amount, created_at, transactions(count)")
       .eq("account_id", accountId)
       .order("created_at", { ascending: false });
 
@@ -356,25 +366,13 @@ export async function getInvoicesSummary(accountId: string): Promise<
       return { data: null, error: invoicesError.message, success: false };
     }
 
-    const invoiceList = (invoices || []) as TInvoice[];
-
-    // Get transaction count for each invoice
-    const summaries = await Promise.all(
-      invoiceList.map(async (invoice) => {
-        const { count, error } = await supabase
-          .from("transactions")
-          .select("*", { count: "exact", head: true })
-          .eq("invoice_id", invoice.id);
-
-        return {
-          invoiceId: invoice.id,
-          period: invoice.period || "Sem período",
-          cardLastDigits: invoice.card_last_digits,
-          totalAmount: Number(invoice.total_amount) || 0,
-          transactionCount: count || 0,
-        };
-      }),
-    );
+    const summaries = (invoices || []).map((invoice: any) => ({
+      invoiceId: invoice.id,
+      period: invoice.period || "Sem período",
+      cardLastDigits: invoice.card_last_digits,
+      totalAmount: Number(invoice.total_amount) || 0,
+      transactionCount: invoice.transactions?.[0]?.count || 0,
+    }));
 
     return { data: summaries, error: null, success: true };
   } catch (error) {
