@@ -74,20 +74,25 @@ async function fetchTransactions(
 }
 
 /**
- * Fetch all transactions for recurring detection
+ * Fetch recent transactions for recurring detection (last 6 months)
  */
-async function fetchAllTransactions(
+async function fetchRecentTransactions(
   supabase: SupabaseClient,
   accountId: string,
 ): Promise<TTransaction[]> {
+  const sixMonthsAgo = new Date();
+  sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+  const startDate = sixMonthsAgo.toISOString().split("T")[0];
+
   const { data, error } = await supabase
     .from("transactions")
     .select("*")
     .eq("account_id", accountId)
+    .gte("date", startDate)
     .order("date", { ascending: true });
 
   if (error) {
-    logger.error("Failed to fetch all transactions", error, { accountId });
+    logger.error("Failed to fetch recent transactions", error, { accountId });
     return [];
   }
 
@@ -112,11 +117,11 @@ export async function buildFinancialContext(
   });
 
   // Fetch data in parallel
-  const [currentTransactions, previousTransactions, allTransactions] =
+  const [currentTransactions, previousTransactions, recentTransactions] =
     await Promise.all([
       fetchTransactions(supabase, accountId, currentPeriod),
       fetchTransactions(supabase, accountId, previousPeriod),
-      fetchAllTransactions(supabase, accountId),
+      fetchRecentTransactions(supabase, accountId),
     ]);
 
   // Calculate stats for current period
@@ -130,9 +135,9 @@ export async function buildFinancialContext(
     previousStats,
   );
 
-  // Detect recurring transactions
+  // Detect recurring transactions (from last 6 months)
   const recurring: RecurringTransaction[] =
-    detectRecurringTransactions(allTransactions);
+    detectRecurringTransactions(recentTransactions);
 
   // Calculate days in period
   const startDate = new Date(currentPeriod.startDate);

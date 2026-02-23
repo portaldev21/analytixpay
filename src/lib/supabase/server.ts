@@ -2,15 +2,13 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import type { Database } from "@/db/types";
 import { env } from "@/lib/env";
+import { logger } from "@/lib/logger";
 
 /**
  * Supabase Client for Server Components and Server Actions
  * Use this in Server Components and Server Actions
  */
 export async function createClient() {
-  console.log("[Supabase Server] Creating client...");
-  console.log("[Supabase Server] URL:", env.NEXT_PUBLIC_SUPABASE_URL?.substring(0, 30) + "...");
-
   const cookieStore = await cookies();
 
   const client = createServerClient<Database>(
@@ -36,7 +34,6 @@ export async function createClient() {
     },
   );
 
-  console.log("[Supabase Server] Client created successfully");
   return client;
 }
 
@@ -74,7 +71,7 @@ export async function getUserAccounts() {
     .eq("user_id", user.id);
 
   if (error) {
-    console.error("Error fetching user accounts:", error);
+    logger.error("Error fetching user accounts", error);
     return [];
   }
 
@@ -86,7 +83,9 @@ export async function getUserAccounts() {
  */
 export async function hasAccessToAccount(accountId: string): Promise<boolean> {
   const supabase = await createClient();
-  const user = await getCurrentUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (!user) {
     return false;
@@ -143,10 +142,24 @@ export async function requireAuth() {
  * @throws Error if not authenticated or no access
  */
 export async function requireAccountAccess(accountId: string) {
-  const { user, supabase } = await requireAuth();
+  const supabase = await createClient();
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
 
-  const hasAccess = await hasAccessToAccount(accountId);
-  if (!hasAccess) {
+  if (authError || !user) {
+    throw new Error("Usuário não autenticado");
+  }
+
+  const { data, error } = await supabase
+    .from("account_members")
+    .select("id")
+    .eq("account_id", accountId)
+    .eq("user_id", user.id)
+    .single();
+
+  if (error || !data) {
     throw new Error("Acesso negado a esta conta");
   }
 

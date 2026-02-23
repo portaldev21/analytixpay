@@ -3,9 +3,12 @@ import Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@/lib/supabase/server";
 import { env, hasAnthropic } from "@/lib/env";
 import { logger } from "@/lib/logger";
+import { apiLimiter } from "@/lib/rate-limit";
 import { buildFinancialContext } from "@/lib/ai/financial-agent";
 import { buildSystemPrompt } from "@/lib/ai/prompts";
 import type { TChatMessage } from "@/db/types";
+
+const MAX_MESSAGE_LENGTH = 2000;
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -46,6 +49,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (message.length > MAX_MESSAGE_LENGTH) {
+      return new Response(
+        JSON.stringify({
+          error: `Mensagem muito longa (maximo ${MAX_MESSAGE_LENGTH} caracteres)`,
+        }),
+        { status: 400, headers: { "Content-Type": "application/json" } },
+      );
+    }
+
     // Create Supabase client and verify auth
     const supabase = await createClient();
     const {
@@ -72,6 +84,19 @@ export async function POST(request: NextRequest) {
       return new Response(
         JSON.stringify({ error: "Sem acesso a esta conta" }),
         { status: 403, headers: { "Content-Type": "application/json" } },
+      );
+    }
+
+    // Rate limit: 20 messages per minute per user
+    try {
+      await apiLimiter.check(20, user.id);
+    } catch {
+      return new Response(
+        JSON.stringify({
+          error:
+            "Limite de mensagens excedido. Aguarde um momento antes de enviar outra mensagem.",
+        }),
+        { status: 429, headers: { "Content-Type": "application/json" } },
       );
     }
 

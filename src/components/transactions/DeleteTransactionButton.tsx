@@ -34,7 +34,7 @@ export function DeleteTransactionButton({
     onDeleteStart?.(); // Chama callback para iniciar animação
 
     try {
-      const result = await deleteTransaction(transaction.id);
+      const result = await deleteTransaction(transaction.id, transaction.account_id);
 
       if (result.success) {
         toast.success("Transação deletada com sucesso!");

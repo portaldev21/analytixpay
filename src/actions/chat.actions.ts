@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireAccountAccess } from "@/lib/supabase/server";
+import { requireAuth, requireAccountAccess } from "@/lib/supabase/server";
 import { logger } from "@/lib/logger";
 import type {
   TApiResponse,
@@ -70,20 +70,20 @@ export async function getConversationWithMessages(
   const startTime = Date.now();
 
   try {
-    // First get the conversation
-    const { supabase, user } = await requireAccountAccess("");
+    const { supabase, user } = await requireAuth();
 
     logger.info("Fetching conversation with messages", {
       conversationId,
       userId: user.id,
     });
 
-    // Get conversation
+    // Get conversation (verify ownership via user_id)
     const { data: conversation, error: convError } = await (
       supabase.from("chat_conversations") as any
     )
       .select("*")
       .eq("id", conversationId)
+      .eq("user_id", user.id)
       .single();
 
     if (convError) {
@@ -203,7 +203,7 @@ export async function addMessage(
   const startTime = Date.now();
 
   try {
-    const { supabase, user } = await requireAccountAccess("");
+    const { supabase, user } = await requireAuth();
 
     logger.info("Adding message", {
       conversationId,
@@ -265,7 +265,7 @@ export async function updateConversationTitle(
   const startTime = Date.now();
 
   try {
-    const { supabase, user } = await requireAccountAccess("");
+    const { supabase, user } = await requireAuth();
 
     logger.info("Updating conversation title", {
       conversationId,
@@ -326,7 +326,7 @@ export async function deleteConversation(
   const startTime = Date.now();
 
   try {
-    const { supabase, user } = await requireAccountAccess("");
+    const { supabase, user } = await requireAuth();
 
     logger.info("Deleting conversation", { conversationId, userId: user.id });
 
@@ -376,7 +376,7 @@ export async function getMessages(
   const startTime = Date.now();
 
   try {
-    const { supabase } = await requireAccountAccess("");
+    const { supabase } = await requireAuth();
 
     logger.info("Fetching messages", { conversationId });
 
