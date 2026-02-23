@@ -11,6 +11,7 @@ import {
   LogOut,
   BarChart3,
   Wallet,
+  TrendingUp,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { logout } from "@/actions/auth.actions";
@@ -19,6 +20,7 @@ import { Button } from "@/components/ui/button";
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Orcamento", href: "/budget", icon: Wallet },
+  { name: "Planejamento", href: "/planning", icon: TrendingUp },
   { name: "Analytics", href: "/analytics", icon: BarChart3 },
   { name: "Faturas", href: "/invoices", icon: FileText },
   { name: "Transacoes", href: "/transactions", icon: CreditCard },
