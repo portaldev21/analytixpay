@@ -609,10 +609,22 @@ export type TFinancialContext = {
 // BUDGET TYPES (Rolling Budget / Orcamento Fluido)
 // =====================================================
 
-export type TCarryOverMode = "reset" | "carry_all" | "carry_deficit" | "carry_credit";
+export type TCarryOverMode =
+  | "reset"
+  | "carry_all"
+  | "carry_deficit"
+  | "carry_credit";
 export type TCycleStatus = "active" | "closed";
-export type TReconciliationStatus = "pending" | "matched" | "unmatched" | "manual";
-export type TBudgetStatus = "above_base" | "at_base" | "below_base" | "critical";
+export type TReconciliationStatus =
+  | "pending"
+  | "matched"
+  | "unmatched"
+  | "manual";
+export type TBudgetStatus =
+  | "above_base"
+  | "at_base"
+  | "below_base"
+  | "critical";
 
 // Budget Configuration
 export type TBudgetConfig = {

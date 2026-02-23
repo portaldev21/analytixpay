@@ -5,7 +5,6 @@ import { type NextRequest, NextResponse } from "next/server";
  * Supabase Client for Middleware
  */
 export async function updateSession(request: NextRequest) {
-
   let supabaseResponse = NextResponse.next({
     request,
   });

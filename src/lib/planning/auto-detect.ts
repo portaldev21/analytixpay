@@ -1,5 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { TTransaction, TPlanScenarioItem } from "@/db/types";
+import type { TPlanScenarioItem, TTransaction } from "@/db/types";
 import { detectRecurringTransactions } from "@/lib/analytics/recurring";
 import { calculateTransactionStats } from "@/lib/analytics/stats";
 import { logger } from "@/lib/logger";
