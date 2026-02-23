@@ -219,7 +219,8 @@ export async function getInvoices(
       .from("invoices")
       .select("*")
       .eq("account_id", accountId)
-      .order("created_at", { ascending: false });
+      .order("created_at", { ascending: false })
+      .limit(100);
 
     if (error) {
       return { data: null, error: error.message, success: false };

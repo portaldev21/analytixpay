@@ -75,7 +75,7 @@ export async function getTransactions(
       query = query.eq("invoice_id", filters.invoiceId);
     }
 
-    query = query.order("date", { ascending: false });
+    query = query.order("date", { ascending: false }).limit(1000);
 
     const { data, error } = await query;
 

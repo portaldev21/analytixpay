@@ -30,20 +30,23 @@ async function InvoicesList({ accountId }: { accountId: string }) {
     );
   }
 
-  // Get transaction count for each invoice
-  const invoicesWithCount = await Promise.all(
-    result.data.map(async (invoice) => {
-      const { count } = await supabase
-        .from("transactions")
-        .select("*", { count: "exact", head: true })
-        .eq("invoice_id", invoice.id);
+  // Get transaction counts in a single query using embedded count
+  const { data: invoicesWithCounts } = await supabase
+    .from("invoices")
+    .select("id, transactions(count)")
+    .eq("account_id", accountId)
+    .in("id", result.data.map((i) => i.id));
 
-      return {
-        ...invoice,
-        transaction_count: count || 0,
-      };
-    }),
-  );
+  // Build count lookup
+  const countMap = new Map<string, number>();
+  for (const inv of (invoicesWithCounts || []) as any[]) {
+    countMap.set(inv.id, inv.transactions?.[0]?.count || 0);
+  }
+
+  const invoicesWithCount = result.data.map((invoice) => ({
+    ...invoice,
+    transaction_count: countMap.get(invoice.id) || 0,
+  }));
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">

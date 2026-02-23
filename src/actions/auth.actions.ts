@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { loginSchema, signupSchema } from "@/lib/validations";
 import { logger } from "@/lib/logger";
+import { authLimiter } from "@/lib/rate-limit";
 import type { TApiResponse } from "@/db/types";
 
 /**
@@ -16,6 +17,19 @@ export async function login(
 ): Promise<TApiResponse<{ redirectTo: string }>> {
   try {
     const validated = loginSchema.parse({ email, password });
+
+    // Rate limit: 5 attempts per 15 minutes per email
+    try {
+      await authLimiter.check(5, validated.email);
+    } catch {
+      return {
+        data: null,
+        error:
+          "Muitas tentativas de login. Aguarde alguns minutos antes de tentar novamente.",
+        success: false,
+      };
+    }
+
     const supabase = await createClient();
 
     const { error } = await supabase.auth.signInWithPassword({
@@ -68,6 +82,18 @@ export async function signup(
       confirmPassword,
       fullName,
     });
+
+    // Rate limit: 5 attempts per 15 minutes per email
+    try {
+      await authLimiter.check(5, validated.email);
+    } catch {
+      return {
+        data: null,
+        error:
+          "Muitas tentativas de cadastro. Aguarde alguns minutos antes de tentar novamente.",
+        success: false,
+      };
+    }
 
     const supabase = await createClient();
 
