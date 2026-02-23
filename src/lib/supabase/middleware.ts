@@ -5,7 +5,6 @@ import { type NextRequest, NextResponse } from "next/server";
  * Supabase Client for Middleware
  */
 export async function updateSession(request: NextRequest) {
-  console.log("[Middleware] Path:", request.nextUrl.pathname);
 
   let supabaseResponse = NextResponse.next({
     request,
@@ -42,8 +41,6 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  console.log("[Middleware] User:", user ? user.email : "null");
-
   const isAuthPage =
     request.nextUrl.pathname.startsWith("/login") ||
     request.nextUrl.pathname.startsWith("/signup");
@@ -57,7 +54,6 @@ export async function updateSession(request: NextRequest) {
 
   // Redirect to login if not authenticated and trying to access dashboard
   if (!user && isDashboardPage) {
-    console.log("[Middleware] Redirecting to /login (not authenticated)");
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
@@ -65,13 +61,10 @@ export async function updateSession(request: NextRequest) {
 
   // Redirect to dashboard if authenticated and trying to access auth pages
   if (user && isAuthPage) {
-    console.log("[Middleware] Redirecting to /dashboard (already authenticated)");
     const url = request.nextUrl.clone();
     url.pathname = "/dashboard";
     return NextResponse.redirect(url);
   }
-
-  console.log("[Middleware] Passing through");
 
   // IMPORTANT: You *must* return the supabaseResponse object as it is. If you're
   // creating a new response object with NextResponse.next() make sure to:

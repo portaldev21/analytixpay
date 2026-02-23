@@ -2,15 +2,13 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import type { Database } from "@/db/types";
 import { env } from "@/lib/env";
+import { logger } from "@/lib/logger";
 
 /**
  * Supabase Client for Server Components and Server Actions
  * Use this in Server Components and Server Actions
  */
 export async function createClient() {
-  console.log("[Supabase Server] Creating client...");
-  console.log("[Supabase Server] URL:", env.NEXT_PUBLIC_SUPABASE_URL?.substring(0, 30) + "...");
-
   const cookieStore = await cookies();
 
   const client = createServerClient<Database>(
@@ -36,7 +34,6 @@ export async function createClient() {
     },
   );
 
-  console.log("[Supabase Server] Client created successfully");
   return client;
 }
 
@@ -74,7 +71,7 @@ export async function getUserAccounts() {
     .eq("user_id", user.id);
 
   if (error) {
-    console.error("Error fetching user accounts:", error);
+    logger.error("Error fetching user accounts", error);
     return [];
   }
 

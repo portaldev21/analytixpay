@@ -108,7 +108,7 @@ export function EditTransactionDialog({
     setDeleting(true);
 
     try {
-      const result = await deleteTransaction(transaction.id);
+      const result = await deleteTransaction(transaction.id, transaction.account_id);
 
       if (result.success) {
         toast.success("Transação deletada com sucesso!");

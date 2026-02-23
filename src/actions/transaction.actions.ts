@@ -16,12 +16,23 @@ import {
   type PeriodDateRange,
   type StatsWithComparison,
 } from "@/lib/analytics/stats";
+import { z } from "zod";
 import type {
   TApiResponse,
   TTransaction,
   TDashboardStats,
   TTransactionFilters,
 } from "@/db/types";
+
+const updateTransactionSchema = z.object({
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  description: z.string().min(1).max(500).optional(),
+  amount: z.number().positive().optional(),
+  category: z.string().min(1).max(100).optional(),
+  installment: z.string().max(20).nullable().optional(),
+  is_international: z.boolean().optional(),
+  billing_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable().optional(),
+});
 
 /**
  * Get transactions for account
@@ -379,21 +390,18 @@ export async function getDashboardStats(
 export async function updateTransaction(
   transactionId: string,
   accountId: string,
-  updates: Partial<TTransaction>,
+  updates: z.infer<typeof updateTransactionSchema>,
 ): Promise<TApiResponse<TTransaction>> {
   try {
-    const supabase = await createClient();
+    const { supabase } = await requireAccountAccess(accountId);
 
-    // Validate access to account
-    if (!(await hasAccessToAccount(accountId))) {
-      return { data: null, error: "Acesso negado", success: false };
-    }
+    // Validate allowed fields only
+    const validated = updateTransactionSchema.parse(updates);
 
-    // Type workaround for Supabase generated types
     const { data, error } = await (supabase.from("transactions") as any)
-      .update(updates)
+      .update(validated)
       .eq("id", transactionId)
-      .eq("account_id", accountId) // Ensure transaction belongs to account
+      .eq("account_id", accountId)
       .select()
       .single();
 
@@ -420,14 +428,16 @@ export async function updateTransaction(
  */
 export async function deleteTransaction(
   transactionId: string,
+  accountId: string,
 ): Promise<TApiResponse<{ success: true }>> {
   try {
-    const supabase = await createClient();
+    const { supabase } = await requireAccountAccess(accountId);
 
     const { error } = await supabase
       .from("transactions")
       .delete()
-      .eq("id", transactionId);
+      .eq("id", transactionId)
+      .eq("account_id", accountId);
 
     if (error) {
       return { data: null, error: error.message, success: false };
