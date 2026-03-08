@@ -131,7 +131,7 @@ export function calculatePercentageChange(
  */
 export function truncate(text: string, length: number): string {
   if (text.length <= length) return text;
-  return text.slice(0, length) + "...";
+  return `${text.slice(0, length)}...`;
 }
 
 /**
@@ -177,7 +177,7 @@ export function formatFileSize(bytes: number): string {
   const sizes = ["Bytes", "KB", "MB", "GB"];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
 
-  return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + " " + sizes[i];
+  return `${Math.round((bytes / k ** i) * 100) / 100} ${sizes[i]}`;
 }
 
 /**
@@ -223,7 +223,7 @@ export function getCategoryColor(category: string): string {
     Outros: "#B0BEC5", // Cinza Médio
   };
 
-  return colors[category] || colors["Outros"];
+  return colors[category] || colors.Outros;
 }
 
 /**

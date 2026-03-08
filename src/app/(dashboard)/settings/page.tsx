@@ -1,11 +1,11 @@
 import { Suspense } from "react";
-import { createClient } from "@/lib/supabase/server";
 import { CreateAccountForm } from "@/components/settings/CreateAccountForm";
-import { RecategorizeButton } from "@/components/settings/RecategorizeButton";
 import { MigrateInvoices } from "@/components/settings/MigrateInvoices";
-import { CardGlass } from "@/components/ui/card-glass";
+import { RecategorizeButton } from "@/components/settings/RecategorizeButton";
 import { Loading } from "@/components/shared/Loading";
 import { Badge } from "@/components/ui/badge";
+import { CardGlass } from "@/components/ui/card-glass";
+import { createClient } from "@/lib/supabase/server";
 
 async function AccountInfo({ userId }: { userId: string }) {
   const supabase = await createClient();
@@ -136,7 +136,7 @@ export default async function SettingsPage() {
   );
 }
 
-function Label({
+function _Label({
   className,
   children,
 }: {

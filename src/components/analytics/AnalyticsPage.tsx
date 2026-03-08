@@ -1,27 +1,27 @@
 "use client";
 
 import { useMemo } from "react";
-import { AnalyticsKPIs } from "./AnalyticsKPIs";
-import { ExpenseHeatmap } from "./ExpenseHeatmap";
-import { SpendingByCardChart } from "./SpendingByCardChart";
-import { InstallmentsTable } from "./InstallmentsTable";
-import { TopExpensesTable } from "./TopExpensesTable";
-import { ChatContainer } from "./ai-chat/ChatContainer";
-import { SpendingTrendsChart } from "@/components/dashboard/SpendingTrendsChart";
 import { CategoryBreakdownChart } from "@/components/dashboard/CategoryBreakdownChart";
-import { RecurringExpenses } from "@/components/dashboard/RecurringExpenses";
 import { HealthScoreCard } from "@/components/dashboard/HealthScoreCard";
 import { InsightsPanel } from "@/components/dashboard/InsightsPanel";
 import { PeriodSelector } from "@/components/dashboard/PeriodSelector";
+import { RecurringExpenses } from "@/components/dashboard/RecurringExpenses";
+import { SpendingTrendsChart } from "@/components/dashboard/SpendingTrendsChart";
 import type {
   TDailySpending,
-  TSpendingByCard,
   TInstallmentProjection,
+  TSpendingByCard,
   TTransaction,
 } from "@/db/types";
 import type { HealthScore } from "@/lib/analytics/health-score";
 import type { Insight } from "@/lib/analytics/insights";
 import type { RecurringTransaction } from "@/lib/analytics/recurring";
+import { AnalyticsKPIs } from "./AnalyticsKPIs";
+import { ChatContainer } from "./ai-chat/ChatContainer";
+import { ExpenseHeatmap } from "./ExpenseHeatmap";
+import { InstallmentsTable } from "./InstallmentsTable";
+import { SpendingByCardChart } from "./SpendingByCardChart";
+import { TopExpensesTable } from "./TopExpensesTable";
 
 interface AnalyticsPageProps {
   accountId: string;

@@ -1,9 +1,9 @@
 "use client";
 
+import { AlertCircle, Loader2 } from "lucide-react";
 import { useState } from "react";
-import { Loader2, AlertCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { loginWithGoogle } from "@/actions/auth.actions";
+import { Button } from "@/components/ui/button";
 
 export function GoogleButton() {
   const [isLoading, setIsLoading] = useState(false);

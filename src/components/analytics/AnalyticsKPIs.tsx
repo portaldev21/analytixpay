@@ -1,15 +1,15 @@
 "use client";
 
-import { StatsCard } from "@/components/dashboard/StatsCard";
-import { formatCurrency } from "@/lib/utils";
 import {
-  DollarSign,
-  TrendingUp,
-  TrendingDown,
   Calendar,
   CreditCard,
+  DollarSign,
   Receipt,
+  TrendingDown,
+  TrendingUp,
 } from "lucide-react";
+import { StatsCard } from "@/components/dashboard/StatsCard";
+import { formatCurrency } from "@/lib/utils";
 
 interface AnalyticsKPIsProps {
   totalSpent: number;

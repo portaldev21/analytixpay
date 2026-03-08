@@ -1,15 +1,15 @@
-import { Suspense } from "react";
 import { CreditCard } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
-import { getTransactions } from "@/actions/transaction.actions";
+import { Suspense } from "react";
 import { getInvoices } from "@/actions/invoice.actions";
-import { TransactionsTable } from "@/components/transactions/TransactionsTable";
-import { TransactionFilters } from "@/components/transactions/TransactionFilters";
+import { getTransactions } from "@/actions/transaction.actions";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { Loading } from "@/components/shared/Loading";
+import { TransactionFilters } from "@/components/transactions/TransactionFilters";
+import { TransactionsTable } from "@/components/transactions/TransactionsTable";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import type { TTransaction, TTransactionFilters } from "@/db/types";
+import { createClient } from "@/lib/supabase/server";
 import { formatCurrency } from "@/lib/utils";
-import type { TTransactionFilters, TTransaction } from "@/db/types";
 
 interface SearchParams {
   invoiceId?: string;
@@ -26,9 +26,7 @@ function filterByInstallment(
 
   switch (installmentType) {
     case "current":
-      return transactions.filter(
-        (t) => t.installment && t.installment.startsWith("1/"),
-      );
+      return transactions.filter((t) => t.installment?.startsWith("1/"));
     case "past":
       return transactions.filter(
         (t) => t.installment && !t.installment.startsWith("1/"),
@@ -88,9 +86,8 @@ async function TransactionsContent({
 
   // Count by installment type
   const installmentCounts = {
-    current: filteredTransactions.filter(
-      (t) => t.installment && t.installment.startsWith("1/"),
-    ).length,
+    current: filteredTransactions.filter((t) => t.installment?.startsWith("1/"))
+      .length,
     past: filteredTransactions.filter(
       (t) => t.installment && !t.installment.startsWith("1/"),
     ).length,

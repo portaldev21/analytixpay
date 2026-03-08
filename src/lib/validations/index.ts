@@ -112,7 +112,7 @@ export const createTransactionSchema = z.object({
     .regex(/^\d{4}-\d{2}-\d{2}$/, "Data deve estar no formato YYYY-MM-DD")
     .refine((date) => {
       const d = new Date(date);
-      return d instanceof Date && !isNaN(d.getTime());
+      return d instanceof Date && !Number.isNaN(d.getTime());
     }, "Data inválida"),
   description: z
     .string()

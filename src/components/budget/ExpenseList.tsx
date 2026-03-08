@@ -1,24 +1,24 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import {
-  Trash2,
-  Loader2,
-  ShoppingCart,
-  Utensils,
   Car,
-  Heart,
   Gamepad2,
+  Heart,
   Home,
-  Shirt,
-  MoreHorizontal,
+  Loader2,
   type LucideIcon,
+  MoreHorizontal,
+  Shirt,
+  ShoppingCart,
+  Trash2,
+  Utensils,
 } from "lucide-react";
-import { CardGlass } from "@/components/ui/card-glass";
-import { cn, formatCurrency } from "@/lib/utils";
+import { useState, useTransition } from "react";
 import { deleteBudgetExpense } from "@/actions/budget.actions";
+import { CardGlass } from "@/components/ui/card-glass";
 import type { TBudgetExpense } from "@/db/types";
+import { cn, formatCurrency } from "@/lib/utils";
 
 const categoryIcons: Record<string, LucideIcon> = {
   Alimentacao: Utensils,
@@ -106,7 +106,8 @@ export function ExpenseList({
         <AnimatePresence mode="popLayout">
           {expenses.map((expense) => {
             const Icon = categoryIcons[expense.category] || MoreHorizontal;
-            const colorClass = categoryColors[expense.category] || categoryColors.Outros;
+            const colorClass =
+              categoryColors[expense.category] || categoryColors.Outros;
             const isDeleting = deletingId === expense.id;
 
             return (

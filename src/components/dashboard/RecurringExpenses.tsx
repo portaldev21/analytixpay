@@ -1,10 +1,10 @@
 "use client";
 
 import { Clock, TrendingUp } from "lucide-react";
-import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { formatCurrency, formatDate } from "@/lib/utils";
+import { Card } from "@/components/ui/card";
 import type { RecurringTransaction } from "@/lib/analytics/recurring";
+import { formatCurrency, formatDate } from "@/lib/utils";
 
 interface RecurringExpensesProps {
   data: RecurringTransaction[];

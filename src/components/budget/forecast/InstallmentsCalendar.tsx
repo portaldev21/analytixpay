@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { ChevronLeft, ChevronRight, CalendarDays } from "lucide-react";
-import { CardGlass } from "@/components/ui/card-glass";
+import { CalendarDays, ChevronLeft, ChevronRight } from "lucide-react";
+import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { cn, formatCurrency } from "@/lib/utils";
+import { CardGlass } from "@/components/ui/card-glass";
 import type { TCalendarEvent } from "@/db/types";
+import { cn, formatCurrency } from "@/lib/utils";
 
 interface InstallmentsCalendarProps {
   events: TCalendarEvent[];
@@ -175,7 +175,7 @@ export function InstallmentsCalendar({
           const dateKey = formatDateKey(date);
           const dayEvents = eventsByDate.get(dateKey) || [];
           const hasEvents = dayEvents.length > 0;
-          const totalAmount = dayEvents.reduce((sum, e) => sum + e.amount, 0);
+          const _totalAmount = dayEvents.reduce((sum, e) => sum + e.amount, 0);
           const isSelected =
             selectedEvent && dayEvents.some((e) => e === selectedEvent);
 
@@ -185,9 +185,7 @@ export function InstallmentsCalendar({
               type="button"
               onClick={() => {
                 if (hasEvents) {
-                  setSelectedEvent(
-                    isSelected ? null : dayEvents[0],
-                  );
+                  setSelectedEvent(isSelected ? null : dayEvents[0]);
                 }
               }}
               className={cn(
@@ -283,7 +281,8 @@ export function InstallmentsCalendar({
                 .filter(([date]) => {
                   const d = new Date(date);
                   return (
-                    d.getMonth() === currentMonth && d.getFullYear() === currentYear
+                    d.getMonth() === currentMonth &&
+                    d.getFullYear() === currentYear
                   );
                 })
                 .flatMap(([_, events]) => events)

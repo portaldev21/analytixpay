@@ -1,22 +1,12 @@
 "use client";
 
-import { useState } from "react";
 import { Pencil, Trash2 } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
 import {
-  updateTransaction,
   deleteTransaction,
+  updateTransaction,
 } from "@/actions/transaction.actions";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,6 +18,17 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -37,9 +38,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
-import { CategoryBadge } from "./CategoryBadge";
 import type { TTransaction } from "@/db/types";
+import { CategoryBadge } from "./CategoryBadge";
 
 interface EditTransactionDialogProps {
   transaction: TTransaction;
@@ -97,7 +97,7 @@ export function EditTransactionDialog({
       } else {
         toast.error(result.error || "Erro ao atualizar transação");
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error("Erro ao atualizar transação");
     } finally {
       setLoading(false);
@@ -108,7 +108,10 @@ export function EditTransactionDialog({
     setDeleting(true);
 
     try {
-      const result = await deleteTransaction(transaction.id, transaction.account_id);
+      const result = await deleteTransaction(
+        transaction.id,
+        transaction.account_id,
+      );
 
       if (result.success) {
         toast.success("Transação deletada com sucesso!");
@@ -116,7 +119,7 @@ export function EditTransactionDialog({
       } else {
         toast.error(result.error || "Erro ao deletar transação");
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error("Erro ao deletar transação");
     } finally {
       setDeleting(false);

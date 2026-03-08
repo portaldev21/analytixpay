@@ -1,10 +1,9 @@
 "use client";
 
-import { useState } from "react";
 import { Trash2 } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { deleteTransaction } from "@/actions/transaction.actions";
-import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,6 +15,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 import type { TTransaction } from "@/db/types";
 
 interface DeleteTransactionButtonProps {
@@ -34,7 +34,10 @@ export function DeleteTransactionButton({
     onDeleteStart?.(); // Chama callback para iniciar animação
 
     try {
-      const result = await deleteTransaction(transaction.id, transaction.account_id);
+      const result = await deleteTransaction(
+        transaction.id,
+        transaction.account_id,
+      );
 
       if (result.success) {
         toast.success("Transação deletada com sucesso!");
@@ -42,7 +45,7 @@ export function DeleteTransactionButton({
         toast.error(result.error || "Erro ao deletar transação");
         setDeleting(false);
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error("Erro ao deletar transação");
       setDeleting(false);
     }

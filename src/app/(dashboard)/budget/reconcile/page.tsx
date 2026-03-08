@@ -1,18 +1,18 @@
-import { redirect } from "next/navigation";
-import Link from "next/link";
 import { ArrowLeft, RefreshCw } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
-import { EmptyDashboard } from "@/components/dashboard/EmptyDashboard";
+import Link from "next/link";
+import { redirect } from "next/navigation";
 import {
-  getReconciliationSuggestions,
   getReconciliationStats,
+  getReconciliationSuggestions,
 } from "@/actions/budget.actions";
-import { CardGlass } from "@/components/ui/card-glass";
-import { Button } from "@/components/ui/button";
 import {
   MatchSuggestionCard,
   ReconciliationStats,
 } from "@/components/budget/reconciliation";
+import { EmptyDashboard } from "@/components/dashboard/EmptyDashboard";
+import { Button } from "@/components/ui/button";
+import { CardGlass } from "@/components/ui/card-glass";
+import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
@@ -156,8 +156,8 @@ export default async function ReconcilePage() {
               Sugestoes automaticas
             </h4>
             <p className="text-sm text-[var(--color-text-muted)]">
-              O sistema encontra transacoes similares nas suas faturas baseado em
-              valor, data e descricao.
+              O sistema encontra transacoes similares nas suas faturas baseado
+              em valor, data e descricao.
             </p>
           </div>
           <div className="space-y-2">

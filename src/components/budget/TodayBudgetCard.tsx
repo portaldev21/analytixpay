@@ -1,10 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Wallet, TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { Minus, TrendingDown, TrendingUp, Wallet } from "lucide-react";
 import { CardGlass } from "@/components/ui/card-glass";
-import { cn, formatCurrency } from "@/lib/utils";
 import type { TTodayBudgetResponse } from "@/db/types";
+import { cn, formatCurrency } from "@/lib/utils";
 
 interface TodayBudgetCardProps {
   data: TTodayBudgetResponse;
@@ -46,12 +46,7 @@ export function TodayBudgetCard({ data, className }: TodayBudgetCardProps) {
   const StatusIcon = config.icon;
 
   return (
-    <CardGlass
-      variant="default"
-      size="xl"
-      interactive
-      className={className}
-    >
+    <CardGlass variant="default" size="xl" interactive className={className}>
       <div className="flex items-start justify-between mb-6">
         <div>
           <p className="text-sm font-medium text-[var(--color-text-muted)] mb-1">
@@ -69,7 +64,9 @@ export function TodayBudgetCard({ data, className }: TodayBudgetCardProps) {
             <div
               className={cn(
                 "flex items-center gap-1 mt-2",
-                data.adjustment > 0 ? "text-[var(--color-positive)]" : "text-[var(--color-negative)]",
+                data.adjustment > 0
+                  ? "text-[var(--color-positive)]"
+                  : "text-[var(--color-negative)]",
               )}
             >
               <StatusIcon className="size-4" />
@@ -81,12 +78,7 @@ export function TodayBudgetCard({ data, className }: TodayBudgetCardProps) {
           )}
         </div>
 
-        <div
-          className={cn(
-            "p-3 rounded-xl",
-            "bg-[var(--color-primary)]/10",
-          )}
-        >
+        <div className={cn("p-3 rounded-xl", "bg-[var(--color-primary)]/10")}>
           <Wallet className="size-6 text-[var(--color-primary)]" />
         </div>
       </div>
@@ -96,7 +88,8 @@ export function TodayBudgetCard({ data, className }: TodayBudgetCardProps) {
         <div className="flex justify-between text-sm">
           <span className="text-[var(--color-text-muted)]">Gasto hoje</span>
           <span className="text-[var(--color-text-primary)] font-medium tabular-nums">
-            {formatCurrency(data.total_spent_today)} / {formatCurrency(data.available_budget)}
+            {formatCurrency(data.total_spent_today)} /{" "}
+            {formatCurrency(data.available_budget)}
           </span>
         </div>
         <div className="h-3 bg-[var(--color-surface-muted)] rounded-full overflow-hidden">

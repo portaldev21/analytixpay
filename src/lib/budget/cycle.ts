@@ -7,11 +7,10 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type {
   TBudgetConfig,
-  TCarryOverMode,
   TDailyRecord,
+  TDailyRecordInsert,
   TWeekCycle,
   TWeekCycleInsert,
-  TDailyRecordInsert,
 } from "@/db/types";
 import {
   calculateAvailableBudget,
@@ -89,7 +88,9 @@ export async function createNewCycle(
         .single();
 
       if (raceError || !raceRecord) {
-        throw new Error(`Erro ao buscar ciclo apos conflito: ${raceError?.message}`);
+        throw new Error(
+          `Erro ao buscar ciclo apos conflito: ${raceError?.message}`,
+        );
       }
 
       return raceRecord as TWeekCycle;
@@ -306,7 +307,9 @@ export async function getOrCreateDailyRecord(
         .single();
 
       if (raceError || !raceRecord) {
-        throw new Error(`Erro ao buscar registro apos conflito: ${raceError?.message}`);
+        throw new Error(
+          `Erro ao buscar registro apos conflito: ${raceError?.message}`,
+        );
       }
 
       return raceRecord as TDailyRecord;
@@ -343,7 +346,8 @@ export async function updateDailyRecordSpent(
   }
 
   const availableBudget = currentRecord.available_budget;
-  const dailyBalance = Math.round((availableBudget - newTotalSpent) * 100) / 100;
+  const dailyBalance =
+    Math.round((availableBudget - newTotalSpent) * 100) / 100;
 
   const { data: updatedRecord, error } = await supabase
     .from("daily_records")

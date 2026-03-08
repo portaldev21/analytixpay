@@ -1,10 +1,10 @@
 "use client";
 
-import { CardGlass } from "@/components/ui/card-glass";
-import { Badge } from "@/components/ui/badge";
-import { formatCurrency, formatDate, getCategoryColor, cn } from "@/lib/utils";
-import type { TTransaction } from "@/db/types";
 import { TrendingUp } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { CardGlass } from "@/components/ui/card-glass";
+import type { TTransaction } from "@/db/types";
+import { cn, formatCurrency, formatDate, getCategoryColor } from "@/lib/utils";
 
 interface TopExpensesTableProps {
   data: TTransaction[];

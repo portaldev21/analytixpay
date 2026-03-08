@@ -1,17 +1,17 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { createAccount } from "@/actions/account.actions";
 import { Button } from "@/components/ui/button";
+import { CardGlass } from "@/components/ui/card-glass";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { CardGlass } from "@/components/ui/card-glass";
 
 const createAccountSchema = z.object({
   name: z.string().min(3, "Nome deve ter no mínimo 3 caracteres"),

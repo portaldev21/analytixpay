@@ -1,18 +1,17 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
-
-import { loginSchema } from "@/lib/validations";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { login } from "@/actions/auth.actions";
 import { Button } from "@/components/ui/button";
+import { CardGlass } from "@/components/ui/card-glass";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { CardGlass } from "@/components/ui/card-glass";
+import { loginSchema } from "@/lib/validations";
 
 type LoginFormData = {
   email: string;

@@ -1,42 +1,32 @@
-import { Suspense } from "react";
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
 import {
-  getTransactionStatsWithComparison,
-  getSpendingTrends,
-  getTopExpenses,
-} from "@/actions/transaction.actions";
-import { getInvoicesSummary } from "@/actions/invoice.actions";
-import {
+  getFinancialHealthScore,
   getRecurringTransactions,
   getSmartInsights,
-  getFinancialHealthScore,
 } from "@/actions/analytics.actions";
+import { getInvoicesSummary } from "@/actions/invoice.actions";
+import {
+  getSpendingTrends,
+  getTopExpenses,
+  getTransactionStatsWithComparison,
+} from "@/actions/transaction.actions";
+import { CategoryBreakdownChart } from "@/components/dashboard/CategoryBreakdownChart";
+import { EmptyDashboard } from "@/components/dashboard/EmptyDashboard";
+import { HealthScoreCard } from "@/components/dashboard/HealthScoreCard";
+import { InsightsPanel } from "@/components/dashboard/InsightsPanel";
+import { InvoicesSummary } from "@/components/dashboard/InvoicesSummary";
+import { PeriodSelector } from "@/components/dashboard/PeriodSelector";
+import { RecurringExpenses } from "@/components/dashboard/RecurringExpenses";
+import { SpendingTrendsChart } from "@/components/dashboard/SpendingTrendsChart";
+import { StatsCard } from "@/components/dashboard/StatsCard";
+import { TopExpenses } from "@/components/dashboard/TopExpenses";
 import {
   getPeriodDateRange,
   getPreviousPeriodDateRange,
   type StatsWithComparison,
 } from "@/lib/analytics/stats";
-import { StatsCard } from "@/components/dashboard/StatsCard";
-import { SpendingTrendsChart } from "@/components/dashboard/SpendingTrendsChart";
-import { CategoryBreakdownChart } from "@/components/dashboard/CategoryBreakdownChart";
-import { InvoicesSummary } from "@/components/dashboard/InvoicesSummary";
-import { TopExpenses } from "@/components/dashboard/TopExpenses";
-import { RecurringExpenses } from "@/components/dashboard/RecurringExpenses";
-import { InsightsPanel } from "@/components/dashboard/InsightsPanel";
-import { HealthScoreCard } from "@/components/dashboard/HealthScoreCard";
-import { PeriodSelector } from "@/components/dashboard/PeriodSelector";
-import { EmptyDashboard } from "@/components/dashboard/EmptyDashboard";
-import {
-  StatsCardSkeleton,
-  ChartSkeleton,
-  ListSkeleton,
-} from "@/components/dashboard/DashboardSkeleton";
+import { createClient } from "@/lib/supabase/server";
 import { formatCurrency } from "@/lib/utils";
-import type { TTransaction } from "@/db/types";
-import type { HealthScore } from "@/lib/analytics/health-score";
-import type { Insight } from "@/lib/analytics/insights";
-import type { RecurringTransaction } from "@/lib/analytics/recurring";
 
 // Opt into dynamic rendering for real-time data
 export const dynamic = "force-dynamic";

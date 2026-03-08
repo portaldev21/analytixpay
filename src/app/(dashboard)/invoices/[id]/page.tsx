@@ -1,6 +1,3 @@
-import { Suspense } from "react";
-import { notFound, redirect } from "next/navigation";
-import Link from "next/link";
 import {
   ArrowLeft,
   Calendar,
@@ -8,14 +5,17 @@ import {
   FileText,
   TrendingUp,
 } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
+import Link from "next/link";
+import { notFound, redirect } from "next/navigation";
+import { Suspense } from "react";
 import { getInvoiceWithTransactions } from "@/actions/invoice.actions";
-import { formatCurrency, formatDate, getCategoryColor } from "@/lib/utils";
+import { Loading } from "@/components/shared/Loading";
 import { TransactionsTable } from "@/components/transactions/TransactionsTable";
-import { CardGlass } from "@/components/ui/card-glass";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Loading } from "@/components/shared/Loading";
+import { CardGlass } from "@/components/ui/card-glass";
+import { createClient } from "@/lib/supabase/server";
+import { formatCurrency, formatDate, getCategoryColor } from "@/lib/utils";
 
 interface InvoiceDetailPageProps {
   params: Promise<{ id: string }>;
@@ -65,8 +65,8 @@ export default async function InvoiceDetailPage({
   // Filter transactions by installment type if specified
   let filteredTransactions = invoice.transactions;
   if (installment === "current") {
-    filteredTransactions = invoice.transactions.filter(
-      (t) => t.installment && t.installment.startsWith("1/"),
+    filteredTransactions = invoice.transactions.filter((t) =>
+      t.installment?.startsWith("1/"),
     );
   } else if (installment === "past") {
     filteredTransactions = invoice.transactions.filter(
@@ -102,9 +102,8 @@ export default async function InvoiceDetailPage({
 
   // Count installments
   const installmentStats = {
-    current: invoice.transactions.filter(
-      (t) => t.installment && t.installment.startsWith("1/"),
-    ).length,
+    current: invoice.transactions.filter((t) => t.installment?.startsWith("1/"))
+      .length,
     past: invoice.transactions.filter(
       (t) => t.installment && !t.installment.startsWith("1/"),
     ).length,
@@ -153,7 +152,7 @@ export default async function InvoiceDetailPage({
           )}
         </CardGlass>
 
-        <CardGlass variant="default" size="lg" >
+        <CardGlass variant="default" size="lg">
           <div className="flex items-center justify-between mb-3">
             <span className="text-sm font-medium text-[var(--color-text-muted)]">
               Total

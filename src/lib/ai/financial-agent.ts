@@ -1,6 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { TFinancialContext, TTransaction } from "@/db/types";
-import { calculateTransactionStats } from "@/lib/analytics/stats";
 import {
   calculateHealthScore,
   type HealthScore,
@@ -9,6 +8,7 @@ import {
   detectRecurringTransactions,
   type RecurringTransaction,
 } from "@/lib/analytics/recurring";
+import { calculateTransactionStats } from "@/lib/analytics/stats";
 import { logger } from "@/lib/logger";
 
 export interface PeriodDateRange {

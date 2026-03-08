@@ -1,16 +1,16 @@
 import { describe, expect, it } from "vitest";
 import {
   calculateAvailableBudget,
+  calculateCarryOverBalance,
   calculateDailyBalance,
+  calculateDerivedBudgets,
   calculateRemainingDays,
   calculateWeekCycleDates,
+  formatDateToString,
   getBudgetStatus,
-  calculateDerivedBudgets,
-  calculateCarryOverBalance,
+  parseDateString,
   validateDailyBase,
   validateExpenseAmount,
-  formatDateToString,
-  parseDateString,
 } from "../calculations";
 
 describe("calculateAvailableBudget", () => {
@@ -270,7 +270,9 @@ describe("validateDailyBase", () => {
   });
 
   it("should reject non-finite values", () => {
-    expect(() => validateDailyBase(Number.POSITIVE_INFINITY)).toThrow("numero valido");
+    expect(() => validateDailyBase(Number.POSITIVE_INFINITY)).toThrow(
+      "numero valido",
+    );
     expect(() => validateDailyBase(Number.NaN)).toThrow("numero valido");
   });
 });

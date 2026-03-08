@@ -1,14 +1,14 @@
 "use server";
 
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { revalidatePath } from "next/cache";
+import { logger } from "@/lib/logger";
 import {
   createClient,
+  hasAccessToAccount,
   requireAccountAccess,
   requireAccountOwnership,
-  hasAccessToAccount,
 } from "@/lib/supabase/server";
-import { logger } from "@/lib/logger";
-import type { SupabaseClient } from "@supabase/supabase-js";
 
 // Helper to get untyped supabase client for new tables
 // This is needed because the Database type hasn't been regenerated from Supabase
@@ -16,36 +16,34 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 function getUntypedClient(supabase: SupabaseClient): SupabaseClient<any> {
   return supabase as SupabaseClient<any>;
 }
-import {
-  calculateAvailableBudget,
-  calculateDailyBalance,
-  calculateRemainingDays,
-  getBudgetStatus,
-  formatDateToString,
-  getToday,
-  validateDailyBase,
-  validateExpenseAmount,
-} from "@/lib/budget/calculations";
-import {
-  ensureActiveCycle,
-  getOrCreateDailyRecord,
-  updateDailyRecordSpent,
-  recalculateCycleAccumulatedBalance,
-  getDailyRecordsForCycle,
-  getTotalExpensesForRecord,
-} from "@/lib/budget/cycle";
+
 import type {
   TApiResponse,
   TBudgetConfig,
   TBudgetConfigInsert,
   TBudgetExpense,
   TBudgetExpenseInsert,
-  TDailyRecord,
+  TCarryOverMode,
   TTodayBudgetResponse,
   TWeekCycle,
   TWeekSummary,
-  TCarryOverMode,
 } from "@/db/types";
+import {
+  calculateRemainingDays,
+  formatDateToString,
+  getBudgetStatus,
+  getToday,
+  validateDailyBase,
+  validateExpenseAmount,
+} from "@/lib/budget/calculations";
+import {
+  ensureActiveCycle,
+  getDailyRecordsForCycle,
+  getOrCreateDailyRecord,
+  getTotalExpensesForRecord,
+  recalculateCycleAccumulatedBalance,
+  updateDailyRecordSpent,
+} from "@/lib/budget/cycle";
 
 // =============================================================================
 // CONFIGURATION ACTIONS
@@ -320,7 +318,10 @@ export async function addBudgetExpense(
     time?: string;
   },
 ): Promise<
-  TApiResponse<{ expense: TBudgetExpense; updated_budget: TTodayBudgetResponse }>
+  TApiResponse<{
+    expense: TBudgetExpense;
+    updated_budget: TTodayBudgetResponse;
+  }>
 > {
   try {
     const { user, supabase } = await requireAccountAccess(accountId);
@@ -428,8 +429,7 @@ export async function addBudgetExpense(
     logger.error("Error in addBudgetExpense", error);
     return {
       data: null,
-      error:
-        error instanceof Error ? error.message : "Erro ao adicionar gasto",
+      error: error instanceof Error ? error.message : "Erro ao adicionar gasto",
       success: false,
     };
   }
@@ -514,8 +514,7 @@ export async function updateBudgetExpense(
     logger.error("Error in updateBudgetExpense", error);
     return {
       data: null,
-      error:
-        error instanceof Error ? error.message : "Erro ao atualizar gasto",
+      error: error instanceof Error ? error.message : "Erro ao atualizar gasto",
       success: false,
     };
   }
@@ -560,7 +559,11 @@ export async function deleteBudgetExpense(
       supabase,
       expense.daily_record_id,
     );
-    await updateDailyRecordSpent(supabase, expense.daily_record_id, newTotalSpent);
+    await updateDailyRecordSpent(
+      supabase,
+      expense.daily_record_id,
+      newTotalSpent,
+    );
 
     // Get cycle ID and recalculate balance
     const { data: dailyRecord } = await db
@@ -613,13 +616,16 @@ export async function getExpensesForDate(
       return { data: null, error: error.message, success: false };
     }
 
-    return { data: (data || []) as TBudgetExpense[], error: null, success: true };
+    return {
+      data: (data || []) as TBudgetExpense[],
+      error: null,
+      success: true,
+    };
   } catch (error) {
     logger.error("Error in getExpensesForDate", error);
     return {
       data: null,
-      error:
-        error instanceof Error ? error.message : "Erro ao buscar gastos",
+      error: error instanceof Error ? error.message : "Erro ao buscar gastos",
       success: false,
     };
   }
@@ -849,10 +855,7 @@ export async function getBudgetVsActual(
     );
 
     // Group by category
-    const categoryMap = new Map<
-      string,
-      { budget: number; actual: number }
-    >();
+    const categoryMap = new Map<string, { budget: number; actual: number }>();
 
     for (const expense of manualExpenses || []) {
       const cat = expense.category || "Outros";
@@ -904,11 +907,11 @@ export async function getBudgetVsActual(
 // RECONCILIATION ACTIONS
 // =============================================================================
 
+import type { TTransaction } from "@/db/types";
 import {
   findReconciliationSuggestions,
   type TReconciliationResult,
 } from "@/lib/budget/reconciliation";
-import type { TTransaction } from "@/db/types";
 
 /**
  * Get reconciliation suggestions for pending expenses
@@ -1114,9 +1117,7 @@ export async function markExpenseUnmatched(
 /**
  * Get reconciliation statistics
  */
-export async function getReconciliationStats(
-  accountId: string,
-): Promise<
+export async function getReconciliationStats(accountId: string): Promise<
   TApiResponse<{
     total_expenses: number;
     pending: number;
@@ -1190,10 +1191,10 @@ export async function getReconciliationStats(
 
 import type {
   TBudgetForecast,
+  TBudgetImpact,
+  TCalendarEvent,
   TInstallmentProjection,
   TMonthlyProjection,
-  TCalendarEvent,
-  TBudgetImpact,
 } from "@/db/types";
 
 /**
@@ -1373,8 +1374,10 @@ export async function getBudgetForecast(
     // Calculate budget impact
     const avgMonthlyInstallments =
       monthlyProjections.length > 0
-        ? monthlyProjections.reduce((sum, mp) => sum + mp.total_installments, 0) /
-          monthlyProjections.length
+        ? monthlyProjections.reduce(
+            (sum, mp) => sum + mp.total_installments,
+            0,
+          ) / monthlyProjections.length
         : 0;
 
     let budgetImpact: TBudgetImpact;
@@ -1389,7 +1392,8 @@ export async function getBudgetForecast(
       const monthlyAvailable = monthlyBudget - avgMonthlyInstallments;
 
       budgetImpact = {
-        avg_monthly_installments: Math.round(avgMonthlyInstallments * 100) / 100,
+        avg_monthly_installments:
+          Math.round(avgMonthlyInstallments * 100) / 100,
         daily_available: Math.round(dailyAvailable * 100) / 100,
         weekly_available: Math.round(weeklyAvailable * 100) / 100,
         monthly_available: Math.round(monthlyAvailable * 100) / 100,
@@ -1401,7 +1405,8 @@ export async function getBudgetForecast(
     } else {
       // No budget config, just show installment totals
       budgetImpact = {
-        avg_monthly_installments: Math.round(avgMonthlyInstallments * 100) / 100,
+        avg_monthly_installments:
+          Math.round(avgMonthlyInstallments * 100) / 100,
         daily_available: 0,
         weekly_available: 0,
         monthly_available: 0,

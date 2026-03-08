@@ -1,24 +1,24 @@
-import { redirect } from "next/navigation";
-import Link from "next/link";
 import { Link2, TrendingUp } from "lucide-react";
-import { EmptyDashboard } from "@/components/dashboard/EmptyDashboard";
-import { createClient } from "@/lib/supabase/server";
+import Link from "next/link";
+import { redirect } from "next/navigation";
 import {
   getActiveBudgetConfig,
+  getExpensesForDate,
   getTodayBudget,
   getWeekSummary,
-  getExpensesForDate,
 } from "@/actions/budget.actions";
-import { formatDateToString, getToday } from "@/lib/budget/calculations";
 import {
-  TodayBudgetCard,
-  WeekSummaryCard,
+  EmptyBudgetState,
   ExpenseForm,
   ExpenseList,
-  EmptyBudgetState,
+  TodayBudgetCard,
+  WeekSummaryCard,
 } from "@/components/budget";
-import { CardGlass } from "@/components/ui/card-glass";
+import { EmptyDashboard } from "@/components/dashboard/EmptyDashboard";
 import { Button } from "@/components/ui/button";
+import { CardGlass } from "@/components/ui/card-glass";
+import { formatDateToString, getToday } from "@/lib/budget/calculations";
+import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
@@ -114,10 +114,7 @@ export default async function BudgetPage() {
           {/* Right column */}
           <div className="space-y-6">
             {weekSummary && <WeekSummaryCard data={weekSummary} />}
-            <ExpenseList
-              expenses={expenses || []}
-              accountId={accountId}
-            />
+            <ExpenseList expenses={expenses || []} accountId={accountId} />
           </div>
         </div>
       ) : (
@@ -142,7 +139,8 @@ export default async function BudgetPage() {
               Economia e Recompensa
             </h4>
             <p className="text-sm text-[var(--color-text-muted)]">
-              Gastos abaixo do orcamento geram credito extra para os proximos dias.
+              Gastos abaixo do orcamento geram credito extra para os proximos
+              dias.
             </p>
           </div>
           <div className="space-y-2">

@@ -1,11 +1,11 @@
 "use client";
 
+import { CheckCircle2, Loader2, Sparkles } from "lucide-react";
 import { useState } from "react";
-import { Sparkles, Loader2, CheckCircle2 } from "lucide-react";
+import { toast } from "sonner";
+import { recategorizeTransactionsWithAI } from "@/actions/analytics.actions";
 import { Button } from "@/components/ui/button";
 import { CardGlass } from "@/components/ui/card-glass";
-import { recategorizeTransactionsWithAI } from "@/actions/analytics.actions";
-import { toast } from "sonner";
 
 interface RecategorizeButtonProps {
   accountId: string;
@@ -33,7 +33,7 @@ export function RecategorizeButton({ accountId }: RecategorizeButtonProps) {
       } else {
         toast.error(response.error || "Erro ao recategorizar transações");
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error("Erro ao recategorizar transações");
     } finally {
       setIsLoading(false);

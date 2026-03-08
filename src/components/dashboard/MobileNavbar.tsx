@@ -1,21 +1,22 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import {
-  LayoutDashboard,
-  FileText,
-  CreditCard,
-  Settings,
   BarChart3,
+  FileText,
+  LayoutDashboard,
+  Settings,
+  TrendingUp,
   Wallet,
 } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 const navigation = [
   { name: "Home", href: "/dashboard", icon: LayoutDashboard },
   { name: "Orcamento", href: "/budget", icon: Wallet },
+  { name: "Planejar", href: "/planning", icon: TrendingUp },
   { name: "Analytics", href: "/analytics", icon: BarChart3 },
   { name: "Faturas", href: "/invoices", icon: FileText },
   { name: "Config", href: "/settings", icon: Settings },

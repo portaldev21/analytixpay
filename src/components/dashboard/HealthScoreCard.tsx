@@ -1,15 +1,14 @@
 "use client";
 
-import { Lightbulb, Heart } from "lucide-react";
 import { motion } from "framer-motion";
+import { Heart, Lightbulb } from "lucide-react";
 import { CardGlass } from "@/components/ui/card-glass";
 import { Progress } from "@/components/ui/progress";
-import { cn } from "@/lib/utils";
 import {
-  getHealthScoreColor,
   getHealthScoreDescription,
   type HealthScore,
 } from "@/lib/analytics/health-score";
+import { cn } from "@/lib/utils";
 
 interface HealthScoreCardProps {
   data: HealthScore | null;

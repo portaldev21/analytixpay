@@ -1,17 +1,17 @@
 "use client";
 
-import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import {
-  Sparkles,
   AlertTriangle,
-  Info,
-  CheckCircle,
-  Lightbulb,
   ArrowRight,
+  CheckCircle,
+  Info,
+  Lightbulb,
+  Sparkles,
 } from "lucide-react";
-import { CardGlass } from "@/components/ui/card-glass";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { CardGlass } from "@/components/ui/card-glass";
 import type { Insight, InsightType } from "@/lib/analytics/insights";
 import { cn } from "@/lib/utils";
 
@@ -102,7 +102,10 @@ export function InsightsPanel({ insights }: InsightsPanelProps) {
               >
                 <div className="flex gap-3">
                   <div
-                    className={cn("flex-shrink-0 p-1.5 rounded-[var(--radius-sm)]", styles.bg)}
+                    className={cn(
+                      "flex-shrink-0 p-1.5 rounded-[var(--radius-sm)]",
+                      styles.bg,
+                    )}
                   >
                     <Icon className={cn("size-4", styles.color)} />
                   </div>

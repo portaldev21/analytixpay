@@ -26,7 +26,7 @@ export async function GET(request: Request) {
             });
           },
         },
-      }
+      },
     );
 
     const { error } = await supabase.auth.exchangeCodeForSession(code);
@@ -53,7 +53,9 @@ export async function GET(request: Request) {
 
       // If no account exists, create one (first-time OAuth login)
       if (!existingMember) {
-        console.log("[Auth Callback] Creating default account for new OAuth user");
+        console.log(
+          "[Auth Callback] Creating default account for new OAuth user",
+        );
 
         const { data: account, error: accountError } = await supabase
           .from("accounts")
@@ -65,7 +67,10 @@ export async function GET(request: Request) {
           .single();
 
         if (accountError) {
-          console.error("[Auth Callback] Error creating account:", accountError.message);
+          console.error(
+            "[Auth Callback] Error creating account:",
+            accountError.message,
+          );
         } else if (account) {
           // Add user as owner member
           const { error: memberError } = await supabase
@@ -77,9 +82,14 @@ export async function GET(request: Request) {
             });
 
           if (memberError) {
-            console.error("[Auth Callback] Error adding member:", memberError.message);
+            console.error(
+              "[Auth Callback] Error adding member:",
+              memberError.message,
+            );
           } else {
-            console.log("[Auth Callback] Account and membership created successfully");
+            console.log(
+              "[Auth Callback] Account and membership created successfully",
+            );
           }
         }
       } else {

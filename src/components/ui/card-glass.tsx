@@ -1,8 +1,8 @@
 "use client";
 
-import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
-import { motion, type HTMLMotionProps } from "framer-motion";
+import { type HTMLMotionProps, motion } from "framer-motion";
+import * as React from "react";
 import { cn } from "@/lib/utils";
 
 const cardGlassVariants = cva(
@@ -36,10 +36,7 @@ const cardGlassVariants = cva(
           "text-white",
         ],
         // Outline - Transparent with border
-        outline: [
-          "bg-transparent",
-          "border border-[var(--color-border)]",
-        ],
+        outline: ["bg-transparent", "border border-[var(--color-border)]"],
       },
       size: {
         sm: "rounded-[var(--radius-sm)] p-3",
@@ -67,17 +64,7 @@ export interface CardGlassProps
 }
 
 const CardGlass = React.forwardRef<HTMLDivElement, CardGlassProps>(
-  (
-    {
-      className,
-      variant,
-      size,
-      interactive,
-      children,
-      ...props
-    },
-    ref,
-  ) => {
+  ({ className, variant, size, interactive, children, ...props }, ref) => {
     return (
       <motion.div
         ref={ref}
