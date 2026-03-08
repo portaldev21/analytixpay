@@ -1,16 +1,16 @@
 "use client";
 
-import {
-  DollarSign,
-  TrendingUp,
-  TrendingDown,
-  ShoppingCart,
-  CreditCard,
-  Calendar,
-  Receipt,
-  type LucideIcon,
-} from "lucide-react";
 import { motion } from "framer-motion";
+import {
+  Calendar,
+  CreditCard,
+  DollarSign,
+  type LucideIcon,
+  Receipt,
+  ShoppingCart,
+  TrendingDown,
+  TrendingUp,
+} from "lucide-react";
 import { CardGlass } from "@/components/ui/card-glass";
 import { cn } from "@/lib/utils";
 
@@ -61,12 +61,7 @@ export function StatsCard({
   };
 
   return (
-    <CardGlass
-      variant="default"
-      size="lg"
-      interactive
-      className={className}
-    >
+    <CardGlass variant="default" size="lg" interactive className={className}>
       <div className="flex items-start justify-between">
         <div className="space-y-1">
           <p className="text-sm font-medium text-[var(--color-text-muted)]">
@@ -82,7 +77,12 @@ export function StatsCard({
           </motion.p>
         </div>
 
-        <div className={cn("p-2.5 rounded-[var(--radius-md)]", iconBgColor[variant])}>
+        <div
+          className={cn(
+            "p-2.5 rounded-[var(--radius-md)]",
+            iconBgColor[variant],
+          )}
+        >
           <Icon className={cn("size-5", iconColor[variant])} />
         </div>
       </div>

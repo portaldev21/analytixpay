@@ -1,21 +1,21 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import {
+  AlertCircle,
   Calendar,
   CheckCircle,
-  Loader2,
-  AlertCircle,
   FileText,
+  Loader2,
 } from "lucide-react";
-import { CardGlass } from "@/components/ui/card-glass";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import {
   getInvoicesWithoutBillingDate,
   updateInvoiceBillingDate,
 } from "@/actions/analytics.actions";
+import { Button } from "@/components/ui/button";
+import { CardGlass } from "@/components/ui/card-glass";
+import { Input } from "@/components/ui/input";
 
 interface Invoice {
   id: string;
@@ -39,7 +39,7 @@ export function MigrateInvoices({ accountId }: MigrateInvoicesProps) {
 
   useEffect(() => {
     loadInvoices();
-  }, [accountId]);
+  }, [loadInvoices]);
 
   async function loadInvoices() {
     setLoading(true);

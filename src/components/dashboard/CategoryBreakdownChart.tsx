@@ -1,9 +1,9 @@
 "use client";
 
+import { PieChart as PieChartIcon } from "lucide-react";
+import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 import { CardGlass } from "@/components/ui/card-glass";
 import { formatCurrency, getCategoryColor } from "@/lib/utils";
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
-import { PieChart as PieChartIcon } from "lucide-react";
 
 interface CategoryBreakdownChartProps {
   data: {

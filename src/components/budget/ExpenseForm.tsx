@@ -1,22 +1,22 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import {
-  Plus,
+  Car,
+  Gamepad2,
+  Heart,
+  Home,
   Loader2,
+  MoreHorizontal,
+  Plus,
+  Shirt,
   ShoppingCart,
   Utensils,
-  Car,
-  Heart,
-  Gamepad2,
-  Home,
-  Shirt,
-  MoreHorizontal,
 } from "lucide-react";
-import { CardGlass } from "@/components/ui/card-glass";
-import { cn, formatCurrency } from "@/lib/utils";
+import { useState, useTransition } from "react";
 import { addBudgetExpense } from "@/actions/budget.actions";
+import { CardGlass } from "@/components/ui/card-glass";
+import { cn } from "@/lib/utils";
 
 const categories = [
   { name: "Alimentacao", icon: Utensils, color: "text-green-400" },
@@ -35,7 +35,11 @@ interface ExpenseFormProps {
   className?: string;
 }
 
-export function ExpenseForm({ accountId, onSuccess, className }: ExpenseFormProps) {
+export function ExpenseForm({
+  accountId,
+  onSuccess,
+  className,
+}: ExpenseFormProps) {
   const [amount, setAmount] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("Outros");
   const [description, setDescription] = useState("");
@@ -78,7 +82,7 @@ export function ExpenseForm({ accountId, onSuccess, className }: ExpenseFormProp
   };
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.replace(/[^\d,\.]/g, "");
+    const value = e.target.value.replace(/[^\d,.]/g, "");
     setAmount(value);
   };
 
@@ -121,7 +125,9 @@ export function ExpenseForm({ accountId, onSuccess, className }: ExpenseFormProp
 
         {/* Category selector */}
         <div className="mb-4">
-          <p className="text-xs text-[var(--color-text-muted)] mb-2">Categoria</p>
+          <p className="text-xs text-[var(--color-text-muted)] mb-2">
+            Categoria
+          </p>
           <div className="grid grid-cols-4 gap-2">
             {categories.map((cat) => {
               const Icon = cat.icon;
@@ -138,11 +144,18 @@ export function ExpenseForm({ accountId, onSuccess, className }: ExpenseFormProp
                       : "bg-[var(--color-surface-muted)] border-2 border-transparent hover:border-[var(--color-border-light)]",
                   )}
                 >
-                  <Icon className={cn("size-5", isSelected ? cat.color : "text-[var(--color-text-muted)]")} />
+                  <Icon
+                    className={cn(
+                      "size-5",
+                      isSelected ? cat.color : "text-[var(--color-text-muted)]",
+                    )}
+                  />
                   <span
                     className={cn(
                       "text-[10px] font-medium truncate w-full text-center",
-                      isSelected ? "text-[var(--color-text-primary)]" : "text-[var(--color-text-muted)]",
+                      isSelected
+                        ? "text-[var(--color-text-primary)]"
+                        : "text-[var(--color-text-muted)]",
                     )}
                   >
                     {cat.name}

@@ -1,19 +1,22 @@
 "use client";
 
-import { useState, useTransition } from "react";
 import { motion } from "framer-motion";
-import { Wallet, ArrowRight, Loader2 } from "lucide-react";
+import { ArrowRight, Loader2, Wallet } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
+import { upsertBudgetConfig } from "@/actions/budget.actions";
 import { CardGlass } from "@/components/ui/card-glass";
 import { cn } from "@/lib/utils";
-import { upsertBudgetConfig } from "@/actions/budget.actions";
-import { useRouter } from "next/navigation";
 
 interface EmptyBudgetStateProps {
   accountId: string;
   className?: string;
 }
 
-export function EmptyBudgetState({ accountId, className }: EmptyBudgetStateProps) {
+export function EmptyBudgetState({
+  accountId,
+  className,
+}: EmptyBudgetStateProps) {
   const [dailyBase, setDailyBase] = useState("");
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -44,7 +47,7 @@ export function EmptyBudgetState({ accountId, className }: EmptyBudgetStateProps
   };
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.replace(/[^\d,\.]/g, "");
+    const value = e.target.value.replace(/[^\d,.]/g, "");
     setDailyBase(value);
   };
 
@@ -69,8 +72,8 @@ export function EmptyBudgetState({ accountId, className }: EmptyBudgetStateProps
             Configure seu Orcamento Fluido
           </h2>
           <p className="text-[var(--color-text-muted)] mb-8">
-            Defina quanto voce quer gastar por dia. O sistema ajustara automaticamente
-            seu orcamento baseado nos seus gastos.
+            Defina quanto voce quer gastar por dia. O sistema ajustara
+            automaticamente seu orcamento baseado nos seus gastos.
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -108,13 +111,17 @@ export function EmptyBudgetState({ accountId, className }: EmptyBudgetStateProps
                 className="space-y-3 p-4 rounded-xl bg-[var(--color-surface-muted)]"
               >
                 <div className="flex justify-between text-sm">
-                  <span className="text-[var(--color-text-muted)]">Semanal</span>
+                  <span className="text-[var(--color-text-muted)]">
+                    Semanal
+                  </span>
                   <span className="font-semibold text-[var(--color-text-primary)] tabular-nums">
                     R$ {weeklyBudget.toFixed(2).replace(".", ",")}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-[var(--color-text-muted)]">Mensal (30 dias)</span>
+                  <span className="text-[var(--color-text-muted)]">
+                    Mensal (30 dias)
+                  </span>
                   <span className="font-semibold text-[var(--color-text-primary)] tabular-nums">
                     R$ {monthlyBudget.toFixed(2).replace(".", ",")}
                   </span>

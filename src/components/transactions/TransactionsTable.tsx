@@ -1,16 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Calendar, ExternalLink, Receipt } from "lucide-react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
-import { Calendar, Receipt, ExternalLink } from "lucide-react";
+import { useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import { CardGlass } from "@/components/ui/card-glass";
+import type { TTransaction } from "@/db/types";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { CategoryBadge } from "./CategoryBadge";
-import { EditTransactionDialog } from "./EditTransactionDialog";
 import { DeleteTransactionButton } from "./DeleteTransactionButton";
-import { CardGlass } from "@/components/ui/card-glass";
-import { Badge } from "@/components/ui/badge";
-import type { TTransaction } from "@/db/types";
+import { EditTransactionDialog } from "./EditTransactionDialog";
 
 interface TransactionsTableProps {
   transactions: TTransaction[];

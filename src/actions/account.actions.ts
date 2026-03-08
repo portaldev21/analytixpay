@@ -1,13 +1,13 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import type { TAccount, TAccountWithMembers, TApiResponse } from "@/db/types";
 import {
   createClient,
   getCurrentUser,
   isAccountOwner,
 } from "@/lib/supabase/server";
-import { createAccountSchema, addMemberSchema } from "@/lib/validations";
-import type { TApiResponse, TAccount, TAccountWithMembers } from "@/db/types";
+import { addMemberSchema, createAccountSchema } from "@/lib/validations";
 
 /**
  * Get all accounts for current user

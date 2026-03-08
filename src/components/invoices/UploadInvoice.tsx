@@ -1,23 +1,23 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { useRouter } from "next/navigation";
-import { useDropzone } from "react-dropzone";
 import {
-  Upload,
+  AlertCircle,
+  Calendar,
+  CheckCircle,
   FileText,
   Loader2,
-  CheckCircle,
+  Upload,
   XCircle,
-  Calendar,
-  AlertCircle,
 } from "lucide-react";
-import { CardGlass } from "@/components/ui/card-glass";
+import { useRouter } from "next/navigation";
+import { useCallback, useState } from "react";
+import { useDropzone } from "react-dropzone";
+import { uploadInvoice } from "@/actions/invoice.actions";
 import { Button } from "@/components/ui/button";
+import { CardGlass } from "@/components/ui/card-glass";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { uploadInvoice } from "@/actions/invoice.actions";
 
 interface UploadInvoiceProps {
   accountId: string;
@@ -68,7 +68,7 @@ export function UploadInvoice({ accountId }: UploadInvoiceProps) {
         setStatus("error");
         setMessage(result.error || "Erro ao processar fatura");
       }
-    } catch (error) {
+    } catch (_error) {
       setStatus("error");
       setMessage("Erro inesperado ao fazer upload");
     } finally {

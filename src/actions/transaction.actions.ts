@@ -1,37 +1,42 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { z } from "zod";
+import type {
+  TApiResponse,
+  TDashboardStats,
+  TTransaction,
+  TTransactionFilters,
+} from "@/db/types";
 import {
-  createClient,
-  hasAccessToAccount,
-  requireAuth,
-  requireAccountAccess,
-} from "@/lib/supabase/server";
-import { logger } from "@/lib/logger";
-import {
-  calculateTransactionStats,
   calculateStatsWithComparison,
-  filterTransactionsByDateRange,
+  calculateTransactionStats,
   getPreviousPeriodDateRange,
   type PeriodDateRange,
   type StatsWithComparison,
 } from "@/lib/analytics/stats";
-import { z } from "zod";
-import type {
-  TApiResponse,
-  TTransaction,
-  TDashboardStats,
-  TTransactionFilters,
-} from "@/db/types";
+import { logger } from "@/lib/logger";
+import {
+  createClient,
+  hasAccessToAccount,
+  requireAccountAccess,
+} from "@/lib/supabase/server";
 
 const updateTransactionSchema = z.object({
-  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  date: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
   description: z.string().min(1).max(500).optional(),
   amount: z.number().positive().optional(),
   category: z.string().min(1).max(100).optional(),
   installment: z.string().max(20).nullable().optional(),
   is_international: z.boolean().optional(),
-  billing_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable().optional(),
+  billing_date: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .nullable()
+    .optional(),
 });
 
 /**

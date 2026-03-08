@@ -1,10 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { CreditCard, Calendar, ArrowRight } from "lucide-react";
+import { ArrowRight, Calendar, CreditCard } from "lucide-react";
 import { CardGlass } from "@/components/ui/card-glass";
-import { cn, formatCurrency } from "@/lib/utils";
 import type { TInstallmentProjection } from "@/db/types";
+import { formatCurrency } from "@/lib/utils";
 
 interface ActiveInstallmentsListProps {
   installments: TInstallmentProjection[];
@@ -93,7 +93,8 @@ export function ActiveInstallmentsList({
                   <div className="flex items-center gap-2 mt-1">
                     <Calendar className="size-3 text-[var(--color-text-muted)]" />
                     <span className="text-xs text-[var(--color-text-muted)]">
-                      Proxima: {new Date(inst.next_date).toLocaleDateString("pt-BR")}
+                      Proxima:{" "}
+                      {new Date(inst.next_date).toLocaleDateString("pt-BR")}
                     </span>
                   </div>
                 </div>
@@ -101,9 +102,7 @@ export function ActiveInstallmentsList({
                   <p className="text-sm font-bold text-[var(--color-primary)] tabular-nums">
                     {formatCurrency(inst.amount)}
                   </p>
-                  <p className="text-xs text-[var(--color-text-muted)]">
-                    /mes
-                  </p>
+                  <p className="text-xs text-[var(--color-text-muted)]">/mes</p>
                 </div>
               </div>
 

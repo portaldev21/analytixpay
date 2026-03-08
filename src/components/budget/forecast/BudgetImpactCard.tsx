@@ -1,17 +1,20 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { TrendingDown, Wallet, Calendar, AlertTriangle } from "lucide-react";
+import { AlertTriangle, Calendar, TrendingDown, Wallet } from "lucide-react";
 import { CardGlass } from "@/components/ui/card-glass";
-import { cn, formatCurrency } from "@/lib/utils";
 import type { TBudgetForecast } from "@/db/types";
+import { cn, formatCurrency } from "@/lib/utils";
 
 interface BudgetImpactCardProps {
   forecast: TBudgetForecast;
   className?: string;
 }
 
-export function BudgetImpactCard({ forecast, className }: BudgetImpactCardProps) {
+export function BudgetImpactCard({
+  forecast,
+  className,
+}: BudgetImpactCardProps) {
   const { budget_config, budget_impact } = forecast;
   const hasConfig = budget_config !== null;
 
@@ -66,13 +69,7 @@ export function BudgetImpactCard({ forecast, className }: BudgetImpactCardProps)
   }
 
   return (
-    <CardGlass
-      variant="default"
-      size="xl"
-      interactive
-      
-      className={className}
-    >
+    <CardGlass variant="default" size="xl" interactive className={className}>
       {/* Header */}
       <div className="flex items-start justify-between mb-6">
         <div>
@@ -177,7 +174,8 @@ export function BudgetImpactCard({ forecast, className }: BudgetImpactCardProps)
             <p
               className={cn(
                 "text-lg font-bold tabular-nums",
-                budget_impact.weekly_available >= budget_config.weekly_budget * 0.5
+                budget_impact.weekly_available >=
+                  budget_config.weekly_budget * 0.5
                   ? "text-[var(--color-positive)]"
                   : budget_impact.weekly_available >= 0
                     ? "text-yellow-400"
@@ -206,7 +204,8 @@ export function BudgetImpactCard({ forecast, className }: BudgetImpactCardProps)
             <p
               className={cn(
                 "text-lg font-bold tabular-nums",
-                budget_impact.monthly_available >= budget_config.monthly_budget * 0.5
+                budget_impact.monthly_available >=
+                  budget_config.monthly_budget * 0.5
                   ? "text-[var(--color-positive)]"
                   : budget_impact.monthly_available >= 0
                     ? "text-yellow-400"

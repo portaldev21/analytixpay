@@ -1,8 +1,9 @@
 "use client";
 
+import { AlertTriangle, Trash2 } from "lucide-react";
 import { useState } from "react";
-import { Trash2, AlertTriangle } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { deleteInvoice } from "@/actions/invoice.actions";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,8 +15,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { deleteInvoice } from "@/actions/invoice.actions";
-import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 
 interface DeleteInvoiceButtonProps {
   invoiceId: string;
@@ -51,7 +51,7 @@ export function DeleteInvoiceButton({
         toast.error(result.error || "Erro ao deletar fatura");
         setIsDeleting(false);
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error("Erro ao deletar fatura");
       setIsDeleting(false);
     }

@@ -1,22 +1,22 @@
 "use client";
 
+import { AnimatePresence, motion } from "framer-motion";
+import { Calendar, Check, Link2, X } from "lucide-react";
 import { useState } from "react";
-import { Check, X, Link2, Calendar, DollarSign, Tag } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-import { CardGlass } from "@/components/ui/card-glass";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import {
   approveReconciliation,
   markExpenseUnmatched,
 } from "@/actions/budget.actions";
+import { Button } from "@/components/ui/button";
+import { CardGlass } from "@/components/ui/card-glass";
+import type { TBudgetExpense } from "@/db/types";
 import {
-  getMatchExplanation,
-  getConfidenceLabel,
   formatConfidence,
+  getConfidenceLabel,
+  getMatchExplanation,
   type TReconciliationMatch,
 } from "@/lib/budget/reconciliation";
-import type { TBudgetExpense } from "@/db/types";
+import { cn } from "@/lib/utils";
 
 interface MatchSuggestionCardProps {
   expense: TBudgetExpense;

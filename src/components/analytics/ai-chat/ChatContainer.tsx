@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
-import { CardGlass } from "@/components/ui/card-glass";
-import { Button } from "@/components/ui/button";
-import { ChatMessage } from "./ChatMessage";
-import { ChatInput } from "./ChatInput";
-import { ChatSuggestions } from "./ChatSuggestions";
-import { Bot, Trash2, MessageSquare } from "lucide-react";
+import { Bot, MessageSquare, Trash2 } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { CardGlass } from "@/components/ui/card-glass";
+import { ChatInput } from "./ChatInput";
+import { ChatMessage } from "./ChatMessage";
+import { ChatSuggestions } from "./ChatSuggestions";
 
 interface Message {
   id: string;
@@ -33,7 +33,7 @@ export function ChatContainer({ accountId }: ChatContainerProps) {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages, streamingContent, scrollToBottom]);
+  }, [scrollToBottom]);
 
   // Send message
   const sendMessage = async (content: string) => {
@@ -106,7 +106,7 @@ export function ChatContainer({ accountId }: ChatContainerProps) {
                   setMessages((prev) => [...prev, assistantMessage]);
                   setStreamingContent("");
                 }
-              } catch (e) {
+              } catch (_e) {
                 // Ignore parse errors for incomplete chunks
               }
             }
@@ -188,11 +188,7 @@ export function ChatContainer({ accountId }: ChatContainerProps) {
               />
             ))}
             {streamingContent && (
-              <ChatMessage
-                role="assistant"
-                content={streamingContent}
-                isStreaming
-              />
+              <ChatMessage role="assistant" content={streamingContent} isStreaming />
             )}
             <div ref={messagesEndRef} />
           </>

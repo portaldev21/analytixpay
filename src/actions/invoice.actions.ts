@@ -1,19 +1,19 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import {
-  createClient,
-  getCurrentUser,
-  hasAccessToAccount,
-} from "@/lib/supabase/server";
-import { parsePdfFile } from "@/lib/pdf/parser";
-import { uploadLimiter } from "@/lib/rate-limit";
-import { logger } from "@/lib/logger";
 import type {
   TApiResponse,
   TInvoice,
   TInvoiceWithTransactions,
 } from "@/db/types";
+import { logger } from "@/lib/logger";
+import { parsePdfFile } from "@/lib/pdf/parser";
+import { uploadLimiter } from "@/lib/rate-limit";
+import {
+  createClient,
+  getCurrentUser,
+  hasAccessToAccount,
+} from "@/lib/supabase/server";
 
 /**
  * Upload and process invoice PDF
@@ -33,7 +33,7 @@ export async function uploadInvoice(
     // Rate limiting: 5 uploads per 10 minutes
     try {
       await uploadLimiter.check(5, user.id);
-    } catch (error) {
+    } catch (_error) {
       logger.warn("Upload rate limit exceeded", { userId: user.id });
       return {
         data: null,
@@ -175,10 +175,7 @@ export async function uploadInvoice(
         invoiceId: createdInvoice.id,
         transError,
       });
-      await supabase
-        .from("invoices")
-        .delete()
-        .eq("id", createdInvoice.id);
+      await supabase.from("invoices").delete().eq("id", createdInvoice.id);
       await supabase.storage.from("invoices").remove([filePath]);
       return { data: null, error: transError.message, success: false };
     }
@@ -359,7 +356,9 @@ export async function getInvoicesSummary(accountId: string): Promise<
 
     const { data: invoices, error: invoicesError } = await supabase
       .from("invoices")
-      .select("id, period, card_last_digits, total_amount, created_at, transactions(count)")
+      .select(
+        "id, period, card_last_digits, total_amount, created_at, transactions(count)",
+      )
       .eq("account_id", accountId)
       .order("created_at", { ascending: false });
 

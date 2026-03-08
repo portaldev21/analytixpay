@@ -1,30 +1,30 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import Anthropic from "@anthropic-ai/sdk";
-import { requireAccountAccess } from "@/lib/supabase/server";
-import { logger } from "@/lib/logger";
-import { env, hasAnthropic } from "@/lib/env";
-import {
-  detectRecurringTransactions,
-  type RecurringTransaction,
-} from "@/lib/analytics/recurring";
-import { generateInsights, type Insight } from "@/lib/analytics/insights";
+import { revalidatePath } from "next/cache";
+import type {
+  TApiResponse,
+  TDailySpending,
+  TInstallmentProjection,
+  TSpendingByCard,
+  TTransaction,
+} from "@/db/types";
 import {
   calculateHealthScore,
   type HealthScore,
 } from "@/lib/analytics/health-score";
+import { generateInsights, type Insight } from "@/lib/analytics/insights";
+import {
+  detectRecurringTransactions,
+  type RecurringTransaction,
+} from "@/lib/analytics/recurring";
 import {
   calculateTransactionStats,
   type PeriodDateRange,
 } from "@/lib/analytics/stats";
-import type {
-  TApiResponse,
-  TTransaction,
-  TDailySpending,
-  TSpendingByCard,
-  TInstallmentProjection,
-} from "@/db/types";
+import { env, hasAnthropic } from "@/lib/env";
+import { logger } from "@/lib/logger";
+import { requireAccountAccess } from "@/lib/supabase/server";
 
 /**
  * Get recurring transactions for account

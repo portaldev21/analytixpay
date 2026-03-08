@@ -1,10 +1,16 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Calendar, TrendingUp, TrendingDown, CheckCircle, XCircle } from "lucide-react";
+import {
+  Calendar,
+  CheckCircle,
+  TrendingDown,
+  TrendingUp,
+  XCircle,
+} from "lucide-react";
 import { CardGlass } from "@/components/ui/card-glass";
-import { cn, formatCurrency } from "@/lib/utils";
 import type { TWeekSummary } from "@/db/types";
+import { cn, formatCurrency } from "@/lib/utils";
 
 interface WeekSummaryCardProps {
   data: TWeekSummary;
@@ -13,7 +19,7 @@ interface WeekSummaryCardProps {
 
 export function WeekSummaryCard({ data, className }: WeekSummaryCardProps) {
   const progressPercent = (data.total_spent / data.total_budget) * 100;
-  const daysCompleted = data.daily_records.length;
+  const _daysCompleted = data.daily_records.length;
   const currentDayOfWeek = new Date().getDay();
   const isPositiveBalance = data.cycle.accumulated_balance >= 0;
 
@@ -69,7 +75,9 @@ export function WeekSummaryCard({ data, className }: WeekSummaryCardProps) {
       {/* Budget progress */}
       <div className="space-y-3">
         <div className="flex justify-between items-center">
-          <span className="text-sm text-[var(--color-text-muted)]">Orcamento semanal</span>
+          <span className="text-sm text-[var(--color-text-muted)]">
+            Orcamento semanal
+          </span>
           <span className="text-sm font-medium text-[var(--color-text-primary)] tabular-nums">
             {formatCurrency(data.total_budget)}
           </span>
@@ -90,7 +98,9 @@ export function WeekSummaryCard({ data, className }: WeekSummaryCardProps) {
         </div>
 
         <div className="flex justify-between items-center text-sm">
-          <span className="text-[var(--color-text-muted)]">Gasto ate agora</span>
+          <span className="text-[var(--color-text-muted)]">
+            Gasto ate agora
+          </span>
           <span className="font-medium text-[var(--color-text-primary)] tabular-nums">
             {formatCurrency(data.total_spent)}
           </span>
@@ -100,7 +110,9 @@ export function WeekSummaryCard({ data, className }: WeekSummaryCardProps) {
       {/* Stats grid */}
       <div className="grid grid-cols-2 gap-3 mt-4 pt-4 border-t border-[var(--color-border-light)]">
         <div className="space-y-1">
-          <p className="text-xs text-[var(--color-text-muted)]">Saldo acumulado</p>
+          <p className="text-xs text-[var(--color-text-muted)]">
+            Saldo acumulado
+          </p>
           <div className="flex items-center gap-1">
             {isPositiveBalance ? (
               <TrendingUp className="size-4 text-[var(--color-positive)]" />
@@ -129,7 +141,9 @@ export function WeekSummaryCard({ data, className }: WeekSummaryCardProps) {
         </div>
 
         <div className="space-y-1">
-          <p className="text-xs text-[var(--color-text-muted)]">Dias no orcamento</p>
+          <p className="text-xs text-[var(--color-text-muted)]">
+            Dias no orcamento
+          </p>
           <div className="flex items-center gap-1">
             <CheckCircle className="size-4 text-[var(--color-positive)]" />
             <span className="font-semibold text-[var(--color-positive)]">

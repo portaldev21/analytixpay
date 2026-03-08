@@ -350,7 +350,8 @@ export function parseTransactionsFromText(
           );
 
           // Validate amount: must be positive and reasonable (R$ 0.01 - R$ 100,000)
-          if (isNaN(amount) || amount < 0.01 || amount > 100000) continue;
+          if (Number.isNaN(amount) || amount < 0.01 || amount > 100000)
+            continue;
 
           // Detect installment (e.g., "PARC 01/12", "1/6")
           const installmentMatch = description.match(/(\d+)\/(\d+)/i);
@@ -376,10 +377,7 @@ export function parseTransactionsFromText(
           });
 
           foundMatch = true; // Mark that we found a match for this line
-        } catch {
-          // Skip malformed lines silently
-          continue;
-        }
+        } catch {}
       }
     }
   }

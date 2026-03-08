@@ -1,17 +1,17 @@
-import { redirect } from "next/navigation";
-import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
-import { EmptyDashboard } from "@/components/dashboard/EmptyDashboard";
+import Link from "next/link";
+import { redirect } from "next/navigation";
 import { getBudgetForecast } from "@/actions/budget.actions";
 import {
-  BudgetImpactCard,
-  MonthlyProjectionChart,
-  InstallmentsCalendar,
   ActiveInstallmentsList,
+  BudgetImpactCard,
+  InstallmentsCalendar,
+  MonthlyProjectionChart,
 } from "@/components/budget/forecast";
-import { CardGlass } from "@/components/ui/card-glass";
+import { EmptyDashboard } from "@/components/dashboard/EmptyDashboard";
 import { Button } from "@/components/ui/button";
+import { CardGlass } from "@/components/ui/card-glass";
+import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
@@ -119,7 +119,8 @@ export default async function BudgetForecastPage() {
               Impacto no Orcamento
             </h4>
             <p className="text-sm text-[var(--color-text-muted)]">
-              Mostra quanto das parcelas comprometem seu orcamento diario, semanal e mensal.
+              Mostra quanto das parcelas comprometem seu orcamento diario,
+              semanal e mensal.
             </p>
           </div>
           <div className="space-y-2">
@@ -141,7 +142,8 @@ export default async function BudgetForecastPage() {
               Parcelas Ativas
             </h4>
             <p className="text-sm text-[var(--color-text-muted)]">
-              Acompanhe o progresso de cada compra parcelada e quanto ainda falta pagar.
+              Acompanhe o progresso de cada compra parcelada e quanto ainda
+              falta pagar.
             </p>
           </div>
         </div>

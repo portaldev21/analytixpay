@@ -70,7 +70,8 @@ export function calculateMatchConfidence(
   const transactionDate = new Date(transaction.date);
   const daysDiff = Math.abs(
     Math.floor(
-      (expenseDate.getTime() - transactionDate.getTime()) / (1000 * 60 * 60 * 24),
+      (expenseDate.getTime() - transactionDate.getTime()) /
+        (1000 * 60 * 60 * 24),
     ),
   );
 
@@ -98,7 +99,8 @@ export function calculateMatchConfidence(
   if (
     expense.category &&
     transaction.category &&
-    normalizeCategory(expense.category) === normalizeCategory(transaction.category)
+    normalizeCategory(expense.category) ===
+      normalizeCategory(transaction.category)
   ) {
     confidence += WEIGHTS.same_category;
     reasons.push("same_category");
@@ -118,7 +120,10 @@ export function findPotentialMatches(
   const matches: TReconciliationMatch[] = [];
 
   for (const transaction of transactions) {
-    const { confidence, reasons } = calculateMatchConfidence(expense, transaction);
+    const { confidence, reasons } = calculateMatchConfidence(
+      expense,
+      transaction,
+    );
 
     if (confidence >= minConfidence) {
       matches.push({
@@ -172,7 +177,11 @@ export function findReconciliationSuggestions(
       return tDate >= minDate && tDate <= maxDate;
     });
 
-    const matches = findPotentialMatches(expense, nearbyTransactions, minConfidence);
+    const matches = findPotentialMatches(
+      expense,
+      nearbyTransactions,
+      minConfidence,
+    );
 
     results.push({
       expense,

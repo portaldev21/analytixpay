@@ -1,10 +1,10 @@
 "use client";
 
-import { Card } from "@/components/ui/card";
-import { formatCurrency, formatDate } from "@/lib/utils";
-import { CategoryBadge } from "@/components/transactions/CategoryBadge";
 import { TrendingUp } from "lucide-react";
+import { CategoryBadge } from "@/components/transactions/CategoryBadge";
+import { Card } from "@/components/ui/card";
 import type { TTransaction } from "@/db/types";
+import { formatCurrency, formatDate } from "@/lib/utils";
 
 interface TopExpensesProps {
   data: TTransaction[];

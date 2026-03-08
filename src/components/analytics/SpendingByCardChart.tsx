@@ -1,19 +1,19 @@
 "use client";
 
-import { CardGlass } from "@/components/ui/card-glass";
-import { formatCurrency } from "@/lib/utils";
-import { useMediaQuery } from "@/hooks/use-media-query";
+import { CreditCard } from "lucide-react";
 import {
-  BarChart,
   Bar,
+  BarChart,
+  Cell,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  Cell,
 } from "recharts";
+import { CardGlass } from "@/components/ui/card-glass";
 import type { TSpendingByCard } from "@/db/types";
-import { CreditCard } from "lucide-react";
+import { useMediaQuery } from "@/hooks/use-media-query";
+import { formatCurrency } from "@/lib/utils";
 
 interface SpendingByCardChartProps {
   data: TSpendingByCard[];

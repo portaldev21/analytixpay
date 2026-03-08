@@ -1,10 +1,10 @@
 "use client";
 
-import { CardGlass } from "@/components/ui/card-glass";
+import { AlertCircle, Calendar } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { formatCurrency, formatDate } from "@/lib/utils";
+import { CardGlass } from "@/components/ui/card-glass";
 import type { TInstallmentProjection } from "@/db/types";
-import { Calendar, AlertCircle } from "lucide-react";
+import { formatCurrency, formatDate } from "@/lib/utils";
 
 interface InstallmentsTableProps {
   data: TInstallmentProjection[];

@@ -121,7 +121,7 @@ export function detectRecurringTransactions(
   const groups = groupSimilarTransactions(transactions);
   const recurring: RecurringTransaction[] = [];
 
-  for (const [description, items] of groups) {
+  for (const [_description, items] of groups) {
     // Need at least 3 occurrences to detect pattern
     if (items.length < 3) continue;
 
@@ -144,7 +144,7 @@ export function detectRecurringTransactions(
     // Calculate average interval and variance
     const avgInterval = intervals.reduce((a, b) => a + b, 0) / intervals.length;
     const variance =
-      intervals.reduce((sum, val) => sum + Math.pow(val - avgInterval, 2), 0) /
+      intervals.reduce((sum, val) => sum + (val - avgInterval) ** 2, 0) /
       intervals.length;
     const stdDev = Math.sqrt(variance);
 

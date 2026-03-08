@@ -248,7 +248,7 @@ Retorne APENAS o JSON.`;
       // Find the last complete transaction and close the JSON
       const lastCompleteTransaction = cleanJson.lastIndexOf("},");
       if (lastCompleteTransaction > 0) {
-        cleanJson = cleanJson.slice(0, lastCompleteTransaction + 1) + "]}";
+        cleanJson = `${cleanJson.slice(0, lastCompleteTransaction + 1)}]}`;
         try {
           extracted = JSON.parse(cleanJson);
           logger.info("JSON repair successful", {

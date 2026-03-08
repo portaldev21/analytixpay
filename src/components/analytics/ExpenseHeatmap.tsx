@@ -1,10 +1,10 @@
 "use client";
 
-import { CardGlass } from "@/components/ui/card-glass";
 import CalendarHeatmap from "react-calendar-heatmap";
+import { CardGlass } from "@/components/ui/card-glass";
 import "react-calendar-heatmap/dist/styles.css";
-import { formatCurrency, formatDate } from "@/lib/utils";
 import type { TDailySpending } from "@/db/types";
+import { formatCurrency, formatDate } from "@/lib/utils";
 
 interface ExpenseHeatmapProps {
   data: TDailySpending[];

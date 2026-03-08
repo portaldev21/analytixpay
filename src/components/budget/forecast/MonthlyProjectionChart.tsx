@@ -1,20 +1,20 @@
 "use client";
 
-import { CardGlass } from "@/components/ui/card-glass";
-import { formatCurrency } from "@/lib/utils";
-import { useMediaQuery } from "@/hooks/use-media-query";
+import { CalendarDays } from "lucide-react";
 import {
-  BarChart,
   Bar,
+  BarChart,
+  Cell,
+  ReferenceLine,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  ReferenceLine,
-  Cell,
 } from "recharts";
+import { CardGlass } from "@/components/ui/card-glass";
 import type { TMonthlyProjection } from "@/db/types";
-import { CalendarDays } from "lucide-react";
+import { useMediaQuery } from "@/hooks/use-media-query";
+import { formatCurrency } from "@/lib/utils";
 
 interface MonthlyProjectionChartProps {
   data: TMonthlyProjection[];

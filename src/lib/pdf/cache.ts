@@ -1,4 +1,4 @@
-import crypto from "crypto";
+import crypto from "node:crypto";
 import type { TPdfParseResult } from "@/db/types";
 import { logger } from "@/lib/logger";
 

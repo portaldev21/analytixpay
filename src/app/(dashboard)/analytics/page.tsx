@@ -1,23 +1,23 @@
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
 import {
-  getTransactionStatsWithComparison,
-  getSpendingTrends,
-} from "@/actions/transaction.actions";
-import {
+  getDailySpending,
+  getFinancialHealthScore,
+  getInstallmentsProjection,
   getRecurringTransactions,
   getSmartInsights,
-  getFinancialHealthScore,
-  getDailySpending,
   getSpendingByCard,
-  getInstallmentsProjection,
   getTopTransactions,
 } from "@/actions/analytics.actions";
+import {
+  getSpendingTrends,
+  getTransactionStatsWithComparison,
+} from "@/actions/transaction.actions";
+import { AnalyticsPage } from "@/components/analytics/AnalyticsPage";
 import {
   getPeriodDateRange,
   getPreviousPeriodDateRange,
 } from "@/lib/analytics/stats";
-import { AnalyticsPage } from "@/components/analytics/AnalyticsPage";
+import { createClient } from "@/lib/supabase/server";
 
 // Opt into dynamic rendering for real-time data
 export const dynamic = "force-dynamic";

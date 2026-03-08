@@ -1,7 +1,6 @@
-import type { TTransaction } from "@/db/types";
-import type { TransactionStats } from "./stats";
-import type { RecurringTransaction } from "./recurring";
 import { formatCurrency } from "@/lib/utils";
+import type { RecurringTransaction } from "./recurring";
+import type { TransactionStats } from "./stats";
 
 /**
  * Insight types

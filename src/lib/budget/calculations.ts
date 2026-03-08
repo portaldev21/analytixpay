@@ -184,8 +184,7 @@ export function calculateDerivedBudgets(
     monthly = dailyBase * daysInMonth;
 
     // Check if leap year for yearly calculation
-    const isLeapYear =
-      (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+    const isLeapYear = (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
     yearly = dailyBase * (isLeapYear ? 366 : 365);
   }
 
@@ -228,7 +227,6 @@ export function calculateCarryOverBalance(
       return Math.min(0, accumulatedBalance);
     case "carry_credit":
       return Math.max(0, accumulatedBalance);
-    case "reset":
     default:
       return 0;
   }

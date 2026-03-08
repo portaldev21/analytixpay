@@ -1,7 +1,6 @@
 "use client";
 
-import { getCategoryColor } from "@/lib/utils";
-import { cn } from "@/lib/utils";
+import { cn, getCategoryColor } from "@/lib/utils";
 
 interface CategoryBadgeProps {
   category: string;

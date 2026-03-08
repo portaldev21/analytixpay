@@ -1,12 +1,11 @@
-import { Suspense } from "react";
 import { FileText } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
-import { getInvoices, deleteInvoice } from "@/actions/invoice.actions";
-import { UploadInvoice } from "@/components/invoices/UploadInvoice";
+import { Suspense } from "react";
+import { getInvoices } from "@/actions/invoice.actions";
 import { InvoiceCard } from "@/components/invoices/InvoiceCard";
+import { UploadInvoice } from "@/components/invoices/UploadInvoice";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { Loading } from "@/components/shared/Loading";
-import { Button } from "@/components/ui/button";
+import { createClient } from "@/lib/supabase/server";
 
 async function InvoicesList({ accountId }: { accountId: string }) {
   const supabase = await createClient();
@@ -35,7 +34,10 @@ async function InvoicesList({ accountId }: { accountId: string }) {
     .from("invoices")
     .select("id, transactions(count)")
     .eq("account_id", accountId)
-    .in("id", result.data.map((i) => i.id));
+    .in(
+      "id",
+      result.data.map((i) => i.id),
+    );
 
   // Build count lookup
   const countMap = new Map<string, number>();

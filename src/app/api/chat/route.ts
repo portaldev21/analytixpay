@@ -1,12 +1,12 @@
-import { NextRequest } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
-import { createClient } from "@/lib/supabase/server";
+import type { NextRequest } from "next/server";
+import type { TChatMessage } from "@/db/types";
+import { buildFinancialContext } from "@/lib/ai/financial-agent";
+import { buildSystemPrompt } from "@/lib/ai/prompts";
 import { env, hasAnthropic } from "@/lib/env";
 import { logger } from "@/lib/logger";
 import { apiLimiter } from "@/lib/rate-limit";
-import { buildFinancialContext } from "@/lib/ai/financial-agent";
-import { buildSystemPrompt } from "@/lib/ai/prompts";
-import type { TChatMessage } from "@/db/types";
+import { createClient } from "@/lib/supabase/server";
 
 const MAX_MESSAGE_LENGTH = 2000;
 

@@ -1,17 +1,17 @@
 "use client";
 
-import { CardGlass } from "@/components/ui/card-glass";
-import { formatCurrency } from "@/lib/utils";
-import { useMediaQuery } from "@/hooks/use-media-query";
 import {
-  AreaChart,
   Area,
+  AreaChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
 } from "recharts";
+import { CardGlass } from "@/components/ui/card-glass";
+import { useMediaQuery } from "@/hooks/use-media-query";
+import { formatCurrency } from "@/lib/utils";
 
 interface SpendingTrendsChartProps {
   data: {

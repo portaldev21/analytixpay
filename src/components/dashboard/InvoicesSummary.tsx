@@ -1,9 +1,9 @@
 "use client";
 
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { formatCurrency } from "@/lib/utils";
 import { CreditCard, FileText } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
+import { formatCurrency } from "@/lib/utils";
 
 interface InvoicesSummaryProps {
   data: {

@@ -1,10 +1,10 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+import type { TTransaction } from "@/db/types";
 import {
-  calculateTransactionStats,
   calculateMonthlyComparison,
+  calculateTransactionStats,
   getTopTransactions,
 } from "../stats";
-import type { TTransaction } from "@/db/types";
 
 describe("calculateTransactionStats", () => {
   it("should calculate total spent correctly", () => {

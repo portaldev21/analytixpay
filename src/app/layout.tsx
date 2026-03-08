@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Merriweather, Inter, Roboto_Mono } from "next/font/google";
+import { Inter, Merriweather, Roboto_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
 

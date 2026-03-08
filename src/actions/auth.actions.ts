@@ -2,11 +2,11 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
-import { loginSchema, signupSchema } from "@/lib/validations";
+import type { TApiResponse } from "@/db/types";
 import { logger } from "@/lib/logger";
 import { authLimiter } from "@/lib/rate-limit";
-import type { TApiResponse } from "@/db/types";
+import { createClient } from "@/lib/supabase/server";
+import { loginSchema, signupSchema } from "@/lib/validations";
 
 /**
  * Login with email and password

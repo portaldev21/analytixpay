@@ -1,14 +1,14 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
 import { motion } from "framer-motion";
-import { FileText, Calendar, CreditCard, ChevronRight } from "lucide-react";
-import { CardGlass } from "@/components/ui/card-glass";
+import { Calendar, ChevronRight, CreditCard, FileText } from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
+import { CardGlass } from "@/components/ui/card-glass";
+import type { TInvoice } from "@/db/types";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { DeleteInvoiceButton } from "./DeleteInvoiceButton";
-import type { TInvoice } from "@/db/types";
 
 interface InvoiceCardProps {
   invoice: TInvoice & { transaction_count?: number };
@@ -43,7 +43,6 @@ export function InvoiceCard({
         variant="muted"
         size="lg"
         interactive
-        
         className={
           isDeleting
             ? "!bg-[var(--color-negative)]/10 !border-[var(--color-negative)]/50"
