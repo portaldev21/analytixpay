@@ -48,7 +48,7 @@ export async function createPlan(
       .insert({
         account_id: accountId,
         name,
-        start_month: startMonth,
+        start_month: startMonth.length === 7 ? `${startMonth}-01` : startMonth,
         months: 12,
         initial_balance: initialBalance,
       })
