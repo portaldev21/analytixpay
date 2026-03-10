@@ -26,7 +26,14 @@
       "Bash(lsof:*)",
       "Bash(tail:*)",
       "Skill(superpowers:brainstorming)",
-      "Bash(xxd:*)"
+      "Bash(xxd:*)",
+      "Bash(git branch:*)",
+      "Bash(git status:*)",
+      "Bash(git pull:*)",
+      "Bash(git:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npm run:*)",
+      "Bash(gh pr:*)"
     ],
     "deny": [],
     "ask": []
