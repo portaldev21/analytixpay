@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import {
+  CalendarDays,
   Car,
   Gamepad2,
   Heart,
@@ -43,10 +44,15 @@ export function ExpenseForm({
   const [amount, setAmount] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("Outros");
   const [description, setDescription] = useState("");
+  const [expenseDate, setExpenseDate] = useState(
+    () => new Date().toISOString().split("T")[0],
+  );
   const [showDetails, setShowDetails] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+
+  const today = new Date().toISOString().split("T")[0];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,12 +71,14 @@ export function ExpenseForm({
         amount: numericAmount,
         category: selectedCategory,
         description: description || undefined,
+        date: expenseDate !== today ? expenseDate : undefined,
       });
 
       if (result.success) {
         setAmount("");
         setDescription("");
         setSelectedCategory("Outros");
+        setExpenseDate(new Date().toISOString().split("T")[0]);
         setShowDetails(false);
         setSuccess(true);
         setTimeout(() => setSuccess(false), 2000);
@@ -175,6 +183,35 @@ export function ExpenseForm({
               exit={{ height: 0, opacity: 0 }}
               className="overflow-hidden"
             >
+              {/* Date picker */}
+              <div className="mb-4">
+                <p className="text-xs text-[var(--color-text-muted)] mb-2">
+                  Data do gasto
+                </p>
+                <div className="relative">
+                  <CalendarDays className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-[var(--color-text-muted)] pointer-events-none" />
+                  <input
+                    type="date"
+                    value={expenseDate}
+                    onChange={(e) => setExpenseDate(e.target.value)}
+                    max={today}
+                    className={cn(
+                      "w-full h-10 pl-10 pr-4 rounded-lg text-sm",
+                      "bg-[var(--color-surface-muted)] border border-[var(--color-border-light)]",
+                      "text-[var(--color-text-primary)]",
+                      "focus:outline-none focus:border-[var(--color-primary)]",
+                      "transition-colors",
+                    )}
+                  />
+                </div>
+                {expenseDate !== today && (
+                  <p className="text-xs text-[var(--color-warning)] mt-1">
+                    Lancamento retroativo — sera registrado em {new Date(`${expenseDate}T12:00:00`).toLocaleDateString("pt-BR")}
+                  </p>
+                )}
+              </div>
+
+              {/* Description */}
               <div className="mb-4">
                 <p className="text-xs text-[var(--color-text-muted)] mb-2">
                   Descricao (opcional)
