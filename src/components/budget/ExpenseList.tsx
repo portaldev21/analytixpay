@@ -75,6 +75,15 @@ export function ExpenseList({
     return `${hours}:${minutes}`;
   };
 
+  const today = new Date().toISOString().split("T")[0];
+
+  const formatDate = (date: string) => {
+    return new Date(`${date}T12:00:00`).toLocaleDateString("pt-BR", {
+      day: "2-digit",
+      month: "short",
+    });
+  };
+
   if (expenses.length === 0) {
     return (
       <CardGlass variant="default" size="lg" className={className}>
@@ -134,6 +143,12 @@ export function ExpenseList({
                   </p>
                   <div className="flex items-center gap-2 text-xs text-[var(--color-text-muted)]">
                     <span>{expense.category}</span>
+                    {expense.expense_date && expense.expense_date !== today && (
+                      <>
+                        <span>•</span>
+                        <span>{formatDate(expense.expense_date)}</span>
+                      </>
+                    )}
                     {expense.expense_time && (
                       <>
                         <span>•</span>
