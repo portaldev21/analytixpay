@@ -5,7 +5,11 @@
  * Main formula: Available_Budget = Daily_Base + (Accumulated_Balance / Remaining_Days)
  */
 
-import type { TBudgetStatus, TCarryOverMode } from "@/db/types";
+import type {
+  TBudgetConfigUpdate,
+  TBudgetStatus,
+  TCarryOverMode,
+} from "@/db/types";
 
 /**
  * Calculates the available budget for today
@@ -360,3 +364,36 @@ export function calculateAvailablePerDay(
   );
 }
 
+/**
+ * Default carry-over mode for a new budget config.
+ *
+ * `carry_all` is the only mode that matches the method this budget is built on:
+ * saving today raises tomorrow, overspending today eats into it. `carry_deficit`
+ * keeps only the punitive half (leftovers evaporate) and fails silently.
+ */
+export const DEFAULT_CARRY_OVER_MODE: TCarryOverMode = "carry_all";
+
+/**
+ * Builds the payload for a partial budget config update.
+ *
+ * Only fields that were explicitly provided are included, so an update that
+ * omits a field leaves the stored column untouched. Writing a default here
+ * would silently revert a configured carry_over_mode on any unrelated edit.
+ */
+export function buildBudgetConfigUpdate(data: {
+  daily_base: number;
+  week_start_day?: number;
+  carry_over_mode?: TCarryOverMode;
+}): TBudgetConfigUpdate {
+  const update: TBudgetConfigUpdate = { daily_base: data.daily_base };
+
+  if (data.week_start_day !== undefined) {
+    update.week_start_day = data.week_start_day;
+  }
+
+  if (data.carry_over_mode !== undefined) {
+    update.carry_over_mode = data.carry_over_mode;
+  }
+
+  return update;
+}

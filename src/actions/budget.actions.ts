@@ -29,7 +29,9 @@ import type {
   TWeekSummary,
 } from "@/db/types";
 import {
+  buildBudgetConfigUpdate,
   calculateRemainingDays,
+  DEFAULT_CARRY_OVER_MODE,
   formatDateToString,
   getBudgetStatus,
   getToday,
@@ -79,11 +81,8 @@ export async function upsertBudgetConfig(
 
     if (existingConfig) {
       // Update existing config
-      const updateData = {
-        daily_base: data.daily_base,
-        week_start_day: data.week_start_day ?? 1,
-        carry_over_mode: data.carry_over_mode ?? "carry_deficit",
-      };
+      // Partial update: omitted fields keep their stored value.
+      const updateData = buildBudgetConfigUpdate(data);
 
       const { data: updated, error } = await db
         .from("budget_configs")
@@ -105,7 +104,7 @@ export async function upsertBudgetConfig(
         account_id: accountId,
         daily_base: data.daily_base,
         week_start_day: data.week_start_day ?? 1,
-        carry_over_mode: data.carry_over_mode ?? "carry_deficit",
+        carry_over_mode: data.carry_over_mode ?? DEFAULT_CARRY_OVER_MODE,
         is_active: true,
       };
 
