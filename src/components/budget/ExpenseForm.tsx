@@ -17,6 +17,7 @@ import {
 import { useEffect, useState, useTransition } from "react";
 import { addBudgetExpense } from "@/actions/budget.actions";
 import { CardGlass } from "@/components/ui/card-glass";
+import { formatDateToString } from "@/lib/budget/calculations";
 import { cn } from "@/lib/utils";
 
 const categories = [
@@ -47,7 +48,7 @@ export function ExpenseForm({
   const [selectedCategory, setSelectedCategory] = useState("Outros");
   const [description, setDescription] = useState("");
   const [expenseDate, setExpenseDate] = useState(
-    () => selectedDate || new Date().toISOString().split("T")[0],
+    () => selectedDate || formatDateToString(new Date()),
   );
 
   useEffect(() => {
@@ -60,7 +61,9 @@ export function ExpenseForm({
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  const today = new Date().toISOString().split("T")[0];
+  // Local date, matching the server's getToday(). toISOString() is UTC and
+  // rolls over to tomorrow at 21:00 in Brazil.
+  const today = formatDateToString(new Date());
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -86,7 +89,7 @@ export function ExpenseForm({
         setAmount("");
         setDescription("");
         setSelectedCategory("Outros");
-        setExpenseDate(selectedDate || new Date().toISOString().split("T")[0]);
+        setExpenseDate(selectedDate || formatDateToString(new Date()));
         setShowDetails(false);
         setSuccess(true);
         setTimeout(() => setSuccess(false), 2000);

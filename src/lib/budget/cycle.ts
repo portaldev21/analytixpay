@@ -19,6 +19,7 @@ import {
   calculateWeekCycleDates,
   formatDateToString,
   getToday,
+  parseDateString,
 } from "./calculations";
 
 /**
@@ -285,7 +286,9 @@ export async function getOrCreateDailyRecord(
   }
 
   // Calculate remaining days and available budget
-  const cycleEndDate = new Date(cycle.end_date);
+  // parseDateString, not new Date: new Date("2026-09-06") is parsed as UTC
+  // midnight, which is the previous day in Brazil and costs the cycle a day.
+  const cycleEndDate = parseDateString(cycle.end_date);
   const remainingDays = calculateRemainingDays(date, cycleEndDate);
   const availableBudget = calculateAvailableBudget(
     config.daily_base,

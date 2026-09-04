@@ -34,6 +34,7 @@ import {
   DEFAULT_CARRY_OVER_MODE,
   formatDateToString,
   getBudgetStatus,
+  parseDateString,
   getToday,
   validateDailyBase,
   validateExpenseAmount,
@@ -261,7 +262,9 @@ export async function getTodayBudget(
     );
 
     // Calculate remaining days
-    const cycleEndDate = new Date(cycle.end_date);
+    // parseDateString, not new Date: a bare YYYY-MM-DD parses as UTC midnight,
+    // which lands on the previous day in Brazil.
+    const cycleEndDate = parseDateString(cycle.end_date);
     const remainingDays = calculateRemainingDays(today, cycleEndDate);
 
     const response: TTodayBudgetResponse = {

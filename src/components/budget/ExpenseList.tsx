@@ -18,6 +18,7 @@ import { useState, useTransition } from "react";
 import { deleteBudgetExpense } from "@/actions/budget.actions";
 import { CardGlass } from "@/components/ui/card-glass";
 import type { TBudgetExpense } from "@/db/types";
+import { formatDateToString } from "@/lib/budget/calculations";
 import { cn, formatCurrency } from "@/lib/utils";
 
 const categoryIcons: Record<string, LucideIcon> = {
@@ -79,7 +80,8 @@ export function ExpenseList({
     return `${hours}:${minutes}`;
   };
 
-  const today = new Date().toISOString().split("T")[0];
+  // Local date, matching the server. See the note in ExpenseForm.
+  const today = formatDateToString(new Date());
   const isViewingToday = !selectedDate || selectedDate === today;
 
   const displayDate = selectedDate
