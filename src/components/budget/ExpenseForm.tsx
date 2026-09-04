@@ -14,9 +14,13 @@ import {
   ShoppingCart,
   Utensils,
 } from "lucide-react";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { addBudgetExpense } from "@/actions/budget.actions";
 import { CardGlass } from "@/components/ui/card-glass";
+import {
+  formatDateToString,
+  parseAmountInput,
+} from "@/lib/budget/calculations";
 import { cn } from "@/lib/utils";
 
 const categories = [
@@ -32,12 +36,14 @@ const categories = [
 
 interface ExpenseFormProps {
   accountId: string;
+  selectedDate?: string;
   onSuccess?: () => void;
   className?: string;
 }
 
 export function ExpenseForm({
   accountId,
+  selectedDate,
   onSuccess,
   className,
 }: ExpenseFormProps) {
@@ -45,23 +51,31 @@ export function ExpenseForm({
   const [selectedCategory, setSelectedCategory] = useState("Outros");
   const [description, setDescription] = useState("");
   const [expenseDate, setExpenseDate] = useState(
-    () => new Date().toISOString().split("T")[0],
+    () => selectedDate || formatDateToString(new Date()),
   );
+
+  useEffect(() => {
+    if (selectedDate) {
+      setExpenseDate(selectedDate);
+    }
+  }, [selectedDate]);
   const [showDetails, setShowDetails] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  const today = new Date().toISOString().split("T")[0];
+  // Local date, matching the server's getToday(). toISOString() is UTC and
+  // rolls over to tomorrow at 21:00 in Brazil.
+  const today = formatDateToString(new Date());
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setSuccess(false);
 
-    const numericAmount = Number.parseFloat(amount.replace(",", "."));
+    const numericAmount = parseAmountInput(amount);
 
-    if (Number.isNaN(numericAmount) || numericAmount <= 0) {
+    if (numericAmount === null) {
       setError("Digite um valor valido");
       return;
     }
@@ -78,7 +92,7 @@ export function ExpenseForm({
         setAmount("");
         setDescription("");
         setSelectedCategory("Outros");
-        setExpenseDate(new Date().toISOString().split("T")[0]);
+        setExpenseDate(selectedDate || formatDateToString(new Date()));
         setShowDetails(false);
         setSuccess(true);
         setTimeout(() => setSuccess(false), 2000);
@@ -115,9 +129,11 @@ export function ExpenseForm({
           <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xl text-[var(--color-text-muted)]">
             R$
           </span>
+          {/* biome-ignore lint/a11y/noAutofocus: the screen exists to type here */}
           <input
             type="text"
             inputMode="decimal"
+            autoFocus
             value={amount}
             onChange={handleAmountChange}
             placeholder="0,00"
@@ -206,7 +222,10 @@ export function ExpenseForm({
                 </div>
                 {expenseDate !== today && (
                   <p className="text-xs text-[var(--color-warning)] mt-1">
-                    Lancamento retroativo — sera registrado em {new Date(`${expenseDate}T12:00:00`).toLocaleDateString("pt-BR")}
+                    Lancamento retroativo — sera registrado em{" "}
+                    {new Date(`${expenseDate}T12:00:00`).toLocaleDateString(
+                      "pt-BR",
+                    )}
                   </p>
                 )}
               </div>

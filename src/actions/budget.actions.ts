@@ -29,10 +29,13 @@ import type {
   TWeekSummary,
 } from "@/db/types";
 import {
+  buildBudgetConfigUpdate,
   calculateRemainingDays,
+  DEFAULT_CARRY_OVER_MODE,
   formatDateToString,
   getBudgetStatus,
   getToday,
+  parseDateString,
   validateDailyBase,
   validateExpenseAmount,
 } from "@/lib/budget/calculations";
@@ -79,11 +82,8 @@ export async function upsertBudgetConfig(
 
     if (existingConfig) {
       // Update existing config
-      const updateData = {
-        daily_base: data.daily_base,
-        week_start_day: data.week_start_day ?? 1,
-        carry_over_mode: data.carry_over_mode ?? "carry_deficit",
-      };
+      // Partial update: omitted fields keep their stored value.
+      const updateData = buildBudgetConfigUpdate(data);
 
       const { data: updated, error } = await db
         .from("budget_configs")
@@ -105,7 +105,7 @@ export async function upsertBudgetConfig(
         account_id: accountId,
         daily_base: data.daily_base,
         week_start_day: data.week_start_day ?? 1,
-        carry_over_mode: data.carry_over_mode ?? "carry_deficit",
+        carry_over_mode: data.carry_over_mode ?? DEFAULT_CARRY_OVER_MODE,
         is_active: true,
       };
 
@@ -262,7 +262,9 @@ export async function getTodayBudget(
     );
 
     // Calculate remaining days
-    const cycleEndDate = new Date(cycle.end_date);
+    // parseDateString, not new Date: a bare YYYY-MM-DD parses as UTC midnight,
+    // which lands on the previous day in Brazil.
+    const cycleEndDate = parseDateString(cycle.end_date);
     const remainingDays = calculateRemainingDays(today, cycleEndDate);
 
     const response: TTodayBudgetResponse = {

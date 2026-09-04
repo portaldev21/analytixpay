@@ -59,10 +59,11 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // Redirect to dashboard if authenticated and trying to access auth pages
+  // An already signed in user landing on an auth page goes to the budget
+  // screen, which is what the app is opened for.
   if (user && isAuthPage) {
     const url = request.nextUrl.clone();
-    url.pathname = "/dashboard";
+    url.pathname = "/budget";
     return NextResponse.redirect(url);
   }
 

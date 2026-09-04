@@ -1,13 +1,16 @@
 import { describe, expect, it } from "vitest";
 import {
+  buildBudgetConfigUpdate,
   calculateAvailableBudget,
   calculateCarryOverBalance,
   calculateDailyBalance,
   calculateDerivedBudgets,
   calculateRemainingDays,
   calculateWeekCycleDates,
+  DEFAULT_CARRY_OVER_MODE,
   formatDateToString,
   getBudgetStatus,
+  parseAmountInput,
   parseDateString,
   validateDailyBase,
   validateExpenseAmount,
@@ -410,5 +413,112 @@ describe("Week Simulation from Spec", () => {
 
     // Should end with significant positive balance
     expect(accumulatedBalance).toBeGreaterThan(500);
+  });
+});
+
+describe("DEFAULT_CARRY_OVER_MODE", () => {
+  it("should be carry_all, the only mode that carries savings forward", () => {
+    expect(DEFAULT_CARRY_OVER_MODE).toBe("carry_all");
+  });
+
+  it("should keep both halves of the balance, unlike carry_deficit", () => {
+    expect(calculateCarryOverBalance(50, DEFAULT_CARRY_OVER_MODE)).toBe(50);
+    expect(calculateCarryOverBalance(-30, DEFAULT_CARRY_OVER_MODE)).toBe(-30);
+    expect(calculateCarryOverBalance(50, "carry_deficit")).toBe(0);
+  });
+});
+
+describe("buildBudgetConfigUpdate", () => {
+  it("should omit carry_over_mode when it was not provided", () => {
+    const update = buildBudgetConfigUpdate({ daily_base: 120 });
+
+    expect(update).toEqual({ daily_base: 120 });
+    expect("carry_over_mode" in update).toBe(false);
+  });
+
+  it("should omit week_start_day when it was not provided", () => {
+    const update = buildBudgetConfigUpdate({ daily_base: 120 });
+
+    expect("week_start_day" in update).toBe(false);
+  });
+
+  it("should include carry_over_mode when it was provided", () => {
+    const update = buildBudgetConfigUpdate({
+      daily_base: 150,
+      carry_over_mode: "carry_all",
+    });
+
+    expect(update.carry_over_mode).toBe("carry_all");
+  });
+
+  it("should include week_start_day when provided, zero included", () => {
+    const update = buildBudgetConfigUpdate({
+      daily_base: 150,
+      week_start_day: 0,
+    });
+
+    expect(update.week_start_day).toBe(0);
+  });
+
+  it("should let a daily_base change leave carry_over_mode untouched", () => {
+    // The real scenario: lowering the daily goal from 150 to 120 must not
+    // revert a configured carry_all back to the default.
+    const update = buildBudgetConfigUpdate({ daily_base: 120 });
+    const stored = { daily_base: 150, carry_over_mode: "carry_all" };
+    const merged = { ...stored, ...update };
+
+    expect(merged.carry_over_mode).toBe("carry_all");
+    expect(merged.daily_base).toBe(120);
+  });
+});
+
+describe("parseAmountInput", () => {
+  it("should read a plain number", () => {
+    expect(parseAmountInput("40")).toBe(40);
+  });
+
+  it("should read a comma as the decimal separator", () => {
+    expect(parseAmountInput("37,50")).toBe(37.5);
+  });
+
+  it("should read a dot as the decimal separator", () => {
+    expect(parseAmountInput("37.50")).toBe(37.5);
+  });
+
+  it("should drop a thousands separator", () => {
+    expect(parseAmountInput("1.250,90")).toBe(1250.9);
+  });
+
+  it("should reject a second decimal separator instead of truncating it", () => {
+    // The real failure: parseFloat turned this into 37.5037 and the app stored
+    // it without a word of complaint.
+    expect(parseAmountInput("37,5037,50")).toBeNull();
+  });
+
+  it("should reject two dots", () => {
+    expect(parseAmountInput("12.34.56")).toBeNull();
+  });
+
+  it("should reject more than two decimal places", () => {
+    expect(parseAmountInput("37,5037")).toBeNull();
+  });
+
+  it("should reject letters", () => {
+    expect(parseAmountInput("abc")).toBeNull();
+  });
+
+  it("should reject an empty field", () => {
+    expect(parseAmountInput("")).toBeNull();
+    expect(parseAmountInput("   ")).toBeNull();
+  });
+
+  it("should reject zero", () => {
+    expect(parseAmountInput("0")).toBeNull();
+    expect(parseAmountInput("0,00")).toBeNull();
+  });
+
+  it("should reject a lone separator", () => {
+    expect(parseAmountInput(",")).toBeNull();
+    expect(parseAmountInput("37,")).toBeNull();
   });
 });

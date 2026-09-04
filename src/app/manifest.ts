@@ -6,7 +6,9 @@ export default function manifest(): MetadataRoute.Manifest {
     short_name: "ControleFatura",
     description:
       "Gestao inteligente de faturas de cartao de credito. Acompanhe gastos, categorize transacoes e tenha controle total das suas financas.",
-    start_url: "/",
+    // Straight to the budget screen: logging an expense has to cost less
+    // effort than not logging it.
+    start_url: "/budget",
     display: "standalone",
     background_color: "#0F3B57",
     theme_color: "#0F3B57",

@@ -7,13 +7,7 @@ import {
   getTodayBudget,
   getWeekSummary,
 } from "@/actions/budget.actions";
-import {
-  EmptyBudgetState,
-  ExpenseForm,
-  ExpenseList,
-  TodayBudgetCard,
-  WeekSummaryCard,
-} from "@/components/budget";
+import { BudgetPageClient, EmptyBudgetState } from "@/components/budget";
 import { EmptyDashboard } from "@/components/dashboard/EmptyDashboard";
 import { Button } from "@/components/ui/button";
 import { CardGlass } from "@/components/ui/card-glass";
@@ -62,13 +56,14 @@ export default async function BudgetPage() {
     );
   }
 
-  // Fetch budget data in parallel
-  const [todayBudgetResult, weekSummaryResult, expensesResult] =
-    await Promise.all([
-      getTodayBudget(accountId),
-      getWeekSummary(accountId),
-      getExpensesForDate(accountId, todayStr),
-    ]);
+  // getTodayBudget creates the cycle and the daily record when they are
+  // missing, and so does getWeekSummary. Running them concurrently made both
+  // create a cycle, so this one goes first and the rest follow in parallel.
+  const todayBudgetResult = await getTodayBudget(accountId);
+  const [weekSummaryResult, expensesResult] = await Promise.all([
+    getWeekSummary(accountId),
+    getExpensesForDate(accountId, todayStr),
+  ]);
 
   const todayBudget = todayBudgetResult.success ? todayBudgetResult.data : null;
   const weekSummary = weekSummaryResult.success ? weekSummaryResult.data : null;
@@ -104,19 +99,13 @@ export default async function BudgetPage() {
 
       {/* Main content */}
       {todayBudget ? (
-        <div className="grid gap-6 lg:grid-cols-2">
-          {/* Left column */}
-          <div className="space-y-6">
-            <TodayBudgetCard data={todayBudget} />
-            <ExpenseForm accountId={accountId} />
-          </div>
-
-          {/* Right column */}
-          <div className="space-y-6">
-            {weekSummary && <WeekSummaryCard data={weekSummary} />}
-            <ExpenseList expenses={expenses || []} accountId={accountId} />
-          </div>
-        </div>
+        <BudgetPageClient
+          todayBudget={todayBudget}
+          weekSummary={weekSummary}
+          initialExpenses={expenses || []}
+          accountId={accountId}
+          todayStr={todayStr}
+        />
       ) : (
         <CardGlass variant="default" size="lg" className="text-center py-12">
           <p className="text-[var(--color-text-muted)]">

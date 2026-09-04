@@ -19,6 +19,7 @@ import {
   calculateWeekCycleDates,
   formatDateToString,
   getToday,
+  parseDateString,
 } from "./calculations";
 
 /**
@@ -137,6 +138,9 @@ export async function getActiveCycle(
 ): Promise<TWeekCycle | null> {
   const dateStr = formatDateToString(referenceDate);
 
+  // Deliberately not using .single(): PostgREST answers PGRST116 both when
+  // there is no row and when there is more than one. Treating "more than one"
+  // as "none" made every call create yet another cycle.
   const { data, error } = await supabase
     .from("week_cycles")
     .select("*")
@@ -144,17 +148,14 @@ export async function getActiveCycle(
     .eq("status", "active")
     .lte("start_date", dateStr)
     .gte("end_date", dateStr)
-    .single();
+    .order("created_at", { ascending: true })
+    .limit(1);
 
   if (error) {
-    // No active cycle found is not an error
-    if (error.code === "PGRST116") {
-      return null;
-    }
     throw new Error(`Erro ao buscar ciclo ativo: ${error.message}`);
   }
 
-  return data as TWeekCycle;
+  return (data?.[0] as TWeekCycle) ?? null;
 }
 
 /**
@@ -247,6 +248,26 @@ export async function ensureActiveCycle(
  * @param date - The date for the record
  * @returns The daily record (existing or newly created)
  */
+/**
+ * Finds the daily record for a date, tolerating duplicates left behind by
+ * earlier races instead of failing on them.
+ */
+async function findDailyRecord(
+  supabase: SupabaseClient,
+  accountId: string,
+  dateStr: string,
+): Promise<TDailyRecord | null> {
+  const { data } = await supabase
+    .from("daily_records")
+    .select("*")
+    .eq("account_id", accountId)
+    .eq("record_date", dateStr)
+    .order("created_at", { ascending: true })
+    .limit(1);
+
+  return (data?.[0] as TDailyRecord) ?? null;
+}
+
 export async function getOrCreateDailyRecord(
   supabase: SupabaseClient,
   accountId: string,
@@ -256,24 +277,32 @@ export async function getOrCreateDailyRecord(
 ): Promise<TDailyRecord> {
   const dateStr = formatDateToString(date);
 
-  // Try to get existing record
-  const { data: existingRecord } = await supabase
-    .from("daily_records")
-    .select("*")
-    .eq("account_id", accountId)
-    .eq("record_date", dateStr)
-    .single();
+  // Try to get existing record. Same reason as getActiveCycle for avoiding
+  // .single() here.
+  const existingRecord = await findDailyRecord(supabase, accountId, dateStr);
 
   if (existingRecord) {
-    return existingRecord as TDailyRecord;
+    return existingRecord;
   }
 
   // Calculate remaining days and available budget
-  const cycleEndDate = new Date(cycle.end_date);
+  // parseDateString, not new Date: new Date("2026-09-06") is parsed as UTC
+  // midnight, which is the previous day in Brazil and costs the cycle a day.
+  const cycleEndDate = parseDateString(cycle.end_date);
   const remainingDays = calculateRemainingDays(date, cycleEndDate);
+
+  // Refresh the balance from the days that are over before opening a new one.
+  // The stored value is only updated when an expense is touched, so a day that
+  // ended without any entry would otherwise never reach the following day.
+  const accumulatedBalance = await recalculateCycleAccumulatedBalance(
+    supabase,
+    cycle.id,
+    date,
+  );
+
   const availableBudget = calculateAvailableBudget(
     config.daily_base,
-    cycle.accumulated_balance,
+    accumulatedBalance,
     remainingDays,
   );
 
@@ -298,21 +327,16 @@ export async function getOrCreateDailyRecord(
   if (error) {
     // Handle race condition - record may have been created by another request
     if (error.code === "23505") {
-      // Unique constraint violation - fetch the existing record
-      const { data: raceRecord, error: raceError } = await supabase
-        .from("daily_records")
-        .select("*")
-        .eq("account_id", accountId)
-        .eq("record_date", dateStr)
-        .single();
+      // Unique constraint violation: another request created it first.
+      const raceRecord = await findDailyRecord(supabase, accountId, dateStr);
 
-      if (raceError || !raceRecord) {
+      if (!raceRecord) {
         throw new Error(
-          `Erro ao buscar registro apos conflito: ${raceError?.message}`,
+          `Registro diario de ${dateStr} conflitou na insercao mas nao foi encontrado depois`,
         );
       }
 
-      return raceRecord as TDailyRecord;
+      return raceRecord;
     }
 
     throw new Error(`Erro ao criar registro diario: ${error.message}`);
@@ -367,21 +391,30 @@ export async function updateDailyRecordSpent(
 }
 
 /**
- * Recalculates the accumulated balance for a cycle based on all daily records
+ * Recalculates the accumulated balance for a cycle from its finished days
+ *
+ * Only days that are over are counted. A day still in progress carries its
+ * whole unspent budget as its balance, so counting it would promise the
+ * following days money that today might still spend.
  *
  * @param supabase - Supabase client
  * @param cycleId - The cycle ID
+ * @param referenceDate - The day considered still open, today by default
  * @returns The new accumulated balance
  */
 export async function recalculateCycleAccumulatedBalance(
   supabase: SupabaseClient,
   cycleId: string,
+  referenceDate: Date = getToday(),
 ): Promise<number> {
-  // Get all daily records for this cycle
+  const openDayStr = formatDateToString(referenceDate);
+
+  // Only the days that are already over.
   const { data: dailyRecords, error: fetchError } = await supabase
     .from("daily_records")
     .select("daily_balance")
-    .eq("cycle_id", cycleId);
+    .eq("cycle_id", cycleId)
+    .lt("record_date", openDayStr);
 
   if (fetchError) {
     throw new Error(`Erro ao buscar registros diarios: ${fetchError.message}`);

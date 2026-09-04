@@ -5,7 +5,11 @@
  * Main formula: Available_Budget = Daily_Base + (Accumulated_Balance / Remaining_Days)
  */
 
-import type { TBudgetStatus, TCarryOverMode } from "@/db/types";
+import type {
+  TBudgetConfigUpdate,
+  TBudgetStatus,
+  TCarryOverMode,
+} from "@/db/types";
 
 /**
  * Calculates the available budget for today
@@ -328,4 +332,86 @@ export function getToday(): Date {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   return today;
+}
+
+/**
+ * Calculates the running accumulated balance across daily records.
+ *
+ * This is the number the whole budget turns on: the balance does not reset at
+ * midnight, so each day adds its own surplus or deficit to the running total.
+ * Records must be sorted by date ascending.
+ */
+export function calculateRunningBalance(
+  dailyRecords: { daily_balance: number }[],
+): number[] {
+  const result: number[] = [];
+  let sum = 0;
+  for (const record of dailyRecords) {
+    sum += record.daily_balance;
+    result.push(Math.round(sum * 100) / 100);
+  }
+  return result;
+}
+
+/**
+ * Default carry-over mode for a new budget config.
+ *
+ * `carry_all` is the only mode that matches the method this budget is built on:
+ * saving today raises tomorrow, overspending today eats into it. `carry_deficit`
+ * keeps only the punitive half (leftovers evaporate) and fails silently.
+ */
+export const DEFAULT_CARRY_OVER_MODE: TCarryOverMode = "carry_all";
+
+/**
+ * Builds the payload for a partial budget config update.
+ *
+ * Only fields that were explicitly provided are included, so an update that
+ * omits a field leaves the stored column untouched. Writing a default here
+ * would silently revert a configured carry_over_mode on any unrelated edit.
+ */
+export function buildBudgetConfigUpdate(data: {
+  daily_base: number;
+  week_start_day?: number;
+  carry_over_mode?: TCarryOverMode;
+}): TBudgetConfigUpdate {
+  const update: TBudgetConfigUpdate = { daily_base: data.daily_base };
+
+  if (data.week_start_day !== undefined) {
+    update.week_start_day = data.week_start_day;
+  }
+
+  if (data.carry_over_mode !== undefined) {
+    update.carry_over_mode = data.carry_over_mode;
+  }
+
+  return update;
+}
+
+/**
+ * Parses a currency amount typed by hand, Brazilian style.
+ *
+ * Returns null for anything that is not a single clean number. Accepting a
+ * malformed value here is worse than rejecting it: parseFloat silently
+ * truncates "37,5037,50" to 37.5037 and stores a figure nobody meant.
+ *
+ * @param input - Raw text from the amount field
+ * @returns The amount in reais, or null when the text is not a valid amount
+ */
+export function parseAmountInput(input: string): number | null {
+  const trimmed = input.trim();
+
+  if (trimmed === "") return null;
+
+  // Thousands separators are dropped only when they are shaped like one.
+  const withoutThousands = trimmed.replace(/\.(?=\d{3}(\D|$))/g, "");
+  const normalized = withoutThousands.replace(",", ".");
+
+  // One optional decimal part, and nothing else.
+  if (!/^\d+(\.\d{1,2})?$/.test(normalized)) return null;
+
+  const value = Number.parseFloat(normalized);
+
+  if (!Number.isFinite(value) || value <= 0) return null;
+
+  return Math.round(value * 100) / 100;
 }
