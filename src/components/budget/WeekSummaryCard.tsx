@@ -1,32 +1,64 @@
 "use client";
 
 import { motion } from "framer-motion";
-import {
-  Calendar,
-  CheckCircle,
-  TrendingDown,
-  TrendingUp,
-  XCircle,
-} from "lucide-react";
+import { Calendar } from "lucide-react";
 import { CardGlass } from "@/components/ui/card-glass";
 import type { TWeekSummary } from "@/db/types";
+import {
+  calculateAvailablePerDay,
+  calculateRunningAccumulated,
+  formatDateToString,
+  parseDateString,
+} from "@/lib/budget/calculations";
 import { cn, formatCurrency } from "@/lib/utils";
 
 interface WeekSummaryCardProps {
   data: TWeekSummary;
+  selectedDate?: string;
+  onSelectDate?: (date: string) => void;
   className?: string;
 }
 
-export function WeekSummaryCard({ data, className }: WeekSummaryCardProps) {
+export function WeekSummaryCard({
+  data,
+  selectedDate,
+  onSelectDate,
+  className,
+}: WeekSummaryCardProps) {
   const progressPercent = (data.total_spent / data.total_budget) * 100;
-  const _daysCompleted = data.daily_records.length;
-  const currentDayOfWeek = new Date().getDay();
-  const isPositiveBalance = data.cycle.accumulated_balance >= 0;
+  const todayStr = formatDateToString(new Date());
 
-  // Format dates for display
-  const startDate = new Date(data.cycle.start_date);
-  const endDate = new Date(data.cycle.end_date);
-  const formatDate = (date: Date) =>
+  // Build array of all days in the cycle
+  const cycleStart = parseDateString(data.cycle.start_date);
+  const cycleEnd = parseDateString(data.cycle.end_date);
+  const cycleDays: string[] = [];
+  const current = new Date(cycleStart);
+  while (current <= cycleEnd) {
+    cycleDays.push(formatDateToString(current));
+    current.setDate(current.getDate() + 1);
+  }
+
+  // Map daily records by date for quick lookup
+  const recordsByDate = new Map(
+    data.daily_records.map((r) => [r.record_date, r]),
+  );
+
+  // Sort records by date for accumulated calculation
+  const sortedRecords = [...data.daily_records].sort((a, b) =>
+    a.record_date.localeCompare(b.record_date),
+  );
+
+  // Calculate running accumulated
+  const accumulatedValues = calculateRunningAccumulated(sortedRecords);
+  const accumulatedByDate = new Map(
+    sortedRecords.map((r, i) => [r.record_date, accumulatedValues[i]]),
+  );
+
+  // Day abbreviations in Portuguese (Sunday=0 to Saturday=6)
+  const dayLabels = ["D", "S", "T", "Q", "Q", "S", "S"];
+
+  // Format dates for header
+  const formatHeaderDate = (date: Date) =>
     date.toLocaleDateString("pt-BR", { day: "2-digit", month: "short" });
 
   return (
@@ -37,7 +69,7 @@ export function WeekSummaryCard({ data, className }: WeekSummaryCardProps) {
             Resumo da Semana
           </p>
           <p className="text-xs text-[var(--color-text-muted)]">
-            {formatDate(startDate)} - {formatDate(endDate)}
+            {formatHeaderDate(cycleStart)} - {formatHeaderDate(cycleEnd)}
           </p>
         </div>
         <div className="p-2.5 rounded-xl bg-[var(--color-surface-muted)]">
@@ -45,35 +77,47 @@ export function WeekSummaryCard({ data, className }: WeekSummaryCardProps) {
         </div>
       </div>
 
-      {/* Week days indicator */}
+      {/* Clickable week day buttons */}
       <div className="flex gap-1 mb-4">
-        {["D", "S", "T", "Q", "Q", "S", "S"].map((day, index) => {
-          const isCompleted = data.daily_records.some((r) => {
-            const recordDate = new Date(r.record_date);
-            return recordDate.getDay() === index;
-          });
-          const isToday = index === currentDayOfWeek;
+        {cycleDays.map((dateStr) => {
+          const dayOfWeek = parseDateString(dateStr).getDay();
+          const isToday = dateStr === todayStr;
+          const isSelected = dateStr === selectedDate;
+          const hasRecord = recordsByDate.has(dateStr);
+          const isFuture = dateStr > todayStr;
 
           return (
-            <div
-              key={`${day}-${index}`}
+            <button
+              key={dateStr}
+              type="button"
+              disabled={isFuture}
+              onClick={() => onSelectDate?.(dateStr)}
               className={cn(
-                "flex-1 h-8 rounded-lg flex items-center justify-center text-xs font-medium transition-colors",
-                isToday
+                "flex-1 flex flex-col items-center gap-0.5 rounded-lg py-1.5 transition-colors relative",
+                isSelected
                   ? "bg-[var(--color-primary)] text-white"
-                  : isCompleted
-                    ? "bg-[var(--color-surface-muted)] text-[var(--color-text-secondary)]"
-                    : "bg-[var(--color-surface-muted)] text-[var(--color-text-muted)]",
+                  : isToday
+                    ? "bg-[var(--color-surface-muted)] text-[var(--color-primary)] ring-1 ring-[var(--color-primary)]"
+                    : hasRecord
+                      ? "bg-[var(--color-surface-muted)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-muted)]/80"
+                      : "bg-[var(--color-surface-muted)] text-[var(--color-text-muted)]",
+                isFuture && "opacity-50 cursor-not-allowed",
+                !isFuture && !isSelected && "cursor-pointer",
               )}
             >
-              {day}
-            </div>
+              <span className="text-xs font-medium">
+                {dayLabels[dayOfWeek]}
+              </span>
+              {hasRecord && !isSelected && (
+                <span className="size-1 rounded-full bg-[var(--color-positive)]" />
+              )}
+            </button>
           );
         })}
       </div>
 
-      {/* Budget progress */}
-      <div className="space-y-3">
+      {/* Budget progress bar */}
+      <div className="space-y-3 mb-4">
         <div className="flex justify-between items-center">
           <span className="text-sm text-[var(--color-text-muted)]">
             Orcamento semanal
@@ -107,59 +151,109 @@ export function WeekSummaryCard({ data, className }: WeekSummaryCardProps) {
         </div>
       </div>
 
-      {/* Stats grid */}
-      <div className="grid grid-cols-2 gap-3 mt-4 pt-4 border-t border-[var(--color-border-light)]">
-        <div className="space-y-1">
-          <p className="text-xs text-[var(--color-text-muted)]">
-            Saldo acumulado
-          </p>
-          <div className="flex items-center gap-1">
-            {isPositiveBalance ? (
-              <TrendingUp className="size-4 text-[var(--color-positive)]" />
-            ) : (
-              <TrendingDown className="size-4 text-[var(--color-negative)]" />
-            )}
-            <span
-              className={cn(
-                "font-semibold tabular-nums",
-                isPositiveBalance
-                  ? "text-[var(--color-positive)]"
-                  : "text-[var(--color-negative)]",
-              )}
-            >
-              {isPositiveBalance ? "+" : ""}
-              {formatCurrency(data.cycle.accumulated_balance)}
-            </span>
-          </div>
-        </div>
+      {/* Day-by-day accumulated table */}
+      <div className="border-t border-[var(--color-border-light)] pt-3">
+        <table className="w-full text-xs">
+          <thead>
+            <tr className="text-[var(--color-text-muted)]">
+              <th className="text-left font-medium pb-2">Dia</th>
+              <th className="text-right font-medium pb-2">Gasto</th>
+              <th className="text-right font-medium pb-2">Disp/dia</th>
+              <th className="text-right font-medium pb-2">Acumulado</th>
+            </tr>
+          </thead>
+          <tbody>
+            {cycleDays.map((dateStr) => {
+              const record = recordsByDate.get(dateStr);
+              const isToday = dateStr === todayStr;
+              const isSelected = dateStr === selectedDate;
+              const isFuture = dateStr > todayStr;
+              const accumulated = accumulatedByDate.get(dateStr);
 
-        <div className="space-y-1">
-          <p className="text-xs text-[var(--color-text-muted)]">Media diaria</p>
-          <p className="font-semibold text-[var(--color-text-primary)] tabular-nums">
+              // For available per day calculation
+              const lastKnownAccumulated =
+                [...accumulatedByDate.values()].pop() ?? 0;
+              const currentAccumulated = accumulated ?? lastKnownAccumulated;
+              const daysLeft = cycleDays.filter((d) => d >= dateStr).length;
+              const availPerDay =
+                record || isFuture
+                  ? calculateAvailablePerDay(
+                      data.total_budget,
+                      isFuture ? lastKnownAccumulated : currentAccumulated,
+                      daysLeft,
+                    )
+                  : null;
+
+              const dayDate = parseDateString(dateStr);
+              const dayLabel = dayDate.toLocaleDateString("pt-BR", {
+                day: "2-digit",
+                month: "short",
+              });
+
+              return (
+                <tr
+                  key={dateStr}
+                  onClick={() => !isFuture && onSelectDate?.(dateStr)}
+                  className={cn(
+                    "border-b border-[var(--color-border-light)]/50 last:border-0",
+                    isSelected && "bg-[var(--color-primary)]/10",
+                    isToday && !isSelected && "bg-[var(--color-surface-muted)]",
+                    !isFuture &&
+                      "cursor-pointer hover:bg-[var(--color-surface-muted)]/50",
+                    isFuture && "opacity-50",
+                  )}
+                >
+                  <td
+                    className={cn(
+                      "py-1.5 text-left",
+                      isToday && "font-semibold text-[var(--color-primary)]",
+                    )}
+                  >
+                    {dayLabel}
+                  </td>
+                  <td
+                    className={cn(
+                      "py-1.5 text-right tabular-nums",
+                      record && record.total_spent > record.available_budget
+                        ? "text-[var(--color-negative)]"
+                        : record && record.total_spent > 0
+                          ? "text-[var(--color-positive)]"
+                          : "",
+                    )}
+                  >
+                    {record && record.total_spent > 0
+                      ? formatCurrency(record.total_spent)
+                      : "—"}
+                  </td>
+                  <td className="py-1.5 text-right tabular-nums">
+                    {availPerDay != null ? formatCurrency(availPerDay) : "—"}
+                  </td>
+                  <td className="py-1.5 text-right tabular-nums">
+                    {accumulated != null ? formatCurrency(accumulated) : "—"}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+
+        {/* Summary row */}
+        <div className="flex justify-between items-center mt-3 pt-2 border-t border-[var(--color-border-light)] text-xs">
+          <span className="text-[var(--color-text-muted)]">
+            Total: {formatCurrency(data.total_spent)} | Media:{" "}
             {formatCurrency(data.average_daily_spent)}
-          </p>
-        </div>
-
-        <div className="space-y-1">
-          <p className="text-xs text-[var(--color-text-muted)]">
-            Dias no orcamento
-          </p>
-          <div className="flex items-center gap-1">
-            <CheckCircle className="size-4 text-[var(--color-positive)]" />
-            <span className="font-semibold text-[var(--color-positive)]">
-              {data.days_under_budget}
-            </span>
-          </div>
-        </div>
-
-        <div className="space-y-1">
-          <p className="text-xs text-[var(--color-text-muted)]">Dias acima</p>
-          <div className="flex items-center gap-1">
-            <XCircle className="size-4 text-[var(--color-negative)]" />
-            <span className="font-semibold text-[var(--color-negative)]">
-              {data.days_over_budget}
-            </span>
-          </div>
+          </span>
+          <span
+            className={cn(
+              "font-semibold",
+              data.cycle.accumulated_balance >= 0
+                ? "text-[var(--color-positive)]"
+                : "text-[var(--color-negative)]",
+            )}
+          >
+            Saldo: {data.cycle.accumulated_balance >= 0 ? "+" : ""}
+            {formatCurrency(data.cycle.accumulated_balance)}
+          </span>
         </div>
       </div>
     </CardGlass>

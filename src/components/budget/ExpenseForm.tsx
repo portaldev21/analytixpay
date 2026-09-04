@@ -14,7 +14,7 @@ import {
   ShoppingCart,
   Utensils,
 } from "lucide-react";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { addBudgetExpense } from "@/actions/budget.actions";
 import { CardGlass } from "@/components/ui/card-glass";
 import { cn } from "@/lib/utils";
@@ -32,12 +32,14 @@ const categories = [
 
 interface ExpenseFormProps {
   accountId: string;
+  selectedDate?: string;
   onSuccess?: () => void;
   className?: string;
 }
 
 export function ExpenseForm({
   accountId,
+  selectedDate,
   onSuccess,
   className,
 }: ExpenseFormProps) {
@@ -45,8 +47,14 @@ export function ExpenseForm({
   const [selectedCategory, setSelectedCategory] = useState("Outros");
   const [description, setDescription] = useState("");
   const [expenseDate, setExpenseDate] = useState(
-    () => new Date().toISOString().split("T")[0],
+    () => selectedDate || new Date().toISOString().split("T")[0],
   );
+
+  useEffect(() => {
+    if (selectedDate) {
+      setExpenseDate(selectedDate);
+    }
+  }, [selectedDate]);
   const [showDetails, setShowDetails] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -78,7 +86,7 @@ export function ExpenseForm({
         setAmount("");
         setDescription("");
         setSelectedCategory("Outros");
-        setExpenseDate(new Date().toISOString().split("T")[0]);
+        setExpenseDate(selectedDate || new Date().toISOString().split("T")[0]);
         setShowDetails(false);
         setSuccess(true);
         setTimeout(() => setSuccess(false), 2000);
@@ -206,7 +214,10 @@ export function ExpenseForm({
                 </div>
                 {expenseDate !== today && (
                   <p className="text-xs text-[var(--color-warning)] mt-1">
-                    Lancamento retroativo — sera registrado em {new Date(`${expenseDate}T12:00:00`).toLocaleDateString("pt-BR")}
+                    Lancamento retroativo — sera registrado em{" "}
+                    {new Date(`${expenseDate}T12:00:00`).toLocaleDateString(
+                      "pt-BR",
+                    )}
                   </p>
                 )}
               </div>

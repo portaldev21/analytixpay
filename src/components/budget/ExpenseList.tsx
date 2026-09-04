@@ -45,6 +45,8 @@ const categoryColors: Record<string, string> = {
 interface ExpenseListProps {
   expenses: TBudgetExpense[];
   accountId: string;
+  selectedDate?: string;
+  isLoading?: boolean;
   onDelete?: () => void;
   className?: string;
 }
@@ -52,6 +54,8 @@ interface ExpenseListProps {
 export function ExpenseList({
   expenses,
   accountId,
+  selectedDate,
+  isLoading,
   onDelete,
   className,
 }: ExpenseListProps) {
@@ -76,6 +80,15 @@ export function ExpenseList({
   };
 
   const today = new Date().toISOString().split("T")[0];
+  const isViewingToday = !selectedDate || selectedDate === today;
+
+  const displayDate = selectedDate
+    ? new Date(`${selectedDate}T12:00:00`).toLocaleDateString("pt-BR", {
+        weekday: "long",
+        day: "2-digit",
+        month: "short",
+      })
+    : "Hoje";
 
   const formatDate = (date: string) => {
     return new Date(`${date}T12:00:00`).toLocaleDateString("pt-BR", {
@@ -90,7 +103,9 @@ export function ExpenseList({
         <div className="text-center py-8">
           <ShoppingCart className="size-12 mx-auto text-[var(--color-text-muted)] mb-3" />
           <p className="text-[var(--color-text-muted)]">
-            Nenhum gasto registrado hoje
+            {isViewingToday
+              ? "Nenhum gasto registrado hoje"
+              : `Nenhum gasto em ${displayDate}`}
           </p>
           <p className="text-sm text-[var(--color-text-muted)] mt-1">
             Adicione seu primeiro gasto acima
@@ -103,87 +118,103 @@ export function ExpenseList({
   return (
     <CardGlass variant="default" size="lg" className={className}>
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
-          Gastos de Hoje
-        </h3>
+        <div>
+          <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
+            {isViewingToday ? "Gastos de Hoje" : `Gastos de ${displayDate}`}
+          </h3>
+          {!isViewingToday && (
+            <p className="text-xs text-[var(--color-warning)] mt-0.5">
+              Visualizando dia anterior
+            </p>
+          )}
+        </div>
         <span className="text-sm text-[var(--color-text-muted)]">
           {expenses.length} {expenses.length === 1 ? "item" : "itens"}
         </span>
       </div>
 
-      <div className="space-y-2">
-        <AnimatePresence mode="popLayout">
-          {expenses.map((expense) => {
-            const Icon = categoryIcons[expense.category] || MoreHorizontal;
-            const colorClass =
-              categoryColors[expense.category] || categoryColors.Outros;
-            const isDeleting = deletingId === expense.id;
+      <div
+        className={cn(
+          isLoading && "opacity-50 pointer-events-none transition-opacity",
+        )}
+      >
+        <div className="space-y-2">
+          <AnimatePresence mode="popLayout">
+            {expenses.map((expense) => {
+              const Icon = categoryIcons[expense.category] || MoreHorizontal;
+              const colorClass =
+                categoryColors[expense.category] || categoryColors.Outros;
+              const isDeleting = deletingId === expense.id;
 
-            return (
-              <motion.div
-                key={expense.id}
-                layout
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                className={cn(
-                  "flex items-center gap-3 p-3 rounded-xl",
-                  "bg-[var(--color-surface-muted)]",
-                  "border border-[var(--color-border-light)]",
-                  isDeleting && "opacity-50",
-                )}
-              >
-                <div className={cn("p-2 rounded-lg", colorClass.split(" ")[1])}>
-                  <Icon className={cn("size-4", colorClass.split(" ")[0])} />
-                </div>
-
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-[var(--color-text-primary)] truncate">
-                    {expense.description || expense.category}
-                  </p>
-                  <div className="flex items-center gap-2 text-xs text-[var(--color-text-muted)]">
-                    <span>{expense.category}</span>
-                    {expense.expense_date && expense.expense_date !== today && (
-                      <>
-                        <span>•</span>
-                        <span>{formatDate(expense.expense_date)}</span>
-                      </>
-                    )}
-                    {expense.expense_time && (
-                      <>
-                        <span>•</span>
-                        <span>{formatTime(expense.expense_time)}</span>
-                      </>
-                    )}
-                  </div>
-                </div>
-
-                <p className="text-sm font-semibold text-[var(--color-text-primary)] tabular-nums">
-                  {formatCurrency(expense.amount)}
-                </p>
-
-                <button
-                  type="button"
-                  onClick={() => handleDelete(expense.id)}
-                  disabled={isPending}
+              return (
+                <motion.div
+                  key={expense.id}
+                  layout
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
                   className={cn(
-                    "p-2 rounded-lg",
-                    "text-[var(--color-text-muted)] hover:text-[var(--color-negative)]",
-                    "hover:bg-[var(--color-negative)]/10",
-                    "transition-colors",
-                    "disabled:opacity-50 disabled:cursor-not-allowed",
+                    "flex items-center gap-3 p-3 rounded-xl",
+                    "bg-[var(--color-surface-muted)]",
+                    "border border-[var(--color-border-light)]",
+                    isDeleting && "opacity-50",
                   )}
                 >
-                  {isDeleting ? (
-                    <Loader2 className="size-4 animate-spin" />
-                  ) : (
-                    <Trash2 className="size-4" />
-                  )}
-                </button>
-              </motion.div>
-            );
-          })}
-        </AnimatePresence>
+                  <div
+                    className={cn("p-2 rounded-lg", colorClass.split(" ")[1])}
+                  >
+                    <Icon className={cn("size-4", colorClass.split(" ")[0])} />
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-[var(--color-text-primary)] truncate">
+                      {expense.description || expense.category}
+                    </p>
+                    <div className="flex items-center gap-2 text-xs text-[var(--color-text-muted)]">
+                      <span>{expense.category}</span>
+                      {expense.expense_date &&
+                        expense.expense_date !== today && (
+                          <>
+                            <span>•</span>
+                            <span>{formatDate(expense.expense_date)}</span>
+                          </>
+                        )}
+                      {expense.expense_time && (
+                        <>
+                          <span>•</span>
+                          <span>{formatTime(expense.expense_time)}</span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+
+                  <p className="text-sm font-semibold text-[var(--color-text-primary)] tabular-nums">
+                    {formatCurrency(expense.amount)}
+                  </p>
+
+                  <button
+                    type="button"
+                    onClick={() => handleDelete(expense.id)}
+                    disabled={isPending}
+                    className={cn(
+                      "p-2 rounded-lg",
+                      "text-[var(--color-text-muted)] hover:text-[var(--color-negative)]",
+                      "hover:bg-[var(--color-negative)]/10",
+                      "transition-colors",
+                      "disabled:opacity-50 disabled:cursor-not-allowed",
+                    )}
+                  >
+                    {isDeleting ? (
+                      <Loader2 className="size-4 animate-spin" />
+                    ) : (
+                      <Trash2 className="size-4" />
+                    )}
+                  </button>
+                </motion.div>
+              );
+            })}
+          </AnimatePresence>
+        </div>
       </div>
 
       {/* Total */}

@@ -329,3 +329,34 @@ export function getToday(): Date {
   today.setHours(0, 0, 0, 0);
   return today;
 }
+
+/**
+ * Calculates running accumulated spending across daily records.
+ * Records must be sorted by date ascending.
+ */
+export function calculateRunningAccumulated(
+  dailyRecords: { total_spent: number }[],
+): number[] {
+  const result: number[] = [];
+  let sum = 0;
+  for (const record of dailyRecords) {
+    sum += record.total_spent;
+    result.push(Math.round(sum * 100) / 100);
+  }
+  return result;
+}
+
+/**
+ * Calculates available budget per remaining day from a given point.
+ */
+export function calculateAvailablePerDay(
+  totalBudget: number,
+  accumulatedSpent: number,
+  remainingDays: number,
+): number {
+  if (remainingDays <= 0) return 0;
+  return (
+    Math.round(((totalBudget - accumulatedSpent) / remainingDays) * 100) / 100
+  );
+}
+

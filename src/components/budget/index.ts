@@ -1,3 +1,4 @@
+export { BudgetPageClient } from "./BudgetPageClient";
 export { EmptyBudgetState } from "./EmptyBudgetState";
 export { ExpenseForm } from "./ExpenseForm";
 export { ExpenseList } from "./ExpenseList";
