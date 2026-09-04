@@ -290,9 +290,19 @@ export async function getOrCreateDailyRecord(
   // midnight, which is the previous day in Brazil and costs the cycle a day.
   const cycleEndDate = parseDateString(cycle.end_date);
   const remainingDays = calculateRemainingDays(date, cycleEndDate);
+
+  // Refresh the balance from the days that are over before opening a new one.
+  // The stored value is only updated when an expense is touched, so a day that
+  // ended without any entry would otherwise never reach the following day.
+  const accumulatedBalance = await recalculateCycleAccumulatedBalance(
+    supabase,
+    cycle.id,
+    date,
+  );
+
   const availableBudget = calculateAvailableBudget(
     config.daily_base,
-    cycle.accumulated_balance,
+    accumulatedBalance,
     remainingDays,
   );
 
@@ -381,21 +391,30 @@ export async function updateDailyRecordSpent(
 }
 
 /**
- * Recalculates the accumulated balance for a cycle based on all daily records
+ * Recalculates the accumulated balance for a cycle from its finished days
+ *
+ * Only days that are over are counted. A day still in progress carries its
+ * whole unspent budget as its balance, so counting it would promise the
+ * following days money that today might still spend.
  *
  * @param supabase - Supabase client
  * @param cycleId - The cycle ID
+ * @param referenceDate - The day considered still open, today by default
  * @returns The new accumulated balance
  */
 export async function recalculateCycleAccumulatedBalance(
   supabase: SupabaseClient,
   cycleId: string,
+  referenceDate: Date = getToday(),
 ): Promise<number> {
-  // Get all daily records for this cycle
+  const openDayStr = formatDateToString(referenceDate);
+
+  // Only the days that are already over.
   const { data: dailyRecords, error: fetchError } = await supabase
     .from("daily_records")
     .select("daily_balance")
-    .eq("cycle_id", cycleId);
+    .eq("cycle_id", cycleId)
+    .lt("record_date", openDayStr);
 
   if (fetchError) {
     throw new Error(`Erro ao buscar registros diarios: ${fetchError.message}`);

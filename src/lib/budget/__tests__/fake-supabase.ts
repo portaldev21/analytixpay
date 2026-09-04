@@ -13,7 +13,11 @@
 // biome-ignore lint/suspicious/noExplicitAny: test double mirrors an untyped client
 type Row = Record<string, any>;
 
-type Filter = { op: "eq" | "lte" | "gte"; field: string; value: unknown };
+type Filter = {
+  op: "eq" | "lte" | "gte" | "lt" | "gt";
+  field: string;
+  value: unknown;
+};
 
 export type FakeTables = Record<string, Row[]>;
 
@@ -47,7 +51,7 @@ class FakeQuery {
   private orderField: string | null = null;
   private orderAscending = true;
   private limitCount: number | null = null;
-  private mode: "select" | "insert" = "select";
+  private mode: "select" | "insert" | "update" = "select";
   private payload: Row | null = null;
   private coerce: "none" | "single" | "maybeSingle" = "none";
 
@@ -67,6 +71,12 @@ class FakeQuery {
     return this;
   }
 
+  update(payload: Row): this {
+    this.mode = "update";
+    this.payload = payload;
+    return this;
+  }
+
   eq(field: string, value: unknown): this {
     this.filters.push({ op: "eq", field, value });
     return this;
@@ -79,6 +89,16 @@ class FakeQuery {
 
   gte(field: string, value: unknown): this {
     this.filters.push({ op: "gte", field, value });
+    return this;
+  }
+
+  lt(field: string, value: unknown): this {
+    this.filters.push({ op: "lt", field, value });
+    return this;
+  }
+
+  gt(field: string, value: unknown): this {
+    this.filters.push({ op: "gt", field, value });
     return this;
   }
 
@@ -128,6 +148,8 @@ class FakeQuery {
         const cell = row[field];
         if (op === "eq") return cell === value;
         if (op === "lte") return cell <= (value as never);
+        if (op === "lt") return cell < (value as never);
+        if (op === "gt") return cell > (value as never);
         return cell >= (value as never);
       }),
     );
@@ -136,7 +158,11 @@ class FakeQuery {
       const field = this.orderField;
       const direction = this.orderAscending ? 1 : -1;
       result = [...result].sort((a, b) =>
-        a[field] === b[field] ? 0 : a[field] > b[field] ? direction : -direction,
+        a[field] === b[field]
+          ? 0
+          : a[field] > b[field]
+            ? direction
+            : -direction,
       );
     }
 
@@ -149,6 +175,7 @@ class FakeQuery {
 
   private run(): { data: unknown; error: unknown } {
     if (this.mode === "insert") return this.runInsert();
+    if (this.mode === "update") return this.runUpdate();
 
     const found = this.matching();
 
@@ -164,6 +191,22 @@ class FakeQuery {
     }
 
     return { data: found, error: null };
+  }
+
+  private runUpdate(): { data: unknown; error: unknown } {
+    const payload = this.payload as Row;
+    const touched = this.matching();
+
+    for (const row of touched) {
+      Object.assign(row, payload);
+    }
+
+    if (this.coerce === "single") {
+      if (touched.length !== 1) return { data: null, error: PGRST116 };
+      return { data: touched[0], error: null };
+    }
+
+    return { data: touched, error: null };
   }
 
   private runInsert(): { data: unknown; error: unknown } {

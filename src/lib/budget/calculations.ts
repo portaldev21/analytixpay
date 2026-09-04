@@ -335,33 +335,22 @@ export function getToday(): Date {
 }
 
 /**
- * Calculates running accumulated spending across daily records.
+ * Calculates the running accumulated balance across daily records.
+ *
+ * This is the number the whole budget turns on: the balance does not reset at
+ * midnight, so each day adds its own surplus or deficit to the running total.
  * Records must be sorted by date ascending.
  */
-export function calculateRunningAccumulated(
-  dailyRecords: { total_spent: number }[],
+export function calculateRunningBalance(
+  dailyRecords: { daily_balance: number }[],
 ): number[] {
   const result: number[] = [];
   let sum = 0;
   for (const record of dailyRecords) {
-    sum += record.total_spent;
+    sum += record.daily_balance;
     result.push(Math.round(sum * 100) / 100);
   }
   return result;
-}
-
-/**
- * Calculates available budget per remaining day from a given point.
- */
-export function calculateAvailablePerDay(
-  totalBudget: number,
-  accumulatedSpent: number,
-  remainingDays: number,
-): number {
-  if (remainingDays <= 0) return 0;
-  return (
-    Math.round(((totalBudget - accumulatedSpent) / remainingDays) * 100) / 100
-  );
 }
 
 /**
@@ -396,4 +385,33 @@ export function buildBudgetConfigUpdate(data: {
   }
 
   return update;
+}
+
+/**
+ * Parses a currency amount typed by hand, Brazilian style.
+ *
+ * Returns null for anything that is not a single clean number. Accepting a
+ * malformed value here is worse than rejecting it: parseFloat silently
+ * truncates "37,5037,50" to 37.5037 and stores a figure nobody meant.
+ *
+ * @param input - Raw text from the amount field
+ * @returns The amount in reais, or null when the text is not a valid amount
+ */
+export function parseAmountInput(input: string): number | null {
+  const trimmed = input.trim();
+
+  if (trimmed === "") return null;
+
+  // Thousands separators are dropped only when they are shaped like one.
+  const withoutThousands = trimmed.replace(/\.(?=\d{3}(\D|$))/g, "");
+  const normalized = withoutThousands.replace(",", ".");
+
+  // One optional decimal part, and nothing else.
+  if (!/^\d+(\.\d{1,2})?$/.test(normalized)) return null;
+
+  const value = Number.parseFloat(normalized);
+
+  if (!Number.isFinite(value) || value <= 0) return null;
+
+  return Math.round(value * 100) / 100;
 }

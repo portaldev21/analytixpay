@@ -17,7 +17,10 @@ import {
 import { useEffect, useState, useTransition } from "react";
 import { addBudgetExpense } from "@/actions/budget.actions";
 import { CardGlass } from "@/components/ui/card-glass";
-import { formatDateToString } from "@/lib/budget/calculations";
+import {
+  formatDateToString,
+  parseAmountInput,
+} from "@/lib/budget/calculations";
 import { cn } from "@/lib/utils";
 
 const categories = [
@@ -70,9 +73,9 @@ export function ExpenseForm({
     setError(null);
     setSuccess(false);
 
-    const numericAmount = Number.parseFloat(amount.replace(",", "."));
+    const numericAmount = parseAmountInput(amount);
 
-    if (Number.isNaN(numericAmount) || numericAmount <= 0) {
+    if (numericAmount === null) {
       setError("Digite um valor valido");
       return;
     }

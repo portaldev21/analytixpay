@@ -12,7 +12,11 @@ const ACCOUNT = "account-1";
 
 function succeed() {
   // biome-ignore lint/suspicious/noExplicitAny: the form only reads success
-  mockedAdd.mockResolvedValue({ success: true, data: null, error: null } as any);
+  mockedAdd.mockResolvedValue({
+    success: true,
+    data: null,
+    error: null,
+  } as any);
 }
 
 function amountField() {
@@ -80,8 +84,33 @@ describe("logging an expense takes one number", () => {
     fireEvent.change(amountField(), { target: { value: "0" } });
     fireEvent.click(submitButton());
 
-    expect(await screen.findByText("Digite um valor valido")).toBeInTheDocument();
+    expect(
+      await screen.findByText("Digite um valor valido"),
+    ).toBeInTheDocument();
     expect(mockedAdd).not.toHaveBeenCalled();
+  });
+
+  it("should refuse a second decimal separator instead of saving a wrong figure", async () => {
+    // Typing an extra comma used to store 37.5037 without any warning.
+    render(<ExpenseForm accountId={ACCOUNT} />);
+
+    fireEvent.change(amountField(), { target: { value: "37,5037,50" } });
+    fireEvent.click(submitButton());
+
+    expect(
+      await screen.findByText("Digite um valor valido"),
+    ).toBeInTheDocument();
+    expect(mockedAdd).not.toHaveBeenCalled();
+  });
+
+  it("should send a clean amount with a thousands separator", async () => {
+    render(<ExpenseForm accountId={ACCOUNT} />);
+
+    fireEvent.change(amountField(), { target: { value: "1.250,90" } });
+    fireEvent.click(submitButton());
+
+    await waitFor(() => expect(mockedAdd).toHaveBeenCalledTimes(1));
+    expect(mockedAdd.mock.calls[0][1].amount).toBe(1250.9);
   });
 
   it("should clear the amount after a successful entry", async () => {

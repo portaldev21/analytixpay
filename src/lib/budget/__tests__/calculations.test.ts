@@ -10,6 +10,7 @@ import {
   DEFAULT_CARRY_OVER_MODE,
   formatDateToString,
   getBudgetStatus,
+  parseAmountInput,
   parseDateString,
   validateDailyBase,
   validateExpenseAmount,
@@ -468,5 +469,56 @@ describe("buildBudgetConfigUpdate", () => {
 
     expect(merged.carry_over_mode).toBe("carry_all");
     expect(merged.daily_base).toBe(120);
+  });
+});
+
+describe("parseAmountInput", () => {
+  it("should read a plain number", () => {
+    expect(parseAmountInput("40")).toBe(40);
+  });
+
+  it("should read a comma as the decimal separator", () => {
+    expect(parseAmountInput("37,50")).toBe(37.5);
+  });
+
+  it("should read a dot as the decimal separator", () => {
+    expect(parseAmountInput("37.50")).toBe(37.5);
+  });
+
+  it("should drop a thousands separator", () => {
+    expect(parseAmountInput("1.250,90")).toBe(1250.9);
+  });
+
+  it("should reject a second decimal separator instead of truncating it", () => {
+    // The real failure: parseFloat turned this into 37.5037 and the app stored
+    // it without a word of complaint.
+    expect(parseAmountInput("37,5037,50")).toBeNull();
+  });
+
+  it("should reject two dots", () => {
+    expect(parseAmountInput("12.34.56")).toBeNull();
+  });
+
+  it("should reject more than two decimal places", () => {
+    expect(parseAmountInput("37,5037")).toBeNull();
+  });
+
+  it("should reject letters", () => {
+    expect(parseAmountInput("abc")).toBeNull();
+  });
+
+  it("should reject an empty field", () => {
+    expect(parseAmountInput("")).toBeNull();
+    expect(parseAmountInput("   ")).toBeNull();
+  });
+
+  it("should reject zero", () => {
+    expect(parseAmountInput("0")).toBeNull();
+    expect(parseAmountInput("0,00")).toBeNull();
+  });
+
+  it("should reject a lone separator", () => {
+    expect(parseAmountInput(",")).toBeNull();
+    expect(parseAmountInput("37,")).toBeNull();
   });
 });

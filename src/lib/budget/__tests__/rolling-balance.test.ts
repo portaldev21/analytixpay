@@ -111,18 +111,18 @@ describe("carry over at the end of the week", () => {
     const { accumulated } = runCycle([100, 100, 100, 100, 100, 100, 100]);
 
     expect(accumulated).toBeGreaterThan(0);
-    expect(calculateCarryOverBalance(accumulated, DEFAULT_CARRY_OVER_MODE)).toBe(
-      accumulated,
-    );
+    expect(
+      calculateCarryOverBalance(accumulated, DEFAULT_CARRY_OVER_MODE),
+    ).toBe(accumulated);
   });
 
   it("should carry a deficit into the next cycle with carry_all", () => {
     const { accumulated } = runCycle([200, 200, 200, 200, 200, 200, 200]);
 
     expect(accumulated).toBeLessThan(0);
-    expect(calculateCarryOverBalance(accumulated, DEFAULT_CARRY_OVER_MODE)).toBe(
-      accumulated,
-    );
+    expect(
+      calculateCarryOverBalance(accumulated, DEFAULT_CARRY_OVER_MODE),
+    ).toBe(accumulated);
   });
 
   it("should throw the surplus away under carry_deficit, which is the wrong mode", () => {
@@ -131,9 +131,9 @@ describe("carry over at the end of the week", () => {
     const { accumulated } = runCycle([100, 100, 100, 100, 100, 100, 100]);
 
     expect(calculateCarryOverBalance(accumulated, "carry_deficit")).toBe(0);
-    expect(calculateCarryOverBalance(accumulated, DEFAULT_CARRY_OVER_MODE)).toBe(
-      accumulated,
-    );
+    expect(
+      calculateCarryOverBalance(accumulated, DEFAULT_CARRY_OVER_MODE),
+    ).toBe(accumulated);
   });
 
   it("should start the next cycle richer after a frugal week", () => {

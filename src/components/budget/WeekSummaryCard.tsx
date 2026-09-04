@@ -5,8 +5,8 @@ import { Calendar } from "lucide-react";
 import { CardGlass } from "@/components/ui/card-glass";
 import type { TWeekSummary } from "@/db/types";
 import {
-  calculateAvailablePerDay,
-  calculateRunningAccumulated,
+  calculateAvailableBudget,
+  calculateRunningBalance,
   formatDateToString,
   parseDateString,
 } from "@/lib/budget/calculations";
@@ -48,11 +48,18 @@ export function WeekSummaryCard({
     a.record_date.localeCompare(b.record_date),
   );
 
-  // Calculate running accumulated
-  const accumulatedValues = calculateRunningAccumulated(sortedRecords);
-  const accumulatedByDate = new Map(
-    sortedRecords.map((r, i) => [r.record_date, accumulatedValues[i]]),
+  // Running accumulated balance, the figure that carries from day to day.
+  // Only finished days count. A day that is still open starts with its whole
+  // available budget as its balance, so counting it would claim a full day of
+  // savings before the day had happened.
+  const finishedRecords = sortedRecords.filter((r) => r.record_date < todayStr);
+  const balanceValues = calculateRunningBalance(finishedRecords);
+  const balanceByDate = new Map(
+    finishedRecords.map((r, i) => [r.record_date, balanceValues[i]]),
   );
+
+  // The daily base, recovered from the cycle budget.
+  const dailyBase = cycleDays.length ? data.total_budget / cycleDays.length : 0;
 
   // Day abbreviations in Portuguese (Sunday=0 to Saturday=6)
   const dayLabels = ["D", "S", "T", "Q", "Q", "S", "S"];
@@ -168,18 +175,20 @@ export function WeekSummaryCard({
               const isToday = dateStr === todayStr;
               const isSelected = dateStr === selectedDate;
               const isFuture = dateStr > todayStr;
-              const accumulated = accumulatedByDate.get(dateStr);
+              const accumulated = balanceByDate.get(dateStr);
 
-              // For available per day calculation
-              const lastKnownAccumulated =
-                [...accumulatedByDate.values()].pop() ?? 0;
-              const currentAccumulated = accumulated ?? lastKnownAccumulated;
+              // A day that already has a record kept what it actually offered.
+              // Today and the days ahead use the same formula as the card above
+              // this table: base plus the carried balance spread over the days
+              // that are left. Dividing the whole weekly budget by the days
+              // left, as this once did, contradicted that card.
               const daysLeft = cycleDays.filter((d) => d >= dateStr).length;
-              const availPerDay =
-                record || isFuture
-                  ? calculateAvailablePerDay(
-                      data.total_budget,
-                      isFuture ? lastKnownAccumulated : currentAccumulated,
+              const availPerDay = record
+                ? record.available_budget
+                : isFuture || isToday
+                  ? calculateAvailableBudget(
+                      dailyBase,
+                      data.cycle.accumulated_balance,
                       daysLeft,
                     )
                   : null;

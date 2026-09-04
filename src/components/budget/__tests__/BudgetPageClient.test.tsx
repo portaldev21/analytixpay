@@ -71,7 +71,10 @@ const weekSummary: TWeekSummary = {
     created_at: `${CYCLE_START}T00:00:00.000Z`,
     updated_at: `${CYCLE_START}T00:00:00.000Z`,
   },
-  daily_records: [dailyRecord(CYCLE_START, 120), dailyRecord("2026-09-01", 120)],
+  daily_records: [
+    dailyRecord(CYCLE_START, 120),
+    dailyRecord("2026-09-01", 120),
+  ],
   total_budget: 1050,
   total_spent: 240,
   total_saved: 60,
@@ -165,7 +168,9 @@ describe("the week strip", () => {
   it("should name the day in the empty state instead of always saying today", async () => {
     renderPage();
 
-    expect(screen.getByText("Nenhum gasto registrado hoje")).toBeInTheDocument();
+    expect(
+      screen.getByText("Nenhum gasto registrado hoje"),
+    ).toBeInTheDocument();
 
     fireEvent.click(dayButtons()[0]);
 

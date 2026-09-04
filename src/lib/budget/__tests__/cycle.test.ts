@@ -5,6 +5,7 @@ import {
   ensureActiveCycle,
   getActiveCycle,
   getOrCreateDailyRecord,
+  recalculateCycleAccumulatedBalance,
 } from "../cycle";
 import { createFakeSupabase, type FakeTables } from "./fake-supabase";
 
@@ -144,7 +145,10 @@ describe("getOrCreateDailyRecord", () => {
   });
 
   it("should create the record when the day has none", async () => {
-    const { supabase, fake } = client({ daily_records: [] });
+    const { supabase, fake } = client({
+      week_cycles: [makeCycle()],
+      daily_records: [],
+    });
 
     const record = await getOrCreateDailyRecord(
       supabase,
@@ -161,7 +165,10 @@ describe("getOrCreateDailyRecord", () => {
   });
 
   it("should return the existing record without inserting again", async () => {
-    const { supabase, fake } = client({ daily_records: [] });
+    const { supabase, fake } = client({
+      week_cycles: [makeCycle()],
+      daily_records: [],
+    });
 
     const first = await getOrCreateDailyRecord(
       supabase,
@@ -183,7 +190,10 @@ describe("getOrCreateDailyRecord", () => {
   });
 
   it("should not duplicate the day across many page loads", async () => {
-    const { supabase, fake } = client({ daily_records: [] });
+    const { supabase, fake } = client({
+      week_cycles: [makeCycle()],
+      daily_records: [],
+    });
 
     for (let i = 0; i < 5; i++) {
       await getOrCreateDailyRecord(supabase, ACCOUNT, cycle, config, TODAY);
@@ -210,9 +220,13 @@ describe("getOrCreateDailyRecord", () => {
     };
 
     const { supabase, fake } = client(
-      { daily_records: [] },
+      { week_cycles: [makeCycle()], daily_records: [] },
       {
-        onBeforeInsert: (table: string, _payload: unknown, tables: FakeTables) => {
+        onBeforeInsert: (
+          table: string,
+          _payload: unknown,
+          tables: FakeTables,
+        ) => {
           if (table !== "daily_records") return;
           if (tables.daily_records.length === 0) {
             tables.daily_records.push(winner);
@@ -234,7 +248,10 @@ describe("getOrCreateDailyRecord", () => {
   });
 
   it("should keep each day separate", async () => {
-    const { supabase, fake } = client({ daily_records: [] });
+    const { supabase, fake } = client({
+      week_cycles: [makeCycle()],
+      daily_records: [],
+    });
 
     await getOrCreateDailyRecord(supabase, ACCOUNT, cycle, config, TODAY);
     await getOrCreateDailyRecord(
@@ -248,13 +265,18 @@ describe("getOrCreateDailyRecord", () => {
     expect(fake.tables.daily_records).toHaveLength(2);
   });
 
-  it("should raise today's budget when the cycle carries a surplus", async () => {
-    const { supabase } = client({ daily_records: [] });
+  it("should raise today's budget when earlier days left a surplus", async () => {
+    const { supabase } = client({
+      week_cycles: [makeCycle()],
+      daily_records: [
+        { cycle_id: "cycle-1", record_date: "2026-09-01", daily_balance: 100 },
+      ],
+    });
 
     const record = await getOrCreateDailyRecord(
       supabase,
       ACCOUNT,
-      makeCycle({ accumulated_balance: 100 }),
+      makeCycle(),
       config,
       TODAY,
     );
@@ -264,17 +286,131 @@ describe("getOrCreateDailyRecord", () => {
     expect(record.available_budget).toBe(170);
   });
 
-  it("should lower today's budget when the cycle carries a deficit", async () => {
-    const { supabase } = client({ daily_records: [] });
+  it("should lower today's budget when earlier days left a deficit", async () => {
+    const { supabase } = client({
+      week_cycles: [makeCycle()],
+      daily_records: [
+        { cycle_id: "cycle-1", record_date: "2026-09-01", daily_balance: -100 },
+      ],
+    });
 
     const record = await getOrCreateDailyRecord(
       supabase,
       ACCOUNT,
-      makeCycle({ accumulated_balance: -100 }),
+      makeCycle(),
       config,
       TODAY,
     );
 
     expect(record.available_budget).toBe(130);
+  });
+
+  it("should pick up a finished day even when no expense was ever touched", async () => {
+    // recalculate only runs when an expense changes, so a quiet day would
+    // never reach the next one if the stored balance were trusted blindly.
+    const { supabase } = client({
+      week_cycles: [makeCycle({ accumulated_balance: 0 })],
+      daily_records: [
+        { cycle_id: "cycle-1", record_date: "2026-09-01", daily_balance: 50 },
+      ],
+    });
+
+    const record = await getOrCreateDailyRecord(
+      supabase,
+      ACCOUNT,
+      makeCycle({ accumulated_balance: 0 }),
+      config,
+      TODAY,
+    );
+
+    expect(record.available_budget).toBe(160);
+  });
+});
+
+describe("recalculateCycleAccumulatedBalance", () => {
+  const CYCLE_ID = "cycle-1";
+
+  function record(date: string, dailyBalance: number) {
+    return {
+      id: `record-${date}`,
+      account_id: ACCOUNT,
+      cycle_id: CYCLE_ID,
+      record_date: date,
+      daily_balance: dailyBalance,
+    };
+  }
+
+  it("should sum the balances of the days that are over", async () => {
+    const { supabase } = client({
+      week_cycles: [makeCycle()],
+      daily_records: [record("2026-08-31", 50), record("2026-09-01", -20)],
+    });
+
+    const balance = await recalculateCycleAccumulatedBalance(
+      supabase,
+      CYCLE_ID,
+      TODAY,
+    );
+
+    expect(balance).toBe(30);
+  });
+
+  it("should not count the day that is still open", async () => {
+    // The bug this guards against: a day in progress carries its whole unspent
+    // budget as its balance, so counting it promised tomorrow money that today
+    // might still spend. Spending 37.50 of 150 should not read as 112.50 saved.
+    const { supabase } = client({
+      week_cycles: [makeCycle()],
+      daily_records: [record(TODAY_STR, 112.5)],
+    });
+
+    const balance = await recalculateCycleAccumulatedBalance(
+      supabase,
+      CYCLE_ID,
+      TODAY,
+    );
+
+    expect(balance).toBe(0);
+  });
+
+  it("should count yesterday once today has arrived", async () => {
+    const { supabase } = client({
+      week_cycles: [makeCycle()],
+      daily_records: [record("2026-09-01", 40), record(TODAY_STR, 112.5)],
+    });
+
+    const balance = await recalculateCycleAccumulatedBalance(
+      supabase,
+      CYCLE_ID,
+      TODAY,
+    );
+
+    expect(balance).toBe(40);
+  });
+
+  it("should add the balance carried from the previous cycle", async () => {
+    const { supabase } = client({
+      week_cycles: [makeCycle({ carried_balance: 25 })],
+      daily_records: [record("2026-09-01", 40)],
+    });
+
+    const balance = await recalculateCycleAccumulatedBalance(
+      supabase,
+      CYCLE_ID,
+      TODAY,
+    );
+
+    expect(balance).toBe(65);
+  });
+
+  it("should store the balance it calculated on the cycle", async () => {
+    const { supabase, fake } = client({
+      week_cycles: [makeCycle()],
+      daily_records: [record("2026-09-01", 40), record(TODAY_STR, 112.5)],
+    });
+
+    await recalculateCycleAccumulatedBalance(supabase, CYCLE_ID, TODAY);
+
+    expect(fake.tables.week_cycles[0].accumulated_balance).toBe(40);
   });
 });
