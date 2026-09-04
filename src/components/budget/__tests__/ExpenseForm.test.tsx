@@ -138,6 +138,26 @@ describe("logging an expense takes one number", () => {
   });
 });
 
+describe("the screen is ready to type on", () => {
+  it("should put the cursor in the amount field on open", () => {
+    render(<ExpenseForm accountId={ACCOUNT} />);
+
+    expect(amountField()).toHaveFocus();
+  });
+
+  it("should accept typing without any tap first", async () => {
+    render(<ExpenseForm accountId={ACCOUNT} />);
+
+    fireEvent.change(document.activeElement as Element, {
+      target: { value: "25" },
+    });
+    fireEvent.click(submitButton());
+
+    await waitFor(() => expect(mockedAdd).toHaveBeenCalledTimes(1));
+    expect(mockedAdd.mock.calls[0][1].amount).toBe(25);
+  });
+});
+
 describe("choosing a category", () => {
   it("should send the category the user picked", async () => {
     render(<ExpenseForm accountId={ACCOUNT} />);

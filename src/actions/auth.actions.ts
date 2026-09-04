@@ -51,7 +51,7 @@ export async function login(
     revalidatePath("/", "layout");
 
     return {
-      data: { redirectTo: "/dashboard" },
+      data: { redirectTo: "/budget" },
       error: null,
       success: true,
     };
@@ -153,7 +153,7 @@ export async function signup(
     revalidatePath("/", "layout");
 
     return {
-      data: { redirectTo: "/dashboard" },
+      data: { redirectTo: "/budget" },
       error: null,
       success: true,
     };

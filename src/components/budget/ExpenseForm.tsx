@@ -129,9 +129,11 @@ export function ExpenseForm({
           <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xl text-[var(--color-text-muted)]">
             R$
           </span>
+          {/* biome-ignore lint/a11y/noAutofocus: the screen exists to type here */}
           <input
             type="text"
             inputMode="decimal"
+            autoFocus
             value={amount}
             onChange={handleAmountChange}
             placeholder="0,00"
