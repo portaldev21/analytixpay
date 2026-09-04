@@ -137,6 +137,9 @@ export async function getActiveCycle(
 ): Promise<TWeekCycle | null> {
   const dateStr = formatDateToString(referenceDate);
 
+  // Deliberately not using .single(): PostgREST answers PGRST116 both when
+  // there is no row and when there is more than one. Treating "more than one"
+  // as "none" made every call create yet another cycle.
   const { data, error } = await supabase
     .from("week_cycles")
     .select("*")
@@ -144,17 +147,14 @@ export async function getActiveCycle(
     .eq("status", "active")
     .lte("start_date", dateStr)
     .gte("end_date", dateStr)
-    .single();
+    .order("created_at", { ascending: true })
+    .limit(1);
 
   if (error) {
-    // No active cycle found is not an error
-    if (error.code === "PGRST116") {
-      return null;
-    }
     throw new Error(`Erro ao buscar ciclo ativo: ${error.message}`);
   }
 
-  return data as TWeekCycle;
+  return (data?.[0] as TWeekCycle) ?? null;
 }
 
 /**
@@ -247,6 +247,26 @@ export async function ensureActiveCycle(
  * @param date - The date for the record
  * @returns The daily record (existing or newly created)
  */
+/**
+ * Finds the daily record for a date, tolerating duplicates left behind by
+ * earlier races instead of failing on them.
+ */
+async function findDailyRecord(
+  supabase: SupabaseClient,
+  accountId: string,
+  dateStr: string,
+): Promise<TDailyRecord | null> {
+  const { data } = await supabase
+    .from("daily_records")
+    .select("*")
+    .eq("account_id", accountId)
+    .eq("record_date", dateStr)
+    .order("created_at", { ascending: true })
+    .limit(1);
+
+  return (data?.[0] as TDailyRecord) ?? null;
+}
+
 export async function getOrCreateDailyRecord(
   supabase: SupabaseClient,
   accountId: string,
@@ -256,16 +276,12 @@ export async function getOrCreateDailyRecord(
 ): Promise<TDailyRecord> {
   const dateStr = formatDateToString(date);
 
-  // Try to get existing record
-  const { data: existingRecord } = await supabase
-    .from("daily_records")
-    .select("*")
-    .eq("account_id", accountId)
-    .eq("record_date", dateStr)
-    .single();
+  // Try to get existing record. Same reason as getActiveCycle for avoiding
+  // .single() here.
+  const existingRecord = await findDailyRecord(supabase, accountId, dateStr);
 
   if (existingRecord) {
-    return existingRecord as TDailyRecord;
+    return existingRecord;
   }
 
   // Calculate remaining days and available budget
@@ -298,21 +314,16 @@ export async function getOrCreateDailyRecord(
   if (error) {
     // Handle race condition - record may have been created by another request
     if (error.code === "23505") {
-      // Unique constraint violation - fetch the existing record
-      const { data: raceRecord, error: raceError } = await supabase
-        .from("daily_records")
-        .select("*")
-        .eq("account_id", accountId)
-        .eq("record_date", dateStr)
-        .single();
+      // Unique constraint violation: another request created it first.
+      const raceRecord = await findDailyRecord(supabase, accountId, dateStr);
 
-      if (raceError || !raceRecord) {
+      if (!raceRecord) {
         throw new Error(
-          `Erro ao buscar registro apos conflito: ${raceError?.message}`,
+          `Registro diario de ${dateStr} conflitou na insercao mas nao foi encontrado depois`,
         );
       }
 
-      return raceRecord as TDailyRecord;
+      return raceRecord;
     }
 
     throw new Error(`Erro ao criar registro diario: ${error.message}`);

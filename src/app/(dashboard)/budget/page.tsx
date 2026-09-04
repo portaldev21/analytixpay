@@ -56,13 +56,14 @@ export default async function BudgetPage() {
     );
   }
 
-  // Fetch budget data in parallel
-  const [todayBudgetResult, weekSummaryResult, expensesResult] =
-    await Promise.all([
-      getTodayBudget(accountId),
-      getWeekSummary(accountId),
-      getExpensesForDate(accountId, todayStr),
-    ]);
+  // getTodayBudget creates the cycle and the daily record when they are
+  // missing, and so does getWeekSummary. Running them concurrently made both
+  // create a cycle, so this one goes first and the rest follow in parallel.
+  const todayBudgetResult = await getTodayBudget(accountId);
+  const [weekSummaryResult, expensesResult] = await Promise.all([
+    getWeekSummary(accountId),
+    getExpensesForDate(accountId, todayStr),
+  ]);
 
   const todayBudget = todayBudgetResult.success ? todayBudgetResult.data : null;
   const weekSummary = weekSummaryResult.success ? weekSummaryResult.data : null;
