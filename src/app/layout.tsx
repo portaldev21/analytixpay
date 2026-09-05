@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter, Merriweather, Roboto_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
+import { ServiceWorkerRegister } from "@/components/shared/ServiceWorkerRegister";
 
 const merriweather = Merriweather({
   variable: "--font-merriweather",
@@ -50,6 +51,7 @@ export default function RootLayout({
         className={`${merriweather.variable} ${inter.variable} ${robotoMono.variable} font-sans antialiased`}
       >
         {children}
+        <ServiceWorkerRegister />
         <Toaster
           richColors
           position="top-right"
